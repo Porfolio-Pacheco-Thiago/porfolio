@@ -1,0 +1,88 @@
+/* Primitivos compartidos entre secciones.
+   Viven acá y no dentro del CSS de un componente para que ninguna sección dependa
+   de que otra esté montada: antes el Footer tomaba .social-link de Hero.css y
+   .tag lo definía el CSS del timeline. */
+
+/* Encabezado de sección */
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+/* Etiquetas de tecnología */
+.tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-weight: 500;
+    border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Botones */
+.btn {
+    padding: 0.75rem 1.75rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #0a0a0a;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 30px var(--accent-glow-raw);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.btn-outline:hover {
+    background: var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+/* Links a perfiles sociales (Hero y Footer) */
+.social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    background: var(--bg-card);
+}
+
+.social-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent-glow-raw);
+    transform: translateY(-2px);
+}

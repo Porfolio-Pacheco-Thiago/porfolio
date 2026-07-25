@@ -5,58 +5,19 @@
         "experience": "Experience",
         "projects": "Projects",
         "academic": "Academic",
-        "skills": "Skills",
-        "contact": "Contact"
+        "skills": "Skills"
     },
     "journey": {
         "title": "Experience & Education",
-        "subtitle": "My professional and academic path"
-    },
-    "teaching": {
-        "title": "Universidad de Buenos Aires (UBA) - FIUBA",
-        "subtitle": "Teaching Assistant & Project Mentor",
-        "period": "August 2024 — Present",
-        "nodes": [
-            {
-                "id": "is2",
-                "label": "Software Engineering 2 - Mentor",
-                "period": "March 2026 — Present",
-                "desc": "Serving as a Teaching Assistant and Mentor. Guiding student groups through the end-to-end development of full-stack platform replicas. Responsible for conducting weekly agile tracking, architectural mentoring, and code reviews."
-            },
-            {
-                "id": "algos-segundo",
-                "label": "Theory of Algorithms - Ayudante Segundo",
-                "period": "March 2025 — Present",
-                "desc": "Promoted to Ayudante Segundo due to academic excellence. Responsible for conducting teaching sessions, grading complex projects, and managing the organizational structure of the course."
-            },
-            {
-                "id": "algos-adhonorem",
-                "label": "Theory of Algorithms - Ayudante Ad-honorem",
-                "period": "August 2024 — February 2025",
-                "desc": "Started as an Ad-honorem Teaching Assistant (Grader). Tasked with evaluating exams and practical assignments, providing detailed technical feedback to students."
-            }
-        ]
-    },
-    "hero": {
-        "greeting": "Hello, I'm",
-        "name": "Thiago Pacheco",
-        "role": "Software Engineer",
-        "bio": "At 21, I am a Software Engineering graduate from the University of Buenos Aires, holding the distinction of being one of only three individuals in the institution's history to complete the degree in record time—a milestone untouched since 1938. As a Junior Data Engineer at Lovelytics, I channel my passion into architecting robust software solutions, thriving at the intersection of complex distributed systems and cutting-edge AI technologies.",
-        "cta": "View My Work",
-        "contact": "Get in Touch"
-    },
-    "experience": {
-        "title": "Experience",
-        "subtitle": "My Professional Trajectory",
+        "subtitle": "My professional and academic path",
         "items": [
             {
                 "id": "lovelytics",
-                "company": "Lovelytics",
-                "role": "Data Engineer Junior",
+                "title": "Lovelytics",
+                "subtitle": "Data Engineer Junior",
                 "period": "December 2025 — Present",
                 "location": "United States (Remote)",
-                "shortDesc": "Architecting scalable data pipelines and driving enterprise-level engineering solutions for top-tier clients.",
-                "fullDesc": "Architecting scalable data pipelines and driving enterprise-level engineering solutions for top-tier clients.",
+                "desc": "Architecting scalable data pipelines and driving enterprise-level engineering solutions for top-tier clients.",
                 "tags": [
                     "Data Engineering",
                     "Cloud",
@@ -85,19 +46,83 @@
             },
             {
                 "id": "fiubaton",
-                "company": "FIUBAtón 2025",
-                "role": "Winner — Engineering Competition",
+                "title": "FIUBAtón 2025",
+                "subtitle": "Winner — Engineering Competition",
                 "period": "2025",
                 "location": "Universidad de Buenos Aires",
-                "shortDesc": "Champion of the faculty's premier engineering hackathon, delivering a winning tech solution validated by industry executives and government officials.",
-                "fullDesc": "First-place winner at FIUBAtón 2025, the flagship engineering competition hosted by the Faculty of Engineering (FIUBA). Leading a collaborative team, we engineered an innovative solution to a high-stakes, real-world challenge. Our project secured the winning vote from a distinguished panel of corporate executives, investors, and high-ranking national authorities.",
+                "desc": "Champion of the faculty's premier engineering hackathon, delivering a winning tech solution validated by industry executives and government officials.",
+                "body": "First-place winner at FIUBAtón 2025, the flagship engineering competition hosted by the Faculty of Engineering (FIUBA). Leading a collaborative team, we engineered an innovative solution to a high-stakes, real-world challenge. Our project secured the winning vote from a distinguished panel of corporate executives, investors, and high-ranking national authorities.",
                 "tags": [
                     "Competition",
                     "Innovation",
                     "Engineering"
                 ]
+            },
+            {
+                "id": "teaching",
+                "title": "Universidad de Buenos Aires (UBA) - FIUBA",
+                "subtitle": "Teaching Assistant & Project Mentor",
+                "period": "August 2024 — Present",
+                "nodes": [
+                    {
+                        "id": "is2",
+                        "label": "Software Engineering 2 - Mentor",
+                        "period": "March 2026 — Present",
+                        "desc": "Serving as a Teaching Assistant and Mentor. Guiding student groups through the end-to-end development of full-stack platform replicas. Responsible for conducting weekly agile tracking, architectural mentoring, and code reviews."
+                    },
+                    {
+                        "id": "algos-segundo",
+                        "label": "Theory of Algorithms - Ayudante Segundo",
+                        "period": "March 2025 — Present",
+                        "desc": "Promoted to Ayudante Segundo due to academic excellence. Responsible for conducting teaching sessions, grading complex projects, and managing the organizational structure of the course."
+                    },
+                    {
+                        "id": "algos-adhonorem",
+                        "label": "Theory of Algorithms - Ayudante Ad-honorem",
+                        "period": "August 2024 — February 2025",
+                        "desc": "Started as an Ad-honorem Teaching Assistant (Grader). Tasked with evaluating exams and practical assignments, providing detailed technical feedback to students."
+                    }
+                ]
+            },
+            {
+                "id": "uba",
+                "title": "Universidad de Buenos Aires (UBA)",
+                "subtitle": "Software Engineering",
+                "period": "Graduated in record time",
+                "desc": "Became the third person in the institution's entire history to earn a Software Engineering degree in record time—an unprecedented achievement untouched since 1938.",
+                "tags": [
+                    "Historic Academic Record"
+                ]
+            },
+            {
+                "id": "olympiad",
+                "title": "National Informatics Olympiad",
+                "subtitle": "2nd Place — National Level",
+                "period": "Age 16",
+                "desc": "Secured 2nd place nationwide at the Argentine Informatics Olympiad, demonstrating elite algorithmic problem-solving skills at just 16 years old.",
+                "tags": [
+                    "National Silver Medalist"
+                ]
+            },
+            {
+                "id": "pellegrini",
+                "title": "Escuela Superior de Comercio Carlos Pellegrini",
+                "subtitle": "Secondary Education",
+                "period": "Graduated",
+                "desc": "Alumnus of the Escuela Superior de Comercio Carlos Pellegrini, widely recognized as one of Argentina's most rigorous and prestigious academic institutions.",
+                "tags": [
+                    "Elite Secondary Education"
+                ]
             }
         ]
+    },
+    "hero": {
+        "greeting": "Hello, I'm",
+        "name": "Thiago Pacheco",
+        "role": "Software Engineer",
+        "bio": "At 21, I am a Software Engineering graduate from the University of Buenos Aires, holding the distinction of being one of only three individuals in the institution's history to complete the degree in record time—a milestone untouched since 1938. As a Junior Data Engineer at Lovelytics, I channel my passion into architecting robust software solutions, thriving at the intersection of complex distributed systems and cutting-edge AI technologies.",
+        "cta": "View My Work",
+        "contact": "Get in Touch"
     },
     "projects": {
         "title": "Projects",
@@ -116,8 +141,7 @@
                     "Music",
                     "Full Stack",
                     "Machine Learning"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "vibetrip",
@@ -128,8 +152,7 @@
                     "Full Stack",
                     "Web App",
                     "Travel"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "cassandra-engine",
@@ -141,8 +164,7 @@
                     "Databases",
                     "Distributed Systems",
                     "Low-Level"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "specforge",
@@ -154,8 +176,7 @@
                     "AI/LLM",
                     "Testing",
                     "Thesis"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "predictive-models",
@@ -167,8 +188,7 @@
                     "Python",
                     "NLP",
                     "XGBoost"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "monopoly",
@@ -179,8 +199,7 @@
                     "Java",
                     "OOP",
                     "Game"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "zorro-ocas",
@@ -191,38 +210,7 @@
                     "Assembly",
                     "Low-Level",
                     "Game"
-                ],
-                "repo": "#"
-            }
-        ]
-    },
-    "academic": {
-        "title": "Academic",
-        "subtitle": "Academic Excellence & Milestones",
-        "items": [
-            {
-                "id": "uba",
-                "institution": "Universidad de Buenos Aires (UBA)",
-                "degree": "Software Engineering",
-                "period": "Graduated in record time",
-                "description": "Became the third person in the institution's entire history to earn a Software Engineering degree in record time—an unprecedented achievement untouched since 1938.",
-                "highlight": "Historic Academic Record"
-            },
-            {
-                "id": "olympiad",
-                "institution": "National Informatics Olympiad",
-                "degree": "2nd Place — National Level",
-                "period": "Age 16",
-                "description": "Secured 2nd place nationwide at the Argentine Informatics Olympiad, demonstrating elite algorithmic problem-solving skills at just 16 years old.",
-                "highlight": "National Silver Medalist"
-            },
-            {
-                "id": "pellegrini",
-                "institution": "Escuela Superior de Comercio Carlos Pellegrini",
-                "degree": "Secondary Education",
-                "period": "Graduated",
-                "description": "Alumnus of the Escuela Superior de Comercio Carlos Pellegrini, widely recognized as one of Argentina's most rigorous and prestigious academic institutions.",
-                "highlight": "Elite Secondary Education"
+                ]
             }
         ]
     },

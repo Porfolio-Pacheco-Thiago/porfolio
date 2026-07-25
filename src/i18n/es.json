@@ -5,58 +5,19 @@
         "experience": "Experiencia",
         "projects": "Proyectos",
         "academic": "Académico",
-        "skills": "Habilidades",
-        "contact": "Contacto"
+        "skills": "Habilidades"
     },
     "journey": {
         "title": "Experiencia y Formación",
-        "subtitle": "Mi trayectoria profesional y académica"
-    },
-    "teaching": {
-        "title": "Universidad de Buenos Aires (UBA) - FIUBA",
-        "subtitle": "Ayudante de Cátedra y Mentor de Proyectos",
-        "period": "Agosto 2024 — Presente",
-        "nodes": [
-            {
-                "id": "is2",
-                "label": "Ingeniería de Software 2 - Mentor",
-                "period": "Marzo 2026 — Presente",
-                "desc": "Ayudante de Cátedra y Mentor. Guiando a grupos de estudiantes a través del desarrollo integral de réplicas de plataformas full-stack. Responsable del seguimiento ágil semanal, mentoría arquitectónica y revisión de código."
-            },
-            {
-                "id": "algos-segundo",
-                "label": "Teoría de Algoritmos - Ayudante Segundo",
-                "period": "Marzo 2025 — Presente",
-                "desc": "Ascendido a Ayudante Segundo por excelencia académica. Responsable de impartir clases, evaluar proyectos complejos y gestionar la estructura organizativa de la cátedra."
-            },
-            {
-                "id": "algos-adhonorem",
-                "label": "Teoría de Algoritmos - Ayudante Ad-honorem",
-                "period": "Agosto 2024 — Febrero 2025",
-                "desc": "Comencé como Ayudante Ad-honorem (Corrector). Encargado de la evaluación de parciales y trabajos prácticos, brindando feedback técnico detallado a los alumnos."
-            }
-        ]
-    },
-    "hero": {
-        "greeting": "Hola, soy",
-        "name": "Thiago Pacheco",
-        "role": "Ingeniero de Software",
-        "bio": "A mis 21 años, soy Ingeniero de Software graduado de la Universidad de Buenos Aires, con la distinción de ser una de las únicas tres personas en la historia de la institución en completar la carrera en tiempo récord —un hito inalcanzado desde 1938—. Como Data Engineer Junior en Lovelytics, canalizo mi pasión hacia la arquitectura de soluciones de software robustas, destacándome en la intersección entre los sistemas distribuidos complejos y las tecnologías de inteligencia artificial de vanguardia.",
-        "cta": "Ver Mi Trabajo",
-        "contact": "Contactame"
-    },
-    "experience": {
-        "title": "Experiencia",
-        "subtitle": "Mi Trayectoria Profesional",
+        "subtitle": "Mi trayectoria profesional y académica",
         "items": [
             {
                 "id": "lovelytics",
-                "company": "Lovelytics",
-                "role": "Ingeniero de Datos Junior",
+                "title": "Lovelytics",
+                "subtitle": "Ingeniero de Datos Junior",
                 "period": "Diciembre 2025 — Presente",
                 "location": "Estados Unidos (Remoto)",
-                "shortDesc": "Arquitectando pipelines de datos escalables e impulsando soluciones de ingeniería a nivel empresarial para clientes de primer nivel.",
-                "fullDesc": "Arquitectando pipelines de datos escalables e impulsando soluciones de ingeniería a nivel empresarial para clientes de primer nivel.",
+                "desc": "Arquitectando pipelines de datos escalables e impulsando soluciones de ingeniería a nivel empresarial para clientes de primer nivel.",
                 "tags": [
                     "Ingeniería de Datos",
                     "Cloud",
@@ -85,19 +46,83 @@
             },
             {
                 "id": "fiubaton",
-                "company": "FIUBAtón 2025",
-                "role": "Ganador — Competencia de Ingeniería",
+                "title": "FIUBAtón 2025",
+                "subtitle": "Ganador — Competencia de Ingeniería",
                 "period": "2025",
                 "location": "Universidad de Buenos Aires",
-                "shortDesc": "Campeón del principal hackathon de ingeniería de la facultad, desarrollando una solución tecnológica ganadora validada por ejecutivos de la industria y funcionarios gubernamentales.",
-                "fullDesc": "Ganador del primer puesto en el FIUBAtón 2025, la competencia de ingeniería más importante de la Facultad de Ingeniería (FIUBA). Liderando un equipo colaborativo, diseñamos una solución innovadora para un desafío de alto impacto del mundo real. Nuestro proyecto obtuvo el voto ganador de un distinguido panel compuesto por ejecutivos corporativos, inversores y altas autoridades nacionales.",
+                "desc": "Campeón del principal hackathon de ingeniería de la facultad, desarrollando una solución tecnológica ganadora validada por ejecutivos de la industria y funcionarios gubernamentales.",
+                "body": "Ganador del primer puesto en el FIUBAtón 2025, la competencia de ingeniería más importante de la Facultad de Ingeniería (FIUBA). Liderando un equipo colaborativo, diseñamos una solución innovadora para un desafío de alto impacto del mundo real. Nuestro proyecto obtuvo el voto ganador de un distinguido panel compuesto por ejecutivos corporativos, inversores y altas autoridades nacionales.",
                 "tags": [
                     "Competencia",
                     "Innovación",
                     "Ingeniería"
                 ]
+            },
+            {
+                "id": "teaching",
+                "title": "Universidad de Buenos Aires (UBA) - FIUBA",
+                "subtitle": "Ayudante de Cátedra y Mentor de Proyectos",
+                "period": "Agosto 2024 — Presente",
+                "nodes": [
+                    {
+                        "id": "is2",
+                        "label": "Ingeniería de Software 2 - Mentor",
+                        "period": "Marzo 2026 — Presente",
+                        "desc": "Ayudante de Cátedra y Mentor. Guiando a grupos de estudiantes a través del desarrollo integral de réplicas de plataformas full-stack. Responsable del seguimiento ágil semanal, mentoría arquitectónica y revisión de código."
+                    },
+                    {
+                        "id": "algos-segundo",
+                        "label": "Teoría de Algoritmos - Ayudante Segundo",
+                        "period": "Marzo 2025 — Presente",
+                        "desc": "Ascendido a Ayudante Segundo por excelencia académica. Responsable de impartir clases, evaluar proyectos complejos y gestionar la estructura organizativa de la cátedra."
+                    },
+                    {
+                        "id": "algos-adhonorem",
+                        "label": "Teoría de Algoritmos - Ayudante Ad-honorem",
+                        "period": "Agosto 2024 — Febrero 2025",
+                        "desc": "Comencé como Ayudante Ad-honorem (Corrector). Encargado de la evaluación de parciales y trabajos prácticos, brindando feedback técnico detallado a los alumnos."
+                    }
+                ]
+            },
+            {
+                "id": "uba",
+                "title": "Universidad de Buenos Aires (UBA)",
+                "subtitle": "Ingeniería en Software",
+                "period": "Graduado en tiempo récord",
+                "desc": "Me convertí en la tercera persona en toda la historia de la institución en obtener el título de Ingeniero de Software en tiempo récord —un logro sin precedentes e inalcanzado desde 1938.",
+                "tags": [
+                    "Récord Académico Histórico"
+                ]
+            },
+            {
+                "id": "olympiad",
+                "title": "Olimpiada Nacional de Informática",
+                "subtitle": "2do Puesto — Nivel Nacional",
+                "period": "16 años",
+                "desc": "Obtuve el 2do puesto a nivel nacional en la Olimpiada Argentina de Informática, demostrando habilidades de élite en la resolución algorítmica de problemas con tan solo 16 años.",
+                "tags": [
+                    "Medallista de Plata Nacional"
+                ]
+            },
+            {
+                "id": "pellegrini",
+                "title": "Escuela Superior de Comercio Carlos Pellegrini",
+                "subtitle": "Educación Secundaria",
+                "period": "Graduado",
+                "desc": "Exalumno de la Escuela Superior de Comercio Carlos Pellegrini, ampliamente reconocida como una de las instituciones académicas más rigurosas y prestigiosas de Argentina.",
+                "tags": [
+                    "Educación Secundaria de Élite"
+                ]
             }
         ]
+    },
+    "hero": {
+        "greeting": "Hola, soy",
+        "name": "Thiago Pacheco",
+        "role": "Ingeniero de Software",
+        "bio": "A mis 21 años, soy Ingeniero de Software graduado de la Universidad de Buenos Aires, con la distinción de ser una de las únicas tres personas en la historia de la institución en completar la carrera en tiempo récord —un hito inalcanzado desde 1938—. Como Data Engineer Junior en Lovelytics, canalizo mi pasión hacia la arquitectura de soluciones de software robustas, destacándome en la intersección entre los sistemas distribuidos complejos y las tecnologías de inteligencia artificial de vanguardia.",
+        "cta": "Ver Mi Trabajo",
+        "contact": "Contactame"
     },
     "projects": {
         "title": "Proyectos",
@@ -116,8 +141,7 @@
                     "Música",
                     "Full Stack",
                     "Machine Learning"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "vibetrip",
@@ -128,8 +152,7 @@
                     "Full Stack",
                     "Web App",
                     "Viajes"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "cassandra-engine",
@@ -141,8 +164,7 @@
                     "Bases de Datos",
                     "Sistemas Distribuidos",
                     "Bajo Nivel"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "specforge",
@@ -154,8 +176,7 @@
                     "IA/LLM",
                     "Testing",
                     "Tesis"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "predictive-models",
@@ -167,8 +188,7 @@
                     "Python",
                     "PNL",
                     "XGBoost"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "monopoly",
@@ -179,8 +199,7 @@
                     "Java",
                     "POO",
                     "Juego"
-                ],
-                "repo": "#"
+                ]
             },
             {
                 "id": "zorro-ocas",
@@ -191,38 +210,7 @@
                     "Assembly",
                     "Bajo Nivel",
                     "Juego"
-                ],
-                "repo": "#"
-            }
-        ]
-    },
-    "academic": {
-        "title": "Académico",
-        "subtitle": "Excelencia Académica e Hitos",
-        "items": [
-            {
-                "id": "uba",
-                "institution": "Universidad de Buenos Aires (UBA)",
-                "degree": "Ingeniería en Software",
-                "period": "Graduado en tiempo récord",
-                "description": "Me convertí en la tercera persona en toda la historia de la institución en obtener el título de Ingeniero de Software en tiempo récord —un logro sin precedentes e inalcanzado desde 1938.",
-                "highlight": "Récord Académico Histórico"
-            },
-            {
-                "id": "olympiad",
-                "institution": "Olimpiada Nacional de Informática",
-                "degree": "2do Puesto — Nivel Nacional",
-                "period": "16 años",
-                "description": "Obtuve el 2do puesto a nivel nacional en la Olimpiada Argentina de Informática, demostrando habilidades de élite en la resolución algorítmica de problemas con tan solo 16 años.",
-                "highlight": "Medallista de Plata Nacional"
-            },
-            {
-                "id": "pellegrini",
-                "institution": "Escuela Superior de Comercio Carlos Pellegrini",
-                "degree": "Educación Secundaria",
-                "period": "Graduado",
-                "description": "Exalumno de la Escuela Superior de Comercio Carlos Pellegrini, ampliamente reconocida como una de las instituciones académicas más rigurosas y prestigiosas de Argentina.",
-                "highlight": "Educación Secundaria de Élite"
+                ]
             }
         ]
     },

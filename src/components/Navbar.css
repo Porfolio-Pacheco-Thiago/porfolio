@@ -52,10 +52,6 @@
   display: block;
 }
 
-.navbar-logo .accent {
-  color: var(--accent);
-}
-
 .navbar-links {
   display: flex;
   gap: 0.5rem;

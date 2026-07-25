@@ -140,8 +140,3 @@ video {
   background: var(--accent);
   color: #0a0a0a;
 }
-
-/* Accent class */
-.accent {
-  color: var(--accent);
-}
