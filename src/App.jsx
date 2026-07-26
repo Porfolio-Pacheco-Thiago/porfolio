@@ -44,7 +44,12 @@ function App() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+      // threshold 0 y no una fracción: `threshold` se mide sobre el elemento, no
+      // sobre la pantalla, así que con 0.12 los elementos altos (el timeline mide
+      // ~2750px) exigían cientos de píxeles propios visibles y aparecían tardísimo.
+      // Con 0 dispara apenas asoma, sin importar su tamaño, y el -10% solo evita
+      // que la animación arranque pegada al borde inferior.
+      { threshold: 0, rootMargin: '0px 0px -10% 0px' }
     );
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
@@ -55,7 +60,9 @@ function App() {
       <Loader hidden={!loading} />
       <Navbar />
       <main>
-        <Hero />
+        {/* El hero necesita saber cuándo terminó la carga: TextAnimate arranca su
+            animación al montarse, y detrás del loader no se vería. */}
+        <Hero loading={loading} />
         <Journey />
         <Projects />
         <Skills />

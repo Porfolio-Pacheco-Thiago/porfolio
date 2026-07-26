@@ -2,12 +2,13 @@ import { useRef } from 'react';
 import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import SocialLinks from './ui/SocialLinks';
+import { TextAnimate } from './ui/text-animate';
 import heroVideoVp9 from '../assets/hero-video.webm';
 import heroVideoVp8 from '../assets/hero-video-vp8.webm';
 import heroPoster from '../assets/hero-poster.png';
 import './Hero.css';
 
-export default function Hero() {
+export default function Hero({ loading }) {
     const { t } = useLang();
     const videoRef = useRef(null);
 
@@ -25,7 +26,19 @@ export default function Hero() {
                 <div className="hero-text">
                     <p className="hero-greeting reveal">{t('hero.greeting')}</p>
                     <h1 className="hero-name reveal" style={{ transitionDelay: '80ms' }}>{t('hero.name')}</h1>
-                    <p className="hero-role reveal" style={{ transitionDelay: '160ms' }}>{t('hero.role')}</p>
+                    {/* TextAnimate (cult-ui) anima letra por letra al montarse, así que se
+                        monta recién cuando cae el loader. `className` reemplaza las clases
+                        Tailwind que trae hardcodeadas, y `aria-label` da el texto completo
+                        porque el componente parte cada letra en su propio span. */}
+                    {loading
+                        ? <p className="hero-role" aria-hidden="true">{t('hero.role')}</p>
+                        : <TextAnimate
+                            key={t('hero.role')}
+                            text={t('hero.role')}
+                            type="calmInUp"
+                            className="hero-role"
+                            aria-label={t('hero.role')}
+                        />}
                     <p className="hero-bio reveal" style={{ transitionDelay: '240ms' }}>{t('hero.bio')}</p>
                     <div className="hero-buttons reveal" style={{ transitionDelay: '320ms' }}>
                         <button className="btn btn-primary" onClick={() => scrollToSection('projects')}>

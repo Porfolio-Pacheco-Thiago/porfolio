@@ -73,6 +73,10 @@
     color: var(--accent);
     font-weight: 600;
     margin-bottom: 1.5rem;
+    /* TextAnimate renderiza un <h2> con `display: flex` inline (una letra por
+       span). Hace falta permitir el salto de línea, si no el texto se desborda
+       en pantallas angostas en vez de envolverse. */
+    flex-wrap: wrap;
 }
 
 .hero-bio {
@@ -133,7 +137,7 @@
 .scroll-line::after {
     content: '';
     position: absolute;
-    top: -100%;
+    top: 0;
     left: 0;
     width: 100%;
     height: 50%;
@@ -141,13 +145,15 @@
     animation: scrollAnim 2s ease-in-out infinite;
 }
 
+/* translateY y no `top`: mismo motivo que en el loader, es un bucle infinito.
+   Los porcentajes son relativos al alto propio (50% de la línea). */
 @keyframes scrollAnim {
     0% {
-        top: -50%;
+        transform: translateY(-100%);
     }
 
     100% {
-        top: 100%;
+        transform: translateY(200%);
     }
 }
 
@@ -167,6 +173,12 @@
     }
 
     .hero-buttons {
+        justify-content: center;
+    }
+
+    /* El hero centra su texto en mobile, pero el <h2> de TextAnimate es flex y
+       `text-align` no lo alinea: hay que centrarlo por el eje principal. */
+    .hero-role {
         justify-content: center;
     }
 

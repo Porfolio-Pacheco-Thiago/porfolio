@@ -12,7 +12,12 @@ npm run lint         # ESLint (flat config, JS/JSX only) — currently clean
 npm run deploy       # Builds, then publishes dist/ to gh-pages
 ```
 
-Docker alternative for the dev server: `docker-compose up` (mounts the repo, hot-reload, same port 5173). Use the standalone `docker-compose` binary — the `docker compose` plugin subcommand is not installed on this machine. Note it creates a root-owned empty `node_modules/` on the host as a volume mount point, which makes a later host-side `npm install` fail with EACCES; `rmdir node_modules` first.
+Docker alternative for the dev server: `docker-compose up` (mounts the repo, hot-reload, same port 5173). Use the standalone `docker-compose` binary — the `docker compose` plugin subcommand is not installed on this machine.
+
+Two Docker gotchas, both already hit once:
+
+- It creates a root-owned empty `node_modules/` on the host as a volume mount point, which makes a later host-side `npm install` fail with EACCES. `rmdir node_modules` first.
+- `docker-compose.yml` keeps `node_modules` in a separate anonymous volume so host and container don't clobber each other. That means **installing a dependency on the host does not reach a running container** — it keeps serving with its own stale `node_modules` and its own in-memory Vite config, producing confusing errors whose stack traces point at `/app/...` rather than the host path. After any `package.json` change, run `docker-compose down -v && docker-compose up -d --build`. The `-v` matters: without it the stale volume survives. Source edits alone need nothing — those flow through the bind mount.
 
 There are no tests in this project.
 
@@ -21,6 +26,19 @@ There are no tests in this project.
 Single-page React 19 portfolio built with Vite. No router, no backend, no state library — the whole page is one scrollable stack of sections rendered by `App.jsx`: `Hero` → `Journey` → `Projects` → `Skills`, plus `Navbar`, `Footer`, `Loader`.
 
 `vite.config.js` sets `base: '/porfolio/'` because the site is served from a GitHub Pages project subpath, so the dev URL is `http://localhost:5173/porfolio/` — the bare root 302s. Any absolute asset URL must account for that; prefer importing assets so Vite rewrites the path, or put them in `public/` (which is served at the base root).
+
+### shadcn / cult-ui
+
+The project is set up to pull shadcn-compatible components from the `@cult-ui` registry (`components.json` → `registries`), e.g. `npx shadcn@latest add @cult-ui/texture-card`. Tailwind v4 is installed via `@tailwindcss/vite` purely to support those components — **the site itself is styled by the hand-written CSS in `src/index.css`, `src/styles/ui.css` and the per-component files, not by Tailwind utilities.**
+
+Two things keep the two systems from fighting:
+
+- All project CSS is **unlayered**, and Tailwind puts everything in `@layer theme/base/utilities`. Unlayered CSS wins over layered CSS regardless of specificity, so the design system always beats Tailwind's preflight. Do not wrap project CSS in `@layer`.
+- One exception had to be undone by hand: preflight sets `svg { display: block }`, which pushed inline icons (the React logo in the footer) onto their own line. `src/index.css` restores `svg { display: inline }`. If a cult-ui component ever needs the Tailwind behaviour, give it its own rule rather than removing that one.
+
+`@/` is aliased to `src/` in both `vite.config.js` (for the bundler) and `jsconfig.json` (for the editor). `src/lib/utils.js` exports the standard `cn()` helper.
+
+Note that `aliases.ui` in `components.json` points at `@/components/ui`, which already holds this project's own small primitives (`Logo`, `SocialLinks`, `GalleryPlaceholder`) — installed library components will land beside them.
 
 ### Layout of `src/`
 

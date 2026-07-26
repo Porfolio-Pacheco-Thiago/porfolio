@@ -18,13 +18,40 @@
     top: 0;
     bottom: 0;
     width: 2px;
+    /* Color propio de cada eje: evita repetir el degradado por tema */
+    --axis-color: var(--accent);
 }
 
+/* Riel apagado: el recorrido completo, tenue */
 .timeline-axis::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent, var(--accent), var(--accent), transparent);
+    background: linear-gradient(to bottom, transparent, var(--axis-color), var(--axis-color), transparent);
+    opacity: 0.2;
+    transition: opacity 0.45s ease;
+}
+
+/* Tramo encendido: una banda que viaja con el scroll, centrada en la mitad
+   de la pantalla. Arriba y abajo de ella la línea queda apagada. El degradado
+   la desvanece en ambos extremos para que no se vean cortes duros. */
+.timeline-axis::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--timeline-band, 30vh);
+    /* translateY y no `top`: `top` dispara layout, esto es composite puro.
+       El offset en px lo escribe Journey.jsx sobre cada eje (y no sobre
+       .timeline) para que la variable no se herede a las 6 tarjetas y su
+       contenido, invalidándoles el estilo en cada frame. El -50% del calc es
+       relativo al alto propio, así que centra la banda en el offset. */
+    transform: translateY(calc(var(--timeline-offset, 0px) - 50%));
+    background: linear-gradient(to bottom, transparent, var(--axis-color), transparent);
+    /* drop-shadow y no box-shadow: sigue el alfa del degradado en vez de
+       dibujar un halo rectangular con bordes duros */
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--axis-color) 50%, transparent));
     transition: opacity 0.45s ease;
 }
 
@@ -34,14 +61,7 @@
 
 .timeline-axis.line-work {
     left: 96%;
-}
-
-.timeline-axis.line-work::before {
-    background: linear-gradient(to bottom, transparent, var(--work-color), var(--work-color), transparent);
-}
-
-[data-theme="light"] .timeline-axis.line-work::before {
-    background: linear-gradient(to bottom, transparent, #000, #000, transparent);
+    --axis-color: var(--work-color);
 }
 
 .timeline-axis-label {
@@ -69,9 +89,25 @@
     box-shadow: 0 0 16px var(--accent-glow-raw);
 }
 
-/* Timeline colapsada: la línea (gradiente) se desvanece, queda solo el botón */
-.timeline-axis.line-hidden::before {
+/* Timeline colapsada: la línea (riel y tramo encendido) se desvanece,
+   queda solo el botón */
+.timeline-axis.line-hidden::before,
+.timeline-axis.line-hidden::after {
     opacity: 0;
+}
+
+/* Sin animación por preferencia del sistema: línea entera encendida y
+   fija, sin banda viajera. Lo marca Journey.jsx. */
+.timeline[data-static] .timeline-axis::before {
+    opacity: 1;
+}
+
+.timeline[data-static] .timeline-axis::after {
+    display: none;
+}
+
+.timeline[data-static] .timeline-dot {
+    opacity: 1;
 }
 
 .timeline-axis-label.is-collapsed {
@@ -120,6 +156,15 @@
     overflow: visible;
     transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease,
         transform 0.45s ease, overflow 0s 0.45s;
+}
+
+/* Cada tarjeta lleva `reveal-fade`, así que aparece sola al entrar en pantalla
+   en vez de que el timeline entero se desvanezca de golpe. Pero `reveal-fade`
+   también gobierna `opacity`, y con la misma especificidad que `.collapsed`:
+   este selector extra (0,3,0) asegura que ocultar un eje siga ganando aunque la
+   tarjeta ya esté revelada, sin depender del orden en que se junte el CSS. */
+.timeline-item.collapsed[data-revealed] {
+    opacity: 0;
 }
 
 /* Estado colapsado: se anima alto/opacidad/margen y el resto reflueye */
@@ -173,7 +218,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    /* Apagado hasta que la línea lo alcanza */
+    opacity: 0.4;
+    transition: opacity 0.35s ease, box-shadow 0.3s ease, transform 0.3s ease,
+        border-color 0.3s ease;
 }
 
 .timeline-item.cat-academic .timeline-dot {
@@ -202,10 +250,28 @@
     height: 8px;
     border-radius: 50%;
     background: var(--accent);
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+
+/* Color propio de cada entrada, para el brillo del punto */
+.timeline-item.cat-academic {
+    --item-color: var(--accent);
+}
+
+.timeline-item.cat-work {
+    --item-color: var(--work-color);
+}
+
+/* Punto alcanzado por la línea. `data-lit` es un atributo y no una clase
+   porque React reescribe className al re-renderizar y lo borraría
+   (mismo motivo por el que App.jsx usa data-revealed). */
+.timeline-item[data-lit] .timeline-dot {
+    opacity: 1;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--item-color) 50%, transparent);
 }
 
 .timeline-item:hover .timeline-dot {
+    opacity: 1;
     box-shadow: 0 0 20px var(--accent-glow-raw);
     transform: scale(1.2);
 }
@@ -219,7 +285,7 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 /* Tarjetas pegadas a su eje (escalonadas, no alineadas) */

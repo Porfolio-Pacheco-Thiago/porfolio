@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { SiGithub } from 'react-icons/si';
 import { useLang } from '../context/lang-context';
@@ -9,17 +9,26 @@ import './Projects.css';
 export default function Projects() {
     const { t, getList } = useLang();
     const [expandedId, setExpandedId] = useState(null);
+    const activaRef = useRef(null);
     const items = getList('projects.items');
 
     const toggle = (id) => {
         const run = () => flushSync(() => setExpandedId(prev => (prev === id ? null : id)));
         // View Transitions API: anima el reacomodo (posiciones + tamaños) en vez
         // de saltar por el cambio de `order`. Si no está soportada, cambia directo.
-        if (document.startViewTransition) {
-            document.startViewTransition(run);
-        } else {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!document.startViewTransition || reduced) {
             run();
+            return;
         }
+        // Las View Transitions no se interrumpen solas: sin esto, clickear
+        // rápido encadena morphs sobre snapshots viejos y la grilla salta.
+        activaRef.current?.skipTransition();
+        const transicion = document.startViewTransition(run);
+        activaRef.current = transicion;
+        transicion.finished.finally(() => {
+            if (activaRef.current === transicion) activaRef.current = null;
+        });
     };
 
     // En la grilla de 2 columnas (con el primero a ancho completo), los índices
@@ -49,7 +58,15 @@ export default function Projects() {
                         <div
                             key={item.id}
                             className={`project-card reveal-fade ${index === 0 ? 'featured' : ''} ${isExpanded ? 'expanded' : ''}`}
-                            style={{ transitionDelay: `${index * 90}ms`, order, viewTransitionName: `proj-${item.id}` }}
+                            style={{
+                                // Escalonado acotado: cada tarjeta se revela por su cuenta al
+                                // entrar en pantalla, así que sin el tope la última esperaba
+                                // 540ms aunque scrollearas directo hasta ella.
+                                transitionDelay: `${Math.min(index, 2) * 90}ms`,
+                                order,
+                                viewTransitionName: `proj-${item.id}`,
+                                viewTransitionClass: 'proj-card',
+                            }}
                             onClick={() => toggle(item.id)}
                         >
                             <div className="project-media">

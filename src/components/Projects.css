@@ -26,8 +26,11 @@
         box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* Duración/curva del morph de reacomodo (View Transitions API) */
-::view-transition-group(*) {
+/* Duración/curva del morph de reacomodo (View Transitions API).
+   Acotado por `view-transition-class` a las tarjetas de proyecto: con `*`
+   alcanzaba también al navbar y a cualquier otro grupo de la página.
+   Si el navegador no soporta el selector, cae en la duración por defecto. */
+::view-transition-group(*.proj-card) {
     animation-duration: 0.55s;
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -165,16 +168,21 @@
     margin-bottom: 1rem;
 }
 
+/* Un solo marco limpio para las capturas, con el mismo borde y radio que la
+   tarjeta que lo contiene. Sin cromo de ventana ni adornos: el marco lo da el
+   borde, y las capturas van adentro divididas por finas separaciones. */
 .project-gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--border);
+    overflow: hidden;
 }
 
 .project-gallery-item {
     aspect-ratio: 4 / 3;
-    border-radius: 10px;
-    border: 1px dashed var(--border);
     background: var(--bg-secondary);
     display: flex;
     align-items: center;

@@ -48,17 +48,21 @@
     position: absolute;
     top: 0;
     bottom: 0;
+    left: 0;
     width: 40%;
     border-radius: 3px;
     background: var(--accent);
     animation: loaderSlide 1.1s ease-in-out infinite;
 }
 
+/* translateX y no `left`: `left` es layout, y esto corre en bucle justo durante
+   la carga, cuando el main thread está más ocupado. Los porcentajes de translate
+   son relativos al ancho propio (40% de la barra), de ahí -100% / 250%. */
 @keyframes loaderSlide {
     0% {
-        left: -40%;
+        transform: translateX(-100%);
     }
     100% {
-        left: 100%;
+        transform: translateX(250%);
     }
 }

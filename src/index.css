@@ -1,5 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* Tailwind v4, para los componentes de shadcn/cult-ui. Todo lo de abajo es CSS
+   propio sin capa, y en la cascada el CSS sin capa gana sobre el de @layer, así
+   que el design system de acá pisa al preflight de Tailwind, no al revés. */
+@import 'tailwindcss';
+
+/* Puente entre los nombres de shadcn y este design system.
+   Los componentes de cult-ui usan utilidades tipo `bg-background`, `text-foreground`
+   o `border-border`, que Tailwind genera a partir de estos tokens. `inline` hace
+   que las utilidades apunten al var() en vez de copiar su valor, así siguen
+   automáticamente el cambio de tema claro/oscuro de las variables de abajo.
+   Sin esto, cualquier componente de cult-ui se renderiza sin colores. */
+@theme inline {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-card);
+  --color-card-foreground: var(--text-primary);
+  --color-popover: var(--bg-card);
+  --color-popover-foreground: var(--text-primary);
+  --color-primary: var(--accent);
+  --color-primary-foreground: #0a0a0a;
+  --color-secondary: var(--bg-secondary);
+  --color-secondary-foreground: var(--text-primary);
+  --color-muted: var(--bg-secondary);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent: var(--accent-glow);
+  --color-accent-foreground: var(--accent);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+  --color-destructive: #ef4444;
+}
+
 /* Design System — CSS Variables */
 :root {
   /* Dark Theme (default) */
@@ -14,9 +46,6 @@
   --text-primary: #f5f5f5;
   --text-secondary: #a0a0a0;
   --border: rgba(255, 255, 255, 0.08);
-
-  /* Transitions */
-  --transition-theme: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 [data-theme="light"] {
@@ -62,6 +91,9 @@
 .reveal-fade[data-revealed] {
   opacity: 1;
   transform: none;
+  /* Se suelta la capa promovida una vez que el elemento apareció: `will-change`
+     tiene que ser temporal, si no quedan ~30 capas vivas toda la sesión. */
+  will-change: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -82,13 +114,20 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  transition: var(--transition-theme);
+  /* Sin transición de tema acá: `color` se hereda, así que animarlo repintaba
+     todos los nodos de texto durante 400ms. El cambio de tema se hace con una
+     View Transition en ThemeProvider, que es un solo crossfade compuesto. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* Manchas verdes difuminadas de fondo */
+/* Manchas verdes difuminadas de fondo.
+   Antes esto era `filter: blur(60px)` sobre un pseudo-elemento fijo a pantalla
+   completa: la capa más cara del sitio, que se re-rasterizaba entera en cada
+   cambio de tema. Los degradados ya son suaves por sí mismos, así que el blur
+   se reemplaza por paradas más anchas y un punto intermedio que imita la
+   caída gaussiana. Sin filtro, sin transición: puro paint estático. */
 body::before {
   content: '';
   position: fixed;
@@ -96,14 +135,12 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(circle at 12% 15%, var(--accent-glow-raw) 0%, transparent 22%),
-    radial-gradient(circle at 88% 22%, var(--accent-glow-raw) 0%, transparent 20%),
-    radial-gradient(circle at 25% 48%, var(--accent-glow-raw) 0%, transparent 18%),
-    radial-gradient(circle at 78% 58%, var(--accent-glow-raw) 0%, transparent 22%),
-    radial-gradient(circle at 45% 78%, var(--accent-glow-raw) 0%, transparent 20%),
-    radial-gradient(circle at 92% 88%, var(--accent-glow-raw) 0%, transparent 18%);
-  filter: blur(60px);
-  transition: background 0.4s ease;
+    radial-gradient(circle at 12% 15%, var(--accent-glow-raw) 0%, var(--accent-glow) 16%, transparent 34%),
+    radial-gradient(circle at 88% 22%, var(--accent-glow-raw) 0%, var(--accent-glow) 14%, transparent 31%),
+    radial-gradient(circle at 25% 48%, var(--accent-glow-raw) 0%, var(--accent-glow) 13%, transparent 28%),
+    radial-gradient(circle at 78% 58%, var(--accent-glow-raw) 0%, var(--accent-glow) 16%, transparent 34%),
+    radial-gradient(circle at 45% 78%, var(--accent-glow-raw) 0%, var(--accent-glow) 14%, transparent 31%),
+    radial-gradient(circle at 92% 88%, var(--accent-glow-raw) 0%, var(--accent-glow) 13%, transparent 28%);
 }
 
 a {
@@ -115,6 +152,14 @@ img,
 video {
   max-width: 100%;
   display: block;
+}
+
+/* El preflight de Tailwind pone los svg en display:block, lo que saca de la
+   línea de texto a los íconos (p. ej. el de React en el footer). Volvemos al
+   default del navegador. Si algún día un componente de cult-ui necesita el
+   comportamiento de Tailwind, hay que darle su propia regla. */
+svg {
+  display: inline;
 }
 
 /* Scrollbar */
