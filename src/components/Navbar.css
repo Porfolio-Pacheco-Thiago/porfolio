@@ -89,12 +89,12 @@
 }
 
 .nav-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   background: var(--accent-glow);
 }
 
 .nav-link.active {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -127,7 +127,7 @@
 
 .toggle-btn:hover {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
   box-shadow: 0 0 12px var(--accent-glow-raw);
 }
 

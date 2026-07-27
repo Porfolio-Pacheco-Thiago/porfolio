@@ -60,8 +60,8 @@ function App() {
       <Loader hidden={!loading} />
       <Navbar />
       <main>
-        {/* El hero necesita saber cuándo terminó la carga: TextAnimate arranca su
-            animación al montarse, y detrás del loader no se vería. */}
+        {/* El hero necesita saber cuándo terminó la carga: el texto animado del
+            rol arranca al montarse, y detrás del loader no se vería. */}
         <Hero loading={loading} />
         <Journey />
         <Projects />

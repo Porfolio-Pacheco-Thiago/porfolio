@@ -78,7 +78,11 @@ export default function Projects() {
                                 <h3 className="project-title">{item.title}</h3>
                                 <p className="project-desc">{item.shortDesc}</p>
 
-                                <div className="project-extra">
+                                {/* `inert` mientras está colapsado: el bloque sigue en el DOM
+                                    para poder animarlo, pero así no lo leen los lectores de
+                                    pantalla ni recibe foco. `aria-hidden` no serviría, porque
+                                    la skill prohíbe ocultar elementos enfocables. */}
+                                <div className="project-extra" id={`proj-extra-${item.id}`} inert={!isExpanded}>
                                     <p className="project-fulldesc">{item.fullDesc}</p>
                                     <GalleryPlaceholder className="project-gallery" />
                                 </div>
@@ -106,6 +110,7 @@ export default function Projects() {
                                         className="project-toggle"
                                         onClick={(e) => { e.stopPropagation(); toggle(item.id); }}
                                         aria-expanded={isExpanded}
+                                        aria-controls={`proj-extra-${item.id}`}
                                     >
                                         {isExpanded ? t('projects.showLess') : t('projects.viewMore')}
                                     </button>

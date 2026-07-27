@@ -52,7 +52,7 @@
 
 .hero-greeting {
     font-size: 1rem;
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 500;
     margin-bottom: 0.5rem;
     letter-spacing: 1px;
@@ -70,13 +70,9 @@
 
 .hero-role {
     font-size: clamp(1.1rem, 2vw, 1.4rem);
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 600;
     margin-bottom: 1.5rem;
-    /* TextAnimate renderiza un <h2> con `display: flex` inline (una letra por
-       span). Hace falta permitir el salto de línea, si no el texto se desborda
-       en pantallas angostas en vez de envolverse. */
-    flex-wrap: wrap;
 }
 
 .hero-bio {
@@ -173,12 +169,6 @@
     }
 
     .hero-buttons {
-        justify-content: center;
-    }
-
-    /* El hero centra su texto en mobile, pero el <h2> de TextAnimate es flex y
-       `text-align` no lo alinea: hay que centrarlo por el eje principal. */
-    .hero-role {
         justify-content: center;
     }
 

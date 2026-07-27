@@ -130,14 +130,14 @@
 }
 
 .project-link:hover {
-    color: var(--accent);
+    color: var(--accent-text);
 }
 
 .project-toggle {
     margin-left: auto;
     background: none;
     border: none;
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 600;
     font-size: 0.8rem;
     cursor: pointer;

@@ -3,6 +3,73 @@
    de que otra esté montada: antes el Footer tomaba .social-link de Hero.css y
    .tag lo definía el CSS del timeline. */
 
+/* Oculto visualmente pero disponible para lectores de pantalla */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Texto que entra letra por letra (AnimatedText). Solo transform y opacity,
+   una sola vez: el retardo por letra lo pone el componente en línea. */
+.animated-text-word {
+    display: inline-block;
+}
+
+.animated-text-word > span {
+    display: inline-block;
+    animation: letraEntra 0.5s cubic-bezier(0.2, 0.65, 0.3, 1) both;
+}
+
+@keyframes letraEntra {
+    from {
+        opacity: 0;
+        transform: translateY(0.55em);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animated-text-word > span {
+        animation: none;
+    }
+}
+
+/* Foco visible. No había ninguna regla de foco en todo el proyecto: quedaba
+   solo el anillo por defecto del navegador, que sobre botones con fondo propio
+   y `border: none` a veces casi no se distingue. `:focus-visible` lo muestra
+   al navegar con teclado pero no al hacer clic con el mouse. */
+:focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Área de toque de 44x44 sin alterar el tamaño visual del control: el
+   pseudo-elemento agranda la zona clickeable hacia afuera. */
+.toggle-btn,
+.social-link {
+    position: relative;
+}
+
+.toggle-btn::after,
+.social-link::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+}
+
 /* Encabezado de sección */
 .section-header {
     text-align: center;
@@ -28,7 +95,7 @@
     padding: 0.2rem 0.6rem;
     border-radius: 6px;
     background: var(--accent-glow);
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 500;
     border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
 }
@@ -57,7 +124,7 @@
 
 .btn-outline {
     background: transparent;
-    color: var(--accent);
+    color: var(--accent-text);
     border: 1px solid var(--accent);
 }
 
@@ -81,7 +148,7 @@
 }
 
 .social-link:hover {
-    color: var(--accent);
+    color: var(--accent-text);
     border-color: var(--accent);
     box-shadow: 0 0 15px var(--accent-glow-raw);
     transform: translateY(-2px);
