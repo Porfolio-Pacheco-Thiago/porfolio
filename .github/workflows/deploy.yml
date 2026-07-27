@@ -1,0 +1,51 @@
+name: Deploy
+
+# Publica el sitio en GitHub Pages en cada push a main. Reemplaza al
+# `npm run deploy` manual.
+#
+# Requiere una vez, en el repositorio: Settings -> Pages -> Source: GitHub Actions.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permisos mínimos para que la acción oficial pueda publicar.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un despliegue por vez; si entra uno nuevo, el anterior en cola se descarta
+# (pero no se cancela el que ya está publicando).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

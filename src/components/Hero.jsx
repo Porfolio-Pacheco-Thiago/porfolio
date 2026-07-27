@@ -3,9 +3,8 @@ import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import SocialLinks from './ui/SocialLinks';
 import AnimatedText from './ui/AnimatedText';
-import heroVideoVp9 from '../assets/hero-video.webm';
-import heroVideoVp8 from '../assets/hero-video-vp8.webm';
-import heroPoster from '../assets/hero-poster.png';
+import heroVideo from '../assets/hero-video.webm';
+import heroPoster from '../assets/hero-poster.webp';
 import './Hero.css';
 
 export default function Hero({ loading }) {
@@ -55,8 +54,10 @@ export default function Hero({ loading }) {
                             onClick={restartVideo}
                             title="Click to replay"
                         >
-                            <source src={heroVideoVp9} type="video/webm; codecs=vp9" />
-                            <source src={heroVideoVp8} type="video/webm; codecs=vp8" />
+                            {/* Sin fallback VP8: pesaba más que el VP9 al que respaldaba y
+                                no hay navegador que soporte VP8 en <video> pero no VP9. Los que
+                                no leen WebM caen en la <img> de abajo. */}
+                            <source src={heroVideo} type="video/webm; codecs=vp9" />
                             <img src={heroPoster} alt="Thiago Pacheco" className="hero-video" />
                         </video>
                     </div>

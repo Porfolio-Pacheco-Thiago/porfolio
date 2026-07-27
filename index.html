@@ -8,10 +8,51 @@
     <meta name="description" content="Thiago Pacheco — Software Engineer. Portfolio showcasing projects, experience, and skills in software engineering, distributed systems, and AI." />
     <meta name="author" content="Thiago Pacheco" />
     <meta name="keywords" content="Thiago Pacheco, Software Engineer, Portfolio, React, Rust, AI, Machine Learning" />
+    <link rel="canonical" href="https://porfolio-pacheco-thiago.github.io/porfolio/" />
+
+    <!-- Tarjeta al compartir el link. og:image y og:url tienen que ser absolutas:
+         las redes sociales no resuelven rutas relativas. -->
     <meta property="og:title" content="Thiago Pacheco — Software Engineer" />
-    <meta property="og:description" content="Portfolio showcasing projects, experience, and skills in software engineering." />
+    <meta property="og:description" content="Portfolio showcasing projects, experience, and skills in software engineering, distributed systems, and AI." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://porfolio-pacheco-thiago.github.io/porfolio/" />
+    <meta property="og:image" content="https://porfolio-pacheco-thiago.github.io/porfolio/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Thiago Pacheco — Software Engineer" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="es_AR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Thiago Pacheco — Software Engineer" />
+    <meta name="twitter:description" content="Portfolio showcasing projects, experience, and skills in software engineering, distributed systems, and AI." />
+    <meta name="twitter:image" content="https://porfolio-pacheco-thiago.github.io/porfolio/og-image.png" />
+
     <title>Thiago Pacheco — Software Engineer</title>
+
+    <!-- Datos estructurados: le dicen a los buscadores que esto es la página de
+         una persona, no un sitio genérico. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Thiago Pacheco",
+        "jobTitle": "Software Engineer",
+        "url": "https://porfolio-pacheco-thiago.github.io/porfolio/",
+        "image": "https://porfolio-pacheco-thiago.github.io/porfolio/og-image.png",
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Universidad de Buenos Aires"
+        },
+        "knowsAbout": [
+          "Software Engineering",
+          "Distributed Systems",
+          "Data Engineering",
+          "Machine Learning",
+          "Rust",
+          "Python"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -28,6 +28,10 @@ export default function TimelineItem({
         // El div lleva onClick como atajo de mouse, no como control: el control
         // real es el botón de abajo, que sí es enfocable y tiene nombre. Por eso
         // no lleva role ni tabIndex, que crearían un botón dentro de otro.
+        // La alternativa canónica sería estirar el botón sobre la tarjeta con un
+        // ::after, pero eso impide seleccionar el texto y hay que pelear el
+        // z-index con los acordeones anidados.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div
             className={`timeline-item reveal-fade cat-${item.category} ${isCollapsed ? 'collapsed' : ''} ${isExpanded ? 'expanded' : ''} ${clients.length ? 'has-nested' : ''}`}
             onClick={onToggle}

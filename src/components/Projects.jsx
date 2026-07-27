@@ -55,6 +55,9 @@ export default function Projects() {
                         else if (index === expandedIndex - 1) order = expandedIndex;
                     }
                     return (
+                        // onClick como atajo de mouse; el control accesible es el botón
+                        // "ver más" de abajo. Ver la nota en journey/TimelineItem.jsx.
+                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                         <div
                             key={item.id}
                             className={`project-card reveal-fade ${index === 0 ? 'featured' : ''} ${isExpanded ? 'expanded' : ''}`}
