@@ -3,7 +3,8 @@ import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import SocialLinks from './ui/SocialLinks';
 import AnimatedText from './ui/AnimatedText';
-import heroVideo from '../assets/hero-video.webm';
+import heroVideoVp9 from '../assets/hero-video.webm';
+import heroVideoVp8 from '../assets/hero-video-vp8.webm';
 import heroPoster from '../assets/hero-poster.webp';
 import './Hero.css';
 
@@ -54,10 +55,13 @@ export default function Hero({ loading }) {
                             onClick={restartVideo}
                             title="Click to replay"
                         >
-                            {/* Sin fallback VP8: pesaba más que el VP9 al que respaldaba y
-                                no hay navegador que soporte VP8 en <video> pero no VP9. Los que
-                                no leen WebM caen en la <img> de abajo. */}
-                            <source src={heroVideo} type="video/webm; codecs=vp9" />
+                            {/* Los dos WebM llevan transparencia (alpha_mode=1). El VP8 no es
+                                un duplicado: es el fallback de alfa para navegadores que no
+                                soportan alfa en VP9. No recomprimir estos archivos con ffmpeg:
+                                su decodificador vp9 no lee el canal alfa de WebM y lo descarta
+                                silenciosamente, dejando el video con fondo opaco. */}
+                            <source src={heroVideoVp9} type="video/webm; codecs=vp9" />
+                            <source src={heroVideoVp8} type="video/webm; codecs=vp8" />
                             <img src={heroPoster} alt="Thiago Pacheco" className="hero-video" />
                         </video>
                     </div>
