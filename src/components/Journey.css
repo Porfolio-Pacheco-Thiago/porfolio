@@ -78,7 +78,7 @@
     border: 1px solid var(--accent);
     border-radius: 999px;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
         color 0.2s ease, border-color 0.2s ease;
     z-index: 3;
@@ -331,7 +331,7 @@
 
 .timeline-img-placeholder span {
     font-size: 2.5rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--accent-text);
     z-index: 1;
 }
@@ -342,9 +342,11 @@
 }
 
 .timeline-cat-label {
+    /* Rótulo de categoría en mono */
+    font-family: var(--font-mono);
     display: inline-block;
     font-size: 0.65rem;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 0.18rem 0.55rem;
@@ -364,6 +366,8 @@
 }
 
 .timeline-period {
+    /* Períodos en mono */
+    font-family: var(--font-mono);
     display: block;
     font-size: 0.75rem;
     color: var(--accent-text);
@@ -411,7 +415,7 @@
     cursor: pointer;
     padding: 0;
     transition: gap 0.2s ease;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
 }
 
 .timeline-read-more:hover {
@@ -533,6 +537,8 @@
 }
 
 .nested-period {
+    /* Períodos anidados en mono */
+    font-family: var(--font-mono);
     font-size: 0.72rem;
     font-weight: 500;
     color: var(--text-secondary);
@@ -553,7 +559,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--work-color);

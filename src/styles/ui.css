@@ -78,10 +78,25 @@
 
 .section-title {
     font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 0.5rem;
     letter-spacing: -0.5px;
+}
+
+/* Degradado en los títulos. Va dentro de @supports porque `color: transparent`
+   sin `background-clip: text` dejaría el texto invisible; así el color plano de
+   arriba queda como fallback. Usa los tokens del tema, con lo cual sigue solo
+   al cambio de claro/oscuro. */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+    .section-title {
+        background-image: linear-gradient(160deg,
+                var(--text-primary) 35%,
+                var(--accent-text) 115%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
 }
 
 .section-subtitle {
@@ -91,6 +106,8 @@
 
 /* Etiquetas de tecnología */
 .tag {
+    /* Etiquetas de tecnología en mono */
+    font-family: var(--font-mono);
     font-size: 0.7rem;
     padding: 0.2rem 0.6rem;
     border-radius: 6px;
@@ -108,7 +125,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     border: none;
 }
 

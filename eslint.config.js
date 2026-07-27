@@ -6,7 +6,9 @@ import jsxA11y from 'eslint-plugin-jsx-a11y'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // `.claude/skills` trae scripts de terceros (impeccable son 88 .mjs); no es
+  // código nuestro y no tiene por qué cumplir nuestras reglas.
+  globalIgnores(['dist', '.claude']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [

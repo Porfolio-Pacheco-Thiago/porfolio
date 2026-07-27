@@ -3,9 +3,9 @@ import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import SocialLinks from './ui/SocialLinks';
 import AnimatedText from './ui/AnimatedText';
-import heroVideoVp9 from '../assets/hero-video.webm';
-import heroVideoVp8 from '../assets/hero-video-vp8.webm';
-import heroPoster from '../assets/hero-poster.webp';
+import heroVideoVp9 from '../assets/hero-vp9-alpha.webm';
+import heroVideoVp8 from '../assets/hero-vp8-alpha.webm';
+import heroPoster from '../assets/hero-poster-alpha.webp';
 import './Hero.css';
 
 export default function Hero({ loading }) {

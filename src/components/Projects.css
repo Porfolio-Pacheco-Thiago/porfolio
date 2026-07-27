@@ -141,7 +141,7 @@
     font-weight: 600;
     font-size: 0.8rem;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
 }
 
 /* Contenido extra que aparece al expandir */
