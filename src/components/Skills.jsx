@@ -1,12 +1,17 @@
 import { useLang } from '../context/lang-context';
 import { skillsByCategory } from '../data/skills';
+import WireFigure from './ui/WireFigure';
 import './Skills.css';
 
 export default function Skills() {
     const { t } = useLang();
 
     return (
-        <section id="skills" className="skills">
+        <section id="skills" className="skills has-decor">
+            {/* Decorativo: la malla de un globo evoca los sistemas distribuidos
+                que atraviesan estos proyectos. Va detrás del contenido. */}
+            <WireFigure kind="sphere" spin="flat" className="wire-decor at-right" size={860} line={6} seconds={135} tiltX={22} tiltZ={-14} />
+
             <div className="section-header reveal">
                 <h2 className="section-title">{t('skills.title')}</h2>
                 <p className="section-subtitle">{t('skills.subtitle')}</p>

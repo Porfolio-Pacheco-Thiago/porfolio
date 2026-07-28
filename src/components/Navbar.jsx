@@ -3,11 +3,22 @@ import { useTheme } from '../context/theme-context';
 import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import Logo from './ui/Logo';
+import WireFigure from './ui/WireFigure';
 import './Navbar.css';
 
 // Ids de las secciones observadas, en orden de aparición. Cada uno tiene su
 // clave `nav.<id>` en los archivos de i18n.
 const SECTIONS = ['about', 'journey', 'projects', 'skills'];
+
+// Cada sección tiene su figura, la misma que decora esa zona de la página.
+// En el navbar van diminutas y con muy pocos aros: a 18px, más detalle es
+// geometría que nadie ve y que igual hay que rasterizar.
+const FIGURA = {
+    about: { kind: 'pyramid' },
+    journey: { kind: 'cube' },
+    projects: { kind: 'tetrahedron' },
+    skills: { kind: 'sphere', meridians: 5, parallels: 3 },
+};
 
 export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
@@ -62,6 +73,14 @@ export default function Navbar() {
                             onClick={() => goTo(s)}
                             aria-current={activeSection === s ? 'true' : undefined}
                         >
+                            <WireFigure
+                                className="nav-figure"
+                                size={28}
+                                line={3}
+                                seconds={11}
+                                autoSpin={false}
+                                {...FIGURA[s]}
+                            />
                             {t(`nav.${s}`)}
                         </button>
                     ))}

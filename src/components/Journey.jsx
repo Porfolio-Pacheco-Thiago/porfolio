@@ -2,6 +2,7 @@ import { useState, useRef, useLayoutEffect } from 'react';
 import { useLang } from '../context/lang-context';
 import { journeyMeta } from '../data/journey';
 import TimelineItem from './journey/TimelineItem';
+import WireFigure from './ui/WireFigure';
 import './Journey.css';
 
 // Entrada sin metadata: al fondo del timeline, sobre el eje académico.
@@ -133,7 +134,8 @@ export default function Journey() {
         .sort((a, b) => b.sort - a.sort);
 
     return (
-        <section id="journey" className="experience">
+        <section id="journey" className="experience has-decor">
+            <WireFigure kind="cube" detail={3} spin="flat" className="wire-decor at-left" size={880} line={7} seconds={150} tiltX={20} tiltZ={-10} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('journey.title')}</h2>
                 <p className="section-subtitle">{t('journey.subtitle')}</p>

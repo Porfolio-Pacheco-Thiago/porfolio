@@ -62,6 +62,9 @@
 
 .nav-link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background: none;
   border: none;
   color: var(--text-secondary);
@@ -197,4 +200,21 @@
   .hamburger {
     display: flex;
   }
+}
+
+/* Figura diminuta de cada link. Solo gira la del link activo: la rotación es
+   la señal de "estás acá", igual que el subrayado. */
+.nav-figure {
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.25s ease;
+}
+
+.nav-link:hover .nav-figure,
+.nav-link.active .nav-figure {
+  opacity: 1;
+}
+
+.nav-link.active .nav-figure .wire-spin {
+  animation-play-state: running;
 }

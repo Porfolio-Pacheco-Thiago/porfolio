@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import SocialLinks from './ui/SocialLinks';
+import WireFigure from './ui/WireFigure';
 import AnimatedText from './ui/AnimatedText';
 import heroVideoVp9 from '../assets/hero-vp9-alpha.webm';
 import heroVideoVp8 from '../assets/hero-vp8-alpha.webm';
@@ -22,6 +23,12 @@ export default function Hero({ loading }) {
     return (
         <section id="about" className="hero">
             <div className="hero-bg-glow" />
+
+            {/* Las tres figuras que decoran las secciones de abajo, en chico y
+                repartidas por los márgenes: anticipan lo que viene. */}
+            <WireFigure kind="cube" detail={2} spin="flat" className="hero-fig fig-a" size={150} line={3} seconds={70} tiltX={20} tiltZ={-10} />
+            <WireFigure kind="tetrahedron" detail={2} spin="flat" className="hero-fig fig-b" size={120} line={3} seconds={95} tiltX={14} tiltZ={18} />
+            <WireFigure kind="sphere" spin="flat" className="hero-fig fig-c" size={165} line={3} seconds={110} tiltX={24} tiltZ={-14} meridians={8} parallels={6} />
             <div className="hero-content">
                 <div className="hero-text">
                     <p className="hero-greeting reveal">{t('hero.greeting')}</p>

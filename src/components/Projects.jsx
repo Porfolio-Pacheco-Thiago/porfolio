@@ -4,6 +4,7 @@ import { SiGithub } from 'react-icons/si';
 import { useLang } from '../context/lang-context';
 import { projectMeta } from '../data/projects';
 import GalleryPlaceholder from './ui/GalleryPlaceholder';
+import WireFigure from './ui/WireFigure';
 import './Projects.css';
 
 export default function Projects() {
@@ -38,7 +39,8 @@ export default function Projects() {
     const expandedIsRight = expandedIndex >= 2 && expandedIndex % 2 === 0;
 
     return (
-        <section id="projects" className="projects">
+        <section id="projects" className="projects has-decor">
+            <WireFigure kind="tetrahedron" detail={3} spin="flat" className="wire-decor at-right" size={720} line={7} seconds={115} tiltX={14} tiltZ={16} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('projects.title')}</h2>
                 <p className="section-subtitle">{t('projects.subtitle')}</p>

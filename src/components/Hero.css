@@ -190,3 +190,38 @@
         right: -20%;
     }
 }
+/* Figuras decorativas del hero. Van en los márgenes laterales, fuera de la
+   columna de contenido (1200px centrados), así no compiten con el texto ni con
+   el video. Posiciones elegidas para que no se solapen entre sí. */
+.hero-fig {
+    position: absolute;
+    z-index: 0;
+    opacity: 0.5;
+}
+
+.fig-a {
+    top: 16%;
+    left: 3%;
+}
+
+.fig-b {
+    bottom: 14%;
+    left: 8%;
+}
+
+.fig-c {
+    top: 30%;
+    right: 3%;
+}
+
+.hero-content {
+    position: relative;
+}
+
+/* Por debajo de 1400px los márgenes se achican y las figuras se meterían
+   encima del contenido. */
+@media (max-width: 1400px) {
+    .hero-fig {
+        display: none;
+    }
+}

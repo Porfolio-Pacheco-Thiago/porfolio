@@ -45,6 +45,214 @@
     }
 }
 
+/* ── Figuras de alambre decorativas (WireFigure) ─────────────────────────
+   Geometría en CSS 3D. El conteo de elementos se mantiene bajo a propósito:
+   con `preserve-3d` el navegador re-rasteriza cada hijo en cada frame, porque
+   su tamaño proyectado cambia al girar. 111 elementos hacían volar el cooler;
+   ahora son 33 repartidos en tres figuras, y solo gira la que está a la vista. */
+.wire {
+    --wire-size: 800px;
+    --wire-line: 3px;
+    /* Tono propio de las figuras. En claro no alcanza con bajar la opacidad del
+       acento: sobre un fondo claro, un verde medio al 22% desaparece. Se usa el
+       verde oscuro accesible y con bastante más carga. */
+    --wire-tint: color-mix(in srgb, var(--accent) 22%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+    width: var(--wire-size);
+    height: var(--wire-size);
+    perspective: 1900px;
+    pointer-events: none;
+}
+
+[data-theme="light"] .wire {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 62%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 46%, transparent);
+}
+
+/* Marca una sección como contenedora de un adorno. Las secciones miden 1200px
+   y están centradas; las figuras tienen que ignorar ese ancho y sangrar hacia
+   los costados. Sin `overflow: hidden` acá: recorta el `overflow-x: clip` del
+   html, contra la ventana y no contra la columna de contenido. */
+.has-decor {
+    position: relative;
+}
+
+.has-decor>*:not(.wire) {
+    position: relative;
+    z-index: 1;
+}
+
+.wire-decor {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 0;
+}
+
+.wire-decor.at-right {
+    right: calc(-1 * var(--wire-size) / 2.6);
+}
+
+.wire-decor.at-left {
+    left: calc(-1 * var(--wire-size) / 2.6);
+}
+
+/* La inclinación va en su propia capa, separada del giro: si estuviera en el
+   mismo transform, la animación de rotateY la pisaría. En la esfera esto es lo
+   que abre los paralelos — a 0° se ven de canto y parecen no estar. */
+.wire-tilt {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--tx, 18deg)) rotateZ(var(--tz, -12deg));
+}
+
+.wire-turn {
+    width: 100%;
+    height: 100%;
+}
+
+.wire-spin {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+/* — Modo 3d: rotación real. Cada hijo se re-rasteriza por frame; solo para
+     tamaños chicos, donde el área es despreciable. — */
+.spin-3d .wire-spin {
+    animation: wire-gira var(--wire-seconds, 120s) linear infinite;
+    animation-play-state: paused;
+}
+
+.spin-3d[data-visible] .wire-spin {
+    animation-play-state: running;
+}
+
+/* — Modo flat: nada se mueve dentro, así que el subárbol se rasteriza una sola
+     vez; lo que gira es esta capa, en 2D. `will-change` le avisa al navegador
+     que la promueva y no la vuelva a dibujar. — */
+.spin-flat .wire-turn {
+    animation: wire-plano var(--wire-seconds, 120s) linear infinite;
+    animation-play-state: paused;
+    will-change: transform;
+}
+
+.spin-flat[data-visible] .wire-turn {
+    animation-play-state: running;
+}
+
+@keyframes wire-plano {
+    to {
+        rotate: 360deg;
+    }
+}
+
+/* `linear` es correcto acá: la prohibición de Emil apunta a transiciones de
+   estado. Una rotación continua con easing se vería acelerar y frenar sola. */
+@keyframes wire-gira {
+    to {
+        transform: rotateY(360deg);
+    }
+}
+
+/* — Esfera — */
+.wire-ring {
+    position: absolute;
+    inset: 0;
+    border: var(--wire-line) solid var(--wire-tint);
+    border-radius: 50%;
+}
+
+.wire-meridian {
+    transform: rotateY(var(--rot));
+}
+
+/* Cada paralelo es el mismo círculo acostado, escalado por cos(lat) y elevado
+   por sin(lat): de ahí sale la silueta esférica. */
+.wire-parallel {
+    transform:
+        translateY(calc(var(--lift) * var(--wire-size) / 2))
+        rotateX(90deg)
+        scale(var(--scale));
+    border-color: var(--wire-tint-soft);
+    border-width: calc(var(--wire-line) * 0.8);
+}
+
+/* — Cubo: 6 caras con borde en lugar de 12 aristas sueltas — */
+.wire-face {
+    position: absolute;
+    inset: 12%;
+    border: var(--wire-line) solid var(--wire-tint);
+    transform: var(--face) translateZ(calc(var(--wire-size) * var(--z, 0.38)));
+}
+
+/* Cortes interiores del cubo: mismo grosor que las caras. La jerarquía la
+   marca el color, no el trazo — reducirlo los hacía desaparecer. */
+.wire-inner {
+    border-color: var(--wire-tint-soft);
+}
+
+/* Cortes horizontales de la pirámide */
+.wire-slice {
+    position: absolute;
+    inset: 19%;
+    border: calc(var(--wire-line) * 0.8) solid var(--wire-tint-soft);
+    transform:
+        translateY(calc(var(--wire-size) * var(--lift)))
+        rotateX(90deg)
+        scale(var(--scale));
+}
+
+/* — Arista genérica entre dos puntos del espacio. La usa el tetraedro, cuyas
+     aristas de la base no comparten un origen común. — */
+.wire-bar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: var(--wire-line);
+    width: calc(var(--wire-size) * var(--len));
+    margin-top: calc(var(--wire-line) / -2);
+    background: var(--wire-tint);
+    transform-origin: 0 50%;
+    transform:
+        translate3d(calc(var(--wire-size) * var(--px)),
+                    calc(var(--wire-size) * var(--py)),
+                    calc(var(--wire-size) * var(--pz)))
+        rotateY(var(--ry))
+        rotateZ(var(--rz));
+}
+
+/* — Pirámide: base cuadrada + 4 aristas al vértice — */
+.wire-base {
+    position: absolute;
+    inset: 19%;
+    border: var(--wire-line) solid var(--wire-tint);
+    transform: translateY(calc(var(--wire-size) * 0.36)) rotateX(90deg);
+}
+
+.wire-edge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: var(--wire-line);
+    width: calc(var(--wire-size) * var(--len) / 2);
+    background: var(--wire-tint);
+    transform-origin: 0 50%;
+    /* Se parte del vértice y se orienta hacia la esquina de la base */
+    transform:
+        translateY(calc(var(--wire-size) * var(--up) / 2))
+        rotateY(var(--ry))
+        rotateZ(var(--rz));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wire-spin {
+        animation: none;
+    }
+}
+
 /* Foco visible. No había ninguna regla de foco en todo el proyecto: quedaba
    solo el anillo por defecto del navegador, que sobre botones con fondo propio
    y `border: none` a veces casi no se distingue. `:focus-visible` lo muestra
@@ -169,4 +377,10 @@
     border-color: var(--accent);
     box-shadow: 0 0 15px var(--accent-glow-raw);
     transform: translateY(-2px);
+}
+
+/* Nervaduras verticales de la pirámide: mismo trazo que las aristas, tono
+   suave para que no compitan con la silueta. */
+.wire-rib {
+    background: var(--wire-tint-soft);
 }

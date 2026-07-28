@@ -129,6 +129,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* Los globos decorativos sangran fuera de la columna de contenido a
+     propósito. `clip` los recorta contra la ventana sin crear un contenedor
+     de scroll, cosa que `hidden` sí haría. */
+  overflow-x: clip;
 }
 
 body {
