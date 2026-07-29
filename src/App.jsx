@@ -6,6 +6,7 @@ import Projects from './components/Projects';
 import Skills from './components/Skills';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
+import Cursor from './components/ui/Cursor';
 import './App.css';
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
 
   return (
     <div className="app">
+      <Cursor />
       <Loader hidden={!loading} />
       <Navbar />
       <main>

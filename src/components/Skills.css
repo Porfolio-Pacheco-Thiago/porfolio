@@ -1,5 +1,7 @@
 .skills {
-    padding: 6rem 2rem;
+    /* Espaciado atado al alto de la ventana: en pantallas bajas se comprime
+       solo, que es lo que hace cumplir la regla de una sección por pantalla. */
+    padding: clamp(1.5rem, 4vh, 4.5rem) 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -7,14 +9,14 @@
 .skills-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    gap: clamp(0.75rem, 2vh, 2rem);
 }
 
 .skills-category {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: clamp(0.85rem, 1.8vh, 1.5rem);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 

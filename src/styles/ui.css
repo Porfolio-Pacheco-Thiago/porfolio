@@ -339,7 +339,7 @@
 
 .btn-primary {
     background: var(--accent);
-    color: #0a0a0a;
+    color: var(--accent-on);
 }
 
 .btn-primary:hover {
@@ -383,4 +383,286 @@
    suave para que no compitan con la silueta. */
 .wire-rib {
     background: var(--wire-tint-soft);
+}
+
+/* ── Regla: cada sección entra en una pantalla ────────────────────────────
+   Trayectoria medía 3,34 pantallas y Proyectos 2,23. El modo compacto es el
+   estado normal y el botón expande al detalle completo. */
+.section-toggle {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-text);
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.section-toggle:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+}
+
+.section-toggle:active {
+    transform: scale(0.97);
+}
+
+/* En compacto el encabezado ocupa menos: el margen de 4rem se come media
+   pantalla por sí solo. */
+.is-compact .section-header {
+    margin-bottom: clamp(0.75rem, 1.8vh, 1.5rem);
+}
+
+/* ── Luz coherente con el sol ─────────────────────────────────────────────
+   Si hay una fuente arriba, las superficies tienen que mostrarlo: un realce
+   de un píxel en el borde superior. Es lo que integra el sol con el contenido
+   en vez de dejarlo como un fondo pegado atrás. Es `inset`, así que no dibuja
+   nada fuera de la caja ni cuesta capa nueva. */
+.timeline-card,
+.project-card,
+.skills-category {
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+[data-theme="light"] .timeline-card,
+[data-theme="light"] .project-card,
+[data-theme="light"] .skills-category {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* ── Entrada de las figuras ───────────────────────────────────────────────
+   Vienen desde fuera de la pantalla hacia su posición, una sola vez.
+   Se usa `transform` y no `translate`: la propiedad `translate` ya está
+   ocupada centrando verticalmente el adorno, y son propiedades separadas que
+   se componen, así que no se pisan. */
+.wire-decor,
+.hero-fig {
+    opacity: 0;
+    /* Lenta y con retardo a propósito: si entra rápido, para cuando la página
+       terminó de cargar ya están colocadas y el movimiento se pierde. */
+    transition: opacity 2.4s cubic-bezier(0.16, 0.84, 0.32, 1) 0.35s,
+        transform 3s cubic-bezier(0.16, 0.84, 0.32, 1) 0.35s;
+}
+
+.wire-decor.at-left {
+    transform: translateX(-60%);
+}
+
+.wire-decor.at-right {
+    transform: translateX(60%);
+}
+
+/* Las del hero entran desde el borde más cercano */
+.hero-fig.fig-a,
+.hero-fig.fig-b {
+    transform: translateX(-90%);
+}
+
+.hero-fig.fig-c {
+    transform: translateX(90%);
+}
+
+.wire-decor[data-entered],
+.hero-fig[data-entered] {
+    opacity: 0.55;
+    transform: none;
+}
+
+.hero-fig[data-entered] {
+    opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .wire-decor,
+    .hero-fig {
+        transition: none;
+        transform: none;
+        opacity: 0.55;
+    }
+}
+
+/* ── Interacción con el mouse ─────────────────────────────────────────────
+   Las figuras aceptan puntero, pero el contenido va por encima (z-index 1),
+   así que solo reciben hover donde no hay nada del contenido delante. Ningún
+   clic queda bloqueado.
+   La reacción es la misma que provoca señalar su link en el navbar: da igual
+   por dónde llegues, la figura responde igual. */
+.wire-decor,
+.hero-fig {
+    pointer-events: auto;
+}
+
+.wire-decor:hover,
+.hero-fig:hover {
+    opacity: 0.95;
+    --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+[data-theme="light"] .wire-decor:hover,
+[data-theme="light"] .hero-fig:hover {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+}
+
+/* Las chicas crecen más: con el mismo porcentaje que las grandes el cambio
+   no se notaría. */
+.wire-decor:hover {
+    transform: scale(1.06);
+}
+
+.hero-fig:hover {
+    transform: scale(1.18);
+}
+
+/* ── Resaltado desde el navbar ────────────────────────────────────────────
+   Al poner el mouse sobre un link, reaccionan sus DOS figuras: la chica del
+   propio link y la grande de esa sección. Se dispara con el hover del link y
+   no con la sección activa, que dejaba la figura agrandada de forma
+   permanente mientras estabas ahí. */
+[data-hover-section="journey"] #journey .wire-decor,
+[data-hover-section="projects"] #projects .wire-decor,
+[data-hover-section="skills"] #skills .wire-decor {
+    opacity: 0.95;
+    transform: scale(1.06);
+}
+
+[data-hover-section="journey"] #journey .wire,
+[data-hover-section="projects"] #projects .wire,
+[data-hover-section="skills"] #skills .wire,
+.nav-link:hover .nav-figure {
+    --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+[data-theme="light"][data-hover-section="journey"] #journey .wire,
+[data-theme="light"][data-hover-section="projects"] #projects .wire,
+[data-theme="light"][data-hover-section="skills"] #skills .wire,
+[data-theme="light"] .nav-link:hover .nav-figure {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+}
+
+/* Las figuras del hero también responden: son las mismas cuatro formas en
+   chico, así que al señalar una sección se enciende su forma en las tres
+   partes a la vez — el navbar, el hero y la propia sección. Se emparejan por
+   tipo de figura, no por posición. */
+[data-hover-section="journey"] .hero-fig.wire-cube,
+[data-hover-section="projects"] .hero-fig.wire-tetrahedron,
+[data-hover-section="skills"] .hero-fig.wire-sphere,
+[data-hover-section="about"] .hero-fig {
+    opacity: 0.95;
+    transform: scale(1.18);
+}
+
+[data-hover-section="journey"] .hero-fig.wire-cube,
+[data-hover-section="projects"] .hero-fig.wire-tetrahedron,
+[data-hover-section="skills"] .hero-fig.wire-sphere,
+[data-hover-section="about"] .hero-fig {
+    --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+[data-theme="light"][data-hover-section="journey"] .hero-fig.wire-cube,
+[data-theme="light"][data-hover-section="projects"] .hero-fig.wire-tetrahedron,
+[data-theme="light"][data-hover-section="skills"] .hero-fig.wire-sphere,
+[data-theme="light"][data-hover-section="about"] .hero-fig {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+}
+
+/* La figura chica también gira mientras el mouse está sobre su link, no solo
+   cuando la sección está activa. */
+.nav-link:hover .nav-figure .wire-spin {
+    animation-play-state: running;
+}
+
+/* El color también acompaña, no solo el tamaño */
+.wire-ring,
+.wire-face,
+.wire-bar,
+.wire-base,
+.wire-slice {
+    transition: border-color 0.45s ease, background-color 0.45s ease;
+}
+
+/* ── Cursor propio ────────────────────────────────────────────────────────
+   Dos cajas anidadas y no una: la de afuera solo se traslada (la mueve el JS)
+   y la de adentro solo se escala (lo hace el CSS). Mezclar ambas cosas en el
+   mismo elemento desviaba el círculo, porque las propiedades individuales se
+   aplican antes que `transform` y terminaban multiplicando las coordenadas de
+   la traslación por el factor de escala. */
+.cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    will-change: transform;
+}
+
+.cursor[data-vivo] {
+    opacity: 1;
+}
+
+/* El anillo se dibuja centrado en el origen de su padre */
+.cursor-anillo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+}
+
+.tiene-cursor-propio,
+.tiene-cursor-propio a,
+.tiene-cursor-propio button,
+.tiene-cursor-propio [role="button"] {
+    cursor: none;
+}
+
+.tiene-cursor-propio input,
+.tiene-cursor-propio textarea {
+    cursor: text;
+}
+
+/* ── Tarjetas oscuras del tema verde ──────────────────────────────────────
+   Con la tarjeta en verde oscuro, el texto que va encima tiene que invertirse.
+   Se redefinen los tokens en la propia tarjeta: como son variables CSS,
+   heredan a todo lo de adentro sin tener que tocar una sola regla de texto. */
+[data-theme="light"] .timeline-card,
+[data-theme="light"] .project-card,
+[data-theme="light"] .skills-category {
+    --text-primary: #f2f7f4;
+    --text-secondary: #b9d0c2;
+    --accent-text: #6fd89a;
+    --accent-glow: rgba(111, 216, 154, 0.14);
+    --border: rgba(255, 255, 255, 0.16);
+    /* El realce superior blanco pleno era para tarjetas claras; sobre verde
+       oscuro sería una línea deslumbrante. */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+
+/* Y se vuelven a dar vuelta en las superficies blancas de adentro, que sí
+   necesitan texto oscuro. */
+[data-theme="light"] .skill-item,
+[data-theme="light"] .timeline-gallery-item,
+[data-theme="light"] .project-gallery-item,
+[data-theme="light"] .nested-gallery-item {
+    --text-primary: #0d1f14;
+    --text-secondary: #324439;
+    color: var(--text-primary);
 }

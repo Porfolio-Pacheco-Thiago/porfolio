@@ -12,6 +12,9 @@ export default function Journey() {
     const { t, getList } = useLang();
     const timelineRef = useRef(null);
     const [activeId, setActiveId] = useState(null);
+    // Regla de diseño: cada sección entra en una pantalla. El modo compacto es
+    // el estado normal; expandir es una acción explícita del usuario.
+    const [compacto, setCompacto] = useState(true);
     // null | 'academic' | 'work' — solo una línea puede ocultarse a la vez
     const [hidden, setHidden] = useState(null);
     // Acordeones por cliente de la línea de tiempo interna (Lovelytics)
@@ -134,11 +137,19 @@ export default function Journey() {
         .sort((a, b) => b.sort - a.sort);
 
     return (
-        <section id="journey" className="experience has-decor">
+        <section id="journey" className={`experience has-decor ${compacto ? 'is-compact' : ''}`}>
             <WireFigure kind="cube" detail={3} spin="flat" className="wire-decor at-left" size={880} line={7} seconds={150} tiltX={20} tiltZ={-10} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('journey.title')}</h2>
                 <p className="section-subtitle">{t('journey.subtitle')}</p>
+                <button
+                    type="button"
+                    className="section-toggle"
+                    onClick={() => setCompacto(c => !c)}
+                    aria-expanded={!compacto}
+                >
+                    {compacto ? t('section.expand') : t('section.collapse')}
+                </button>
             </div>
 
             <div className="timeline" ref={timelineRef}>

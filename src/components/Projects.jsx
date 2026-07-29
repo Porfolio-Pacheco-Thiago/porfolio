@@ -10,6 +10,7 @@ import './Projects.css';
 export default function Projects() {
     const { t, getList } = useLang();
     const [expandedId, setExpandedId] = useState(null);
+    const [compacto, setCompacto] = useState(true);
     const activaRef = useRef(null);
     const items = getList('projects.items');
 
@@ -39,11 +40,19 @@ export default function Projects() {
     const expandedIsRight = expandedIndex >= 2 && expandedIndex % 2 === 0;
 
     return (
-        <section id="projects" className="projects has-decor">
+        <section id="projects" className={`projects has-decor ${compacto ? 'is-compact' : ''}`}>
             <WireFigure kind="tetrahedron" detail={3} spin="flat" className="wire-decor at-right" size={720} line={7} seconds={115} tiltX={14} tiltZ={16} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('projects.title')}</h2>
                 <p className="section-subtitle">{t('projects.subtitle')}</p>
+                <button
+                    type="button"
+                    className="section-toggle"
+                    onClick={() => setCompacto(c => !c)}
+                    aria-expanded={!compacto}
+                >
+                    {compacto ? t('section.expand') : t('section.collapse')}
+                </button>
             </div>
 
             <div className="projects-grid">

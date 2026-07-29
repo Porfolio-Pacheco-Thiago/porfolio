@@ -51,7 +51,12 @@ export default function WireFigure({
         const el = ref.current;
         if (!el) return;
         const io = new IntersectionObserver(
-            ([e]) => el.toggleAttribute('data-visible', e.isIntersecting),
+            ([e]) => {
+                el.toggleAttribute('data-visible', e.isIntersecting);
+                // `data-entered` se engancha una sola vez: la entrada es un
+                // gesto de bienvenida, no algo que se repita en cada scroll.
+                if (e.isIntersecting) el.setAttribute('data-entered', '');
+            },
             { rootMargin: '5% 0px' }
         );
         io.observe(el);

@@ -8,6 +8,10 @@
         "academic": "Académico",
         "skills": "Habilidades"
     },
+    "section": {
+        "expand": "Ver todo",
+        "collapse": "Vista compacta"
+    },
     "journey": {
         "title": "Experiencia y Formación",
         "subtitle": "Mi trayectoria profesional y académica",

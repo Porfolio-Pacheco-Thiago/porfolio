@@ -196,7 +196,7 @@
 .hero-fig {
     position: absolute;
     z-index: 0;
-    opacity: 0.5;
+    /* la opacidad la fija la animación de entrada, en ui.css */
 }
 
 .fig-a {

@@ -26,6 +26,17 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState(SECTIONS[0]);
+    const [hoverSection, setHoverSection] = useState(null);
+
+    // El link sobre el que está el mouse se refleja en el <html>, para que el
+    // CSS pueda resaltar a la vez su figura chica y la grande de esa sección,
+    // que viven en ramas distintas del DOM. Va por estado + efecto y no por
+    // mutación directa, que es lo que espera React.
+    useEffect(() => {
+        const raiz = document.documentElement;
+        if (hoverSection) raiz.dataset.hoverSection = hoverSection;
+        else delete raiz.dataset.hoverSection;
+    }, [hoverSection]);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -71,6 +82,10 @@ export default function Navbar() {
                             key={s}
                             className={`nav-link ${activeSection === s ? 'active' : ''}`}
                             onClick={() => goTo(s)}
+                            onMouseEnter={() => setHoverSection(s)}
+                            onMouseLeave={() => setHoverSection(null)}
+                            onFocus={() => setHoverSection(s)}
+                            onBlur={() => setHoverSection(null)}
                             aria-current={activeSection === s ? 'true' : undefined}
                         >
                             <WireFigure

@@ -8,6 +8,10 @@
         "academic": "Academic",
         "skills": "Skills"
     },
+    "section": {
+        "expand": "Show all",
+        "collapse": "Compact view"
+    },
     "journey": {
         "title": "Experience & Education",
         "subtitle": "My professional and academic path",

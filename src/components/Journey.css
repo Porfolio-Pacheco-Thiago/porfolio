@@ -682,3 +682,71 @@
         height: 80px;
     }
 }
+/* ── Modo compacto ──────────────────────────────────────────────────────
+   Presupuesto medido: 953px de ventana menos padding y encabezado dejan unos
+   610px para seis entradas, o sea ~100px cada una. Se quitan la imagen (120px
+   por tarjeta), la descripción y las etiquetas; todo eso vuelve al expandir
+   una entrada, que sigue funcionando igual. */
+.experience.is-compact {
+    padding: clamp(1rem, 2.2vh, 2rem) 2rem;
+}
+
+.experience.is-compact .timeline {
+    padding: clamp(1.6rem, 2.8vh, 2.5rem) 0 0.5rem;
+}
+
+.experience.is-compact .timeline-item {
+    margin-bottom: clamp(0.15rem, 0.5vh, 0.4rem);
+}
+
+.experience.is-compact .timeline-card-image,
+.experience.is-compact .timeline-desc,
+.experience.is-compact .timeline-tags {
+    display: none;
+}
+
+.experience.is-compact .timeline-card-content {
+    padding: clamp(0.35rem, 0.65vh, 0.55rem) 1rem;
+}
+
+.experience.is-compact .timeline-company {
+    font-size: 1rem;
+    margin: 0.1rem 0;
+}
+
+.experience.is-compact .timeline-role {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.experience.is-compact .timeline-cat-label {
+    display: none;
+}
+
+.experience.is-compact .timeline-dot {
+    top: 1.1rem;
+}
+
+.experience.is-compact .timeline-item::before {
+    top: calc(1.1rem + 8px);
+}
+
+/* Al expandir una entrada en modo compacto vuelve todo su contenido */
+.experience.is-compact .timeline-item.expanded .timeline-desc,
+.experience.is-compact .timeline-item.expanded .timeline-tags {
+    display: block;
+}
+
+.experience.is-compact .timeline-item.expanded .timeline-tags {
+    display: flex;
+}
+
+/* El botón de "ver más" de cada entrada sobra en compacto: la tarjeta entera
+   ya es clickeable y son 20px por seis entradas. Vuelve al expandirla. */
+.experience.is-compact .timeline-read-more {
+    display: none;
+}
+
+.experience.is-compact .timeline-item.expanded .timeline-read-more {
+    display: inline-flex;
+}

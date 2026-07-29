@@ -206,3 +206,60 @@
         height: 180px;
     }
 }
+/* ── Modo compacto ──────────────────────────────────────────────────────
+   Tres columnas en vez de dos, sin tarjeta destacada a ancho completo, y la
+   media reducida a una franja. Siete tarjetas entran en tres filas. */
+.projects.is-compact {
+    padding: clamp(1rem, 2.2vh, 2rem) 2rem;
+}
+
+.projects.is-compact .project-card,
+.projects.is-compact .project-card.featured {
+    width: calc(33.333% - 1rem);
+}
+
+.projects.is-compact .project-media,
+.projects.is-compact .project-card.featured .project-media {
+    height: clamp(48px, 7vh, 66px);
+}
+
+.projects.is-compact .project-icon {
+    font-size: 1.8rem;
+}
+
+.projects.is-compact .project-info {
+    padding: clamp(0.45rem, 0.8vh, 0.65rem) 0.9rem;
+}
+
+.projects.is-compact .project-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+}
+
+.projects.is-compact .project-desc {
+    display: none;
+}
+
+.projects.is-compact .project-tags {
+    margin-bottom: 0.5rem;
+}
+
+/* Al expandir una tarjeta vuelve su descripción */
+.projects.is-compact .project-card.expanded {
+    width: 100%;
+}
+
+.projects.is-compact .project-card.expanded .project-desc {
+    display: block;
+}
+
+.projects.is-compact .project-card.expanded .project-media {
+    height: 220px;
+}
+
+@media (max-width: 900px) {
+    .projects.is-compact .project-card,
+    .projects.is-compact .project-card.featured {
+        width: 100%;
+    }
+}
