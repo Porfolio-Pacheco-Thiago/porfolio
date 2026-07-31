@@ -28,7 +28,7 @@
 
 .skills-category:hover {
     border-color: var(--accent);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 10px var(--accent-glow-raw);
+    box-shadow: 0 4px 20px rgb(var(--sombra-rgb) / 0.15), 0 0 10px var(--accent-glow-raw);
 }
 
 .skills-category-title {

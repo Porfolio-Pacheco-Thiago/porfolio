@@ -1,5 +1,7 @@
 .experience {
-    padding: 6rem 2rem;
+    /* Ajustado para que la sección entre en una pantalla: ver la nota del
+       presupuesto de alto, más abajo. */
+    padding: clamp(0.6rem, 1.4vh, 1.2rem) 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -9,10 +11,11 @@
     position: relative;
     max-width: 1040px;
     margin: 0 auto;
-    padding: 4.5rem 0 2rem;
+    padding: 0 0 0.2rem;
 }
 
-/* Dos ejes verticales: académico (izquierda) y laboral (derecha) */
+/* Un solo eje vertical, en el medio: lo académico cae a su izquierda y lo laboral
+   a su derecha. Antes eran dos ejes, uno pegado a cada margen. */
 .timeline-axis {
     position: absolute;
     top: 0;
@@ -55,18 +58,32 @@
     transition: opacity 0.45s ease;
 }
 
-.timeline-axis.line-academic {
-    left: 4%;
+.timeline-axis {
+    left: 50%;
 }
 
-.timeline-axis.line-work {
-    left: 96%;
-    --axis-color: var(--work-color);
+/* Los rótulos van arriba de la línea, en el flujo, uno a cada lado del centro.
+   Dos columnas iguales con un hueco al medio: el borde entre ellas cae justo en el
+   50%, o sea sobre la línea, sin depender de cuánto mida cada texto —"Académico" y
+   "Experiencia" no miden lo mismo, así que centrar el par como bloque dejaría la
+   línea adentro de una de las dos—. */
+.timeline-ramas {
+    max-width: 1040px;
+    margin: 0 auto 0.35rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.8rem;
+}
+
+.timeline-ramas> :first-child {
+    justify-self: end;
+}
+
+.timeline-ramas> :last-child {
+    justify-self: start;
 }
 
 .timeline-axis-label {
-    position: absolute;
-    top: 0.5rem;
     white-space: nowrap;
     font-size: 0.85rem;
     font-weight: 700;
@@ -89,12 +106,9 @@
     box-shadow: 0 0 16px var(--accent-glow-raw);
 }
 
-/* Timeline colapsada: la línea (riel y tramo encendido) se desvanece,
-   queda solo el botón */
-.timeline-axis.line-hidden::before,
-.timeline-axis.line-hidden::after {
-    opacity: 0;
-}
+/* Antes, ocultar una rama apagaba su eje. Con la línea compartida eso no aplica:
+   la línea es de las dos, así que se queda encendida y lo único que se colapsa son
+   las tarjetas de ese lado. */
 
 /* Sin animación por preferencia del sistema: línea entera encendida y
    fija, sin banda viajera. Lo marca Journey.jsx. */
@@ -116,31 +130,30 @@
     border-color: var(--accent);
 }
 
-.line-work .timeline-axis-label.is-collapsed {
+.timeline-axis-label.rama-work.is-collapsed {
     background: var(--work-color);
     color: var(--bg-primary);
     border-color: var(--work-color);
 }
 
-[data-theme="light"] .line-work .timeline-axis-label.is-collapsed {
+[data-theme="light"] .timeline-axis-label.rama-work.is-collapsed {
     background: #000;
     color: #fff;
     border-color: #000;
 }
 
-.line-academic .timeline-axis-label {
-    left: 0;
-    transform-origin: left center;
-}
-
-.line-work .timeline-axis-label {
-    right: 0;
-    color: var(--work-color);
-    border-color: var(--work-color);
+/* Cada rótulo crece hacia su lado al pasar el mouse, para no invadir el del otro. */
+.timeline-axis-label.rama-academic {
     transform-origin: right center;
 }
 
-[data-theme="light"] .line-work .timeline-axis-label {
+.timeline-axis-label.rama-work {
+    color: var(--work-color);
+    border-color: var(--work-color);
+    transform-origin: left center;
+}
+
+[data-theme="light"] .timeline-axis-label.rama-work {
     color: #000;
     border-color: #000;
 }
@@ -149,13 +162,18 @@
 .timeline-item {
     position: relative;
     width: 100%;
-    margin: 0 0 2.5rem;
+    margin: 0 0 clamp(0.55rem, 1.2vh, 0.9rem);
     max-height: 650px;
     cursor: pointer;
     text-align: left;
     overflow: visible;
     transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease,
         transform 0.45s ease, overflow 0s 0.45s;
+}
+
+/* El aire de la última no separa de nada y es una entrada entera de presupuesto. */
+.timeline-item:last-child {
+    margin-bottom: 0;
 }
 
 /* Cada tarjeta lleva `reveal-fade`, así que aparece sola al entrar en pantalla
@@ -183,7 +201,7 @@
 .timeline-item::before {
     content: '';
     position: absolute;
-    top: calc(2rem + 8px);
+    top: calc(1.1rem + 8px);
     height: 2px;
     background: var(--accent);
     opacity: 0.5;
@@ -191,13 +209,13 @@
 }
 
 .timeline-item.cat-academic::before {
-    left: 4%;
-    width: 4%;
+    left: 44%;
+    width: 6%;
 }
 
 .timeline-item.cat-work::before {
-    left: 92%;
-    width: 4%;
+    left: 50%;
+    width: 6%;
     background: var(--work-color);
 }
 
@@ -207,7 +225,7 @@
 
 .timeline-dot {
     position: absolute;
-    top: 2rem;
+    top: 1.1rem;
     width: 18px;
     height: 18px;
     border-radius: 50%;
@@ -224,12 +242,13 @@
         border-color 0.3s ease;
 }
 
-.timeline-item.cat-academic .timeline-dot {
-    left: 4%;
+/* Los dos lados comparten la línea, así que los dos puntos van sobre ella. */
+.timeline-item.cat-academic .timeline-dot,
+.timeline-item.cat-work .timeline-dot {
+    left: 50%;
 }
 
 .timeline-item.cat-work .timeline-dot {
-    left: 96%;
     border-color: var(--work-color);
 }
 
@@ -276,39 +295,105 @@
     transform: scale(1.2);
 }
 
+/* ── La entrada es una ventana, como en Proyectos (prototipo) ─────────────
+   Antes era la tarjeta genérica: fondo, borde de 1px, radio de 16px y sombra al
+   pasar el mouse. Ahora es el mismo marco de trazo grueso con barra de título que
+   usan los proyectos.
+
+   Los tokens de grosor son locales y **más finos** que los de Proyectos: acá hay
+   siete entradas apiladas y la sección tiene que entrar en una pantalla, así que
+   cada píxel de barra se multiplica por siete.
+
+   Reusa `--proy-marco` y `--proy-barra`, que ya resuelven el color por tema
+   —incluido el caso del tema claro, donde el acento se atenúa contra otra
+   superficie—. */
 .timeline-card {
+    --trazo: 2px;
+    --barra: 10px;
     position: relative;
     z-index: 1;
-    width: 54%;
     margin: 0;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
+    /* El ancho lo fija el bloque, no la ventana: al lado de la ventana va la foto
+       y las dos comparten esa mitad. */
+    flex: 1;
+    min-width: 0;
+    /* El hueco entre el marco y el contenido sale de este fondo asomando por el
+       relleno de abajo, como en Proyectos. */
+    background: var(--bg-primary);
+    border: var(--trazo) solid var(--proy-marco);
+    padding-bottom: var(--trazo);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* Tarjetas pegadas a su eje (escalonadas, no alineadas) */
-.timeline-item.cat-academic .timeline-card {
-    margin-left: 8%;
-    margin-right: auto;
+/* Los tres cuadraditos son de contorno, no rellenos: rellenos se leerían como los
+   botones de verdad de una ventana. */
+.timeline-barra {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: var(--barra);
+    padding-inline: 5px;
+    background: var(--proy-barra);
 }
 
-.timeline-item.cat-work .timeline-card {
+.timeline-barra span {
+    width: 5px;
+    height: 5px;
+    border: 1px solid color-mix(in srgb, var(--bg-primary) 50%, transparent);
+}
+
+
+
+/* Lo académico a la izquierda de la línea, lo laboral a la derecha. */
+.timeline-item.cat-academic .timeline-bloque {
     margin-left: auto;
-    margin-right: 8%;
+    margin-right: 56%;
+}
+
+.timeline-item.cat-work .timeline-bloque {
+    margin-left: 56%;
+    margin-right: auto;
 }
 
 .timeline-item:hover .timeline-card {
     border-color: var(--accent);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow-raw);
+    box-shadow: 0 8px 30px rgb(var(--sombra-rgb) / 0.2), 0 0 20px var(--accent-glow-raw);
     transform: translateY(-4px);
 }
 
+.timeline-item:hover .timeline-barra {
+    background: var(--accent);
+}
+
+/* Del lado de afuera, cuadrada y chica: es una miniatura, no una portada. */
+/* La foto es hermana de la ventana, no hija: va **afuera del cuadro verde**, a su
+   costado externo. Se estira al alto de la ventana en vez de quedar flotando —una
+   miniatura chica al lado de una caja más alta se lee como un error de alineación—. */
+.timeline-bloque {
+    display: flex;
+    align-items: stretch;
+    gap: 0.45rem;
+    /* Cada bloque ocupa su mitad menos el hueco que la separa de la línea. */
+    width: 44%;
+}
+
 .timeline-card-image {
-    height: 120px;
+    flex: 0 0 var(--foto, 54px);
     overflow: hidden;
     position: relative;
+}
+
+.timeline-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* En la rama laboral la foto pasa a la derecha, que ahí es el lado de afuera. Se
+   invierte el orden visual y no el del DOM: en el DOM la foto va siempre primero. */
+.timeline-item.cat-work .timeline-bloque {
+    flex-direction: row-reverse;
 }
 
 .timeline-img-placeholder {
@@ -336,8 +421,13 @@
     z-index: 1;
 }
 
+/* Embutido dentro del marco, con el hueco a los tres lados restantes: abajo lo
+   pone el `padding-bottom` de la ventana. */
 .timeline-card-content {
-    padding: 1.25rem;
+    margin: var(--trazo);
+    background: var(--bg-card);
+    /* Con la barra de título arriba, el renglón de aire de adentro es redundante. */
+    padding: clamp(0.3rem, 0.5vh, 0.45rem) 1rem;
     text-align: left;
 }
 
@@ -377,16 +467,16 @@
 }
 
 .timeline-company {
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 0.25rem 0;
+    margin: 0.1rem 0;
 }
 
 .timeline-role {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
 }
 
 .timeline-desc {
@@ -422,13 +512,21 @@
     gap: 0.7rem;
 }
 
+/* Expandida la ventana crece mucho a lo alto; la foto se queda arriba con su
+   tamaño en vez de estirarse a toda esa altura. */
+.timeline-item.expanded .timeline-card-image {
+    align-self: flex-start;
+    height: var(--foto, 54px);
+}
+
 /* Expansión en el lugar de la tarjeta del timeline */
 .timeline-item.expanded {
     max-height: none;
 }
 
+/* Expandida crece a lo alto, no a lo ancho: con la línea en el medio, ensancharla
+   la haría cruzar al otro lado. */
 .timeline-item.expanded .timeline-card {
-    width: 80%;
     border-color: var(--accent);
 }
 
@@ -602,11 +700,14 @@
 }
 
 /* === Lado Experiencia (laboral): verde distinto al académico (oscuro) / negro (claro) === */
-.timeline {
+/* Va en la sección y no en `.timeline`: los rótulos de rama viven **afuera** del
+   timeline desde que pasaron al flujo, y ahí `var(--work-color)` quedaba sin
+   definir — el rótulo laboral perdía su color y su borde. */
+.experience {
     --work-color: #4e8c2a;
 }
 
-[data-theme="light"] .timeline {
+[data-theme="light"] .experience {
     --work-color: #000;
 }
 
@@ -628,7 +729,7 @@
 
 .timeline-item.cat-work:hover .timeline-card {
     border-color: var(--work-color);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 30px rgb(var(--sombra-rgb) / 0.2);
 }
 
 .timeline-item.cat-work:hover .timeline-dot {
@@ -641,12 +742,10 @@
         padding-top: 2rem;
     }
 
-    .timeline-axis.line-academic {
+    /* En una columna angosta no hay dos lados: la línea se va al margen y todo
+       cuelga de ella. */
+    .timeline-axis {
         left: 20px;
-    }
-
-    .timeline-axis.line-work {
-        display: none;
     }
 
     .timeline-axis-label {
@@ -682,71 +781,37 @@
         height: 80px;
     }
 }
-/* ── Modo compacto ──────────────────────────────────────────────────────
+/* ── Lo que no se muestra en reposo ───────────────────────────────────────
+   Esto vivía tras un `is-compact` que alternaba con un botón "Ver todo". Ese botón
+   se fue: **esta es la única vista**, así que dejó de ser un modificador y los
+   valores se fusionaron con las reglas de arriba. Acá quedan solo las que no
+   tienen regla base que pisar.
+
    Presupuesto medido: 953px de ventana menos padding y encabezado dejan unos
-   610px para seis entradas, o sea ~100px cada una. Se quitan la imagen (120px
-   por tarjeta), la descripción y las etiquetas; todo eso vuelve al expandir
-   una entrada, que sigue funcionando igual. */
-.experience.is-compact {
-    padding: clamp(1rem, 2.2vh, 2rem) 2rem;
-}
-
-.experience.is-compact .timeline {
-    padding: clamp(1.6rem, 2.8vh, 2.5rem) 0 0.5rem;
-}
-
-.experience.is-compact .timeline-item {
-    margin-bottom: clamp(0.15rem, 0.5vh, 0.4rem);
-}
-
-.experience.is-compact .timeline-card-image,
-.experience.is-compact .timeline-desc,
-.experience.is-compact .timeline-tags {
+   610px para seis entradas, o sea ~100px cada una. Por eso no se muestran la
+   imagen, la descripción ni las etiquetas; todo eso vuelve al expandir una
+   entrada, que sigue funcionando igual. */
+.timeline-desc,
+.timeline-tags,
+.timeline-cat-label {
     display: none;
 }
 
-.experience.is-compact .timeline-card-content {
-    padding: clamp(0.35rem, 0.65vh, 0.55rem) 1rem;
-}
-
-.experience.is-compact .timeline-company {
-    font-size: 1rem;
-    margin: 0.1rem 0;
-}
-
-.experience.is-compact .timeline-role {
-    font-size: 0.8rem;
-    margin-bottom: 0.2rem;
-}
-
-.experience.is-compact .timeline-cat-label {
-    display: none;
-}
-
-.experience.is-compact .timeline-dot {
-    top: 1.1rem;
-}
-
-.experience.is-compact .timeline-item::before {
-    top: calc(1.1rem + 8px);
-}
-
-/* Al expandir una entrada en modo compacto vuelve todo su contenido */
-.experience.is-compact .timeline-item.expanded .timeline-desc,
-.experience.is-compact .timeline-item.expanded .timeline-tags {
+/* Al expandir una entrada vuelve todo su contenido */
+.timeline-item.expanded .timeline-desc {
     display: block;
 }
 
-.experience.is-compact .timeline-item.expanded .timeline-tags {
+.timeline-item.expanded .timeline-tags {
     display: flex;
 }
 
-/* El botón de "ver más" de cada entrada sobra en compacto: la tarjeta entera
-   ya es clickeable y son 20px por seis entradas. Vuelve al expandirla. */
-.experience.is-compact .timeline-read-more {
+/* El botón de "ver más" sobra en reposo: la tarjeta entera ya es clickeable y son
+   20px por seis entradas. Vuelve al expandirla. */
+.timeline-read-more {
     display: none;
 }
 
-.experience.is-compact .timeline-item.expanded .timeline-read-more {
+.timeline-item.expanded .timeline-read-more {
     display: inline-flex;
 }

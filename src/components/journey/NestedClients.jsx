@@ -1,15 +1,18 @@
 import { useLang } from '../../context/lang-context';
-import GalleryPlaceholder from '../ui/GalleryPlaceholder';
+import Gallery from '../ui/Gallery';
 
 /**
  * Acordeones por cliente dentro de una tarjeta del timeline (hoy, Lovelytics).
  *
  * @param {object} props
  * @param {Array<{id: string, label: string, period?: string, desc: string}>} props.clients
+ * @param {string} props.carpeta                    Carpeta de medios de la tarjeta
+ *                                                  que los contiene; cada cliente
+ *                                                  usa una subcarpeta suya.
  * @param {Record<string, boolean>} props.abiertos  Qué cliente está desplegado.
  * @param {(id: string) => void} props.onToggle
  */
-export default function NestedClients({ clients, abiertos, onToggle }) {
+export default function NestedClients({ clients, carpeta, abiertos, onToggle }) {
     const { t } = useLang();
 
     return (
@@ -38,8 +41,10 @@ export default function NestedClients({ clients, abiertos, onToggle }) {
                             </button>
                             {/* inert mientras está cerrada: sigue en el DOM para animarse,
                                 pero no recibe foco ni la leen los lectores de pantalla */}
-                            <GalleryPlaceholder
+                            <Gallery
                                 className="nested-gallery"
+                                carpeta={`${carpeta}/${c.id}`}
+                                label={c.label}
                                 count={2}
                                 id={galeriaId}
                                 inert={!open}

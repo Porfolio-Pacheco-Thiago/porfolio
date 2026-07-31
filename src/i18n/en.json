@@ -6,11 +6,16 @@
         "experience": "Experience",
         "projects": "Projects",
         "academic": "Academic",
-        "skills": "Skills"
+        "skills": "Skills",
+        "contact": "Contact"
     },
-    "section": {
-        "expand": "Show all",
-        "collapse": "Compact view"
+    "media": {
+        "imageOf": "Screenshot of",
+        "videoOf": "Video of"
+    },
+    "contact": {
+        "cta": "Contact me",
+            "close": "Close"
     },
     "journey": {
         "title": "Experience & Education",
@@ -122,11 +127,11 @@
         ]
     },
     "hero": {
-        "greeting": "Hello, I'm",
         "name": "Thiago Pacheco",
         "role": "Software Engineer",
         "bio": "At 21, I am a Software Engineering graduate from the University of Buenos Aires, holding the distinction of being one of only three individuals in the institution's history to complete the degree in record time—a milestone untouched since 1938. As a Junior Data Engineer at Lovelytics, I channel my passion into architecting robust software solutions, thriving at the intersection of complex distributed systems and cutting-edge AI technologies.",
         "cta": "View My Work",
+        "scroll": "Go to Journey",
         "contact": "Get in Touch"
     },
     "projects": {
@@ -135,6 +140,25 @@
         "viewRepo": "View Repository",
         "viewMore": "Learn More",
         "showLess": "Show Less",
+        "demoHint": "Pick a demo to play it on the phone. Tap again to go back.",
+        "player": {
+            "label": "Demo controls",
+            "of": "of",
+            "play": "Play",
+            "back10": "Back 10 seconds",
+            "forward10": "Forward 10 seconds",
+            "pause": "Pause",
+            "mute": "Mute",
+            "unmute": "Unmute",
+            "volume": "Volume",
+            "seek": "Video position",
+            "fullscreen": "Fullscreen"
+        },
+        "demos": {
+            "complete-app": "The full app",
+            "cover-ai": "AI Cover",
+            "shazam": "Song ID"
+        },
         "items": [
             {
                 "id": "melodia",

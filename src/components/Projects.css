@@ -10,20 +10,62 @@
     gap: 1.5rem;
 }
 
+/* La tarjeta **no es una superficie**: en la referencia no hay ninguna caja
+   alrededor: el marco es la tarjeta, y el nombre y el recuadro se apoyan directo
+   sobre el fondo de la página. Con fondo y borde propios se veía un cuadro dentro
+   de otro.
+
+   Tampoco lleva `overflow: hidden` —de recortar la foto se encarga
+   `.project-media`—, así el recuadro puede sobresalir hacia el espacio entre
+   columnas, como en la referencia.
+
+   Lo único que se conserva es el rol de contenedor de layout: ancho, y el
+   `--marco` que le da aire al bloque expandido. */
 .project-card {
+    /* 0 en reposo: el marco arranca en el borde de la columna. El estado expandido
+       lo levanta, porque ahí sí hay una superficie que necesita respiro. */
+    --marco: 0rem;
+    /* Grosor del marco, alto de la barra de título, lado del recuadro y tamaño de
+       su diagonal. Se achican juntos en modo compacto. */
+    --trazo: 3px;
+    --barra: 20px;
+    --notch: 3.6rem;
+    --corte: 0.85rem;
+    /* Aire entre el pie del marco y el nombre. En la referencia hay ~20px ahí, con
+       el recuadro cruzando ese hueco. */
+    --aire: 0.95rem;
+    /* Duración y curva de la coreografía de poner o sacar una demo: la foto que se
+       contrae, la barra, el marco que se desvanece y el celular que crece. Van
+       todas de la misma variable para que no se desfasen — y porque el recentrado
+       escucha el fin de dos de ellas.
+
+       La curva entra y sale suave. Antes era `cubic-bezier(0.22, 1, 0.36, 1)`, que
+       arranca de golpe y frena al final: a 0.45s se sentía un salto más que una
+       animación. */
+    --demo-anim: 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+    /* La banda clara que cruza el marco al pasar el mouse. Sale del acento para no
+       salirse de la paleta: un tornasol como el de la referencia, sobre un sitio de
+       un solo verde, se leería como un error de color. */
+    /* `--degrade-luz` y no `white`: en tema claro el acento es verde profundo
+       sobre una página verde media, y mezclarlo con blanco lo lleva justo a la
+       luminosidad del fondo — la banda se volvía gris y desaparecía. Ver la nota
+       del token en index.css. */
+    --brillo: linear-gradient(115deg,
+            var(--degrade-sombra) 0%,
+            var(--accent) 22%,
+            color-mix(in srgb, var(--accent) 45%, var(--degrade-luz)) 42%,
+            color-mix(in srgb, var(--accent) 25%, var(--degrade-luz)) 52%,
+            var(--accent) 78%,
+            var(--degrade-sombra) 100%);
     width: calc(50% - 0.75rem);
     flex-shrink: 0;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
     cursor: pointer;
 }
 
 /* Reveal (opacity) y hover. El ancho/alto los anima la View Transition. */
 .projects-grid .project-card {
     transition: opacity 0.7s ease, border-color 0.3s ease,
-        box-shadow 0.3s ease, transform 0.3s ease;
+        box-shadow 0.3s ease, transform 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 /* Duración/curva del morph de reacomodo (View Transitions API).
@@ -35,34 +77,228 @@
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* La tarjeta expandida ocupa todo el ancho de la fila (ancho animado) */
+/* Con una tarjeta abierta, el resto se va: si siguieran ahí, la expandida las
+   empujaría hacia abajo y la sección pasaría de 950px a 1445px, o sea habría que
+   scrollear para ver lo que se acaba de abrir. Abierta, la tarjeta **es** la
+   sección; se cierra con el mismo título que la abrió. */
+.projects-grid:has(.project-card.expanded) .project-card:not(.expanded) {
+    display: none;
+}
+
+/* Expandida sí es una superficie: adentro hay descripción, celular y galería, y
+   sin un fondo que los contenga quedarían flotando sobre la página. */
 .project-card.expanded {
+    position: relative;
+    --marco: 0.9rem;
     width: 100%;
-    border-color: var(--accent);
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
 }
 
 .project-card.expanded .project-media {
     height: 300px;
 }
 
-.project-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-6px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow-raw);
+/* ── Hover: la tarjeta se inclina y el marco se pone brilloso ──────────────
+   Como en la referencia. Ahí el efecto son **dos SVG intercambiados**
+   —`GridWindow_Default` y `GridWindow_Hover`—; acá el marco está dibujado con CSS,
+   así que se reproduce con CSS.
+
+   El brillo es un degradado del propio acento, no el tornasol de la referencia:
+   su paleta es violeta y admite un arcoíris, la nuestra es de un solo verde y un
+   arcoíris se leería como un error. La sensación de brillo la da la banda clara
+   cruzando en diagonal. */
+.project-card:not(.expanded):hover {
+    transform: rotate(-1.8deg) scale(1.03);
 }
 
-.project-card.featured {
-    width: 100%;
+.project-card:not(.expanded):hover .project-marco {
+    /* Borde con degradado: el truco de dos fondos, uno recortado a la caja de
+       relleno y otro a la del borde. Un `border-color` no puede llevar degradado. */
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+        var(--brillo) border-box;
+    box-shadow: 0 14px 44px rgb(var(--sombra-rgb) / 0.35),
+        0 0 26px var(--accent-glow-raw);
+}
+
+.project-card:not(.expanded):hover .project-barra {
+    background: var(--brillo);
+}
+
+.project-card:not(.expanded):hover .project-notch {
+    border-color: var(--accent);
+}
+
+/* ── La ventana (larson) ──────────────────────────────────────────────────
+   Marco de trazo grueso con barra de título arriba y la foto embutida, con un
+   hueco oscuro entre el borde y la imagen. Esquinas rectas y **sin recorte**: la
+   diagonal es del recuadro, no del marco. */
+.project-marco {
+    margin: var(--marco) var(--marco) 0;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease,
+        opacity var(--demo-anim), margin var(--demo-anim),
+        padding var(--demo-anim), border-width var(--demo-anim);
+    /* Atenuado contra el acento puro: en larson el marco es del color de acento
+       porque toda su paleta es ese violeta. Nuestro verde a full sobre siete
+       tarjetas a la vez se vuelve un subrayador. El cómo se atenúa depende del
+       tema: ver `--proy-marco` en `index.css`. */
+    border: var(--trazo) solid var(--proy-marco);
+    /* El hueco entre el marco y la foto sale de este fondo asomando por el
+       padding, como en la referencia. */
+    background: var(--bg-primary);
+    padding-bottom: var(--trazo);
+}
+
+/* Los tres cuadraditos son de contorno, como en la referencia: el relleno los
+   haría leer como botones de ventana de verdad. */
+.project-barra {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: var(--barra);
+    overflow: hidden;
+    transition: height var(--demo-anim);
+    padding-inline: 6px;
+    /* Mismo motivo que el borde: una franja de acento puro a lo ancho de cada
+       tarjeta domina la sección entera. Mezclada con la superficie se lee como
+       cromo de ventana y no como un resaltador. */
+    background: var(--proy-barra);
+}
+
+.project-barra span {
+    width: 7px;
+    height: 7px;
+    border: 1px solid color-mix(in srgb, var(--bg-primary) 50%, transparent);
 }
 
 .project-media {
     position: relative;
     height: 200px;
+    /* El hueco a los tres lados restantes; abajo lo pone el padding del marco. */
+    margin: var(--trazo) var(--trazo) 0;
     overflow: hidden;
+    transition: height var(--demo-anim);
 }
 
-.project-card.featured .project-media {
-    height: 260px;
+/* ── Reproduciendo: la ventana se contrae y el celular se queda con el espacio ──
+   Mientras corre una demo, lo que hay que mirar es la pantalla del celular; la
+   foto de arriba no aporta nada, así que se va y le cede su alto.
+
+   Se animan los altos de la foto y de la barra, que son valores concretos, y no un
+   `max-height` sobre el marco: desde `none` no interpola y el colapso saltaría. */
+/* La especificidad tiene que ganarle a `.projects.is-compact .project-card.expanded
+   .project-media`, que fija el alto de la foto abierta. Con un selector más corto
+   la foto no colapsaba: la regla de arriba seguía mandando. */
+.projects.is-compact .project-card.expanded.is-reproduciendo .project-media,
+.project-card.is-reproduciendo .project-barra {
+    height: 0;
+}
+
+.project-card.is-reproduciendo .project-marco {
+    margin-block: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    opacity: 0;
+}
+
+/* El recuadro se apoyaba en la esquina de la ventana; sin ventana no tiene de qué
+   colgarse. */
+.project-card.is-reproduciendo .project-notch {
+    opacity: 0;
+}
+
+/* El nombre va **debajo** del marco y alineado con su borde izquierdo. El
+   recuadro no ocupa lugar en el flujo: se posiciona sobre la esquina del marco y
+   el título le pasa por encima, como en la referencia. */
+.project-cabecera {
+    position: relative;
+    margin: var(--aire) var(--marco) 0;
+}
+
+/* Vacío, de trazo fino y **transparente**: en la referencia se ven los bordes del
+   marco a través de él. Sobresale hacia la izquierda y hacia abajo de la esquina,
+   y la diagonal está en **su** esquina superior derecha. */
+.project-notch {
+    position: absolute;
+    /* Sobresale hacia el espacio entre columnas. Ahora la tarjeta no recorta, así
+       que el desplazamiento se mide contra el propio lado del recuadro: un tercio
+       queda afuera, bastante menos que los 24px de separación de la grilla. */
+    left: calc(var(--notch) / -3.4);
+    /* Anclado **por arriba**, no por abajo. Dos razones: en la referencia el
+       recuadro cuelga sobre todo hacia abajo del pie del marco (un tercio arriba,
+       dos tercios abajo), y anclarlo al borde inferior lo movía cuando el nombre
+       ocupaba dos líneas y la cabecera crecía. Se descuenta `--aire` porque la
+       cabecera arranca ese tanto más abajo que el marco. */
+    top: calc((var(--aire) + var(--notch) / 3) * -1);
+    width: var(--notch);
+    height: var(--notch);
+    border: 1px solid color-mix(in srgb, var(--accent) 85%, var(--border));
+    transition: opacity var(--demo-anim);
+    clip-path: polygon(
+        0 0,
+        calc(100% - var(--corte)) 0,
+        100% var(--corte),
+        100% 100%,
+        0 100%
+    );
+}
+
+/* La tapa reemplaza al ícono cuando el proyecto tiene medios. En compacto la
+   ventana es apaisada y baja, así que el recorte vertical es fuerte: `getCover`
+   elige una imagen apaisada justamente para que ahí se siga entendiendo qué se
+   ve. */
+.project-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* ── La tapa ampliada al pasar el mouse (solo en la tarjeta abierta) ───────
+   La tapa está muy recortada: el mockup es 1600×1132 y el hueco, apaisado y bajo.
+   Al pasar el mouse se ve completa y más grande.
+
+   **Crece como capa, no en el flujo.** Completa y a ancho de tarjeta serían 781px
+   de alto: la tarjeta abierta dejaría de entrar en una pantalla, que es
+   justamente lo que no puede pasar. Posicionada en absoluto no mueve nada de lo
+   que tiene alrededor, y el alto se acota en `vh` para no pasarse de la ventana.
+
+   La imagen está en absoluto **siempre**, no solo en hover: cambiar `position` no
+   se puede animar y el salto se vería. Así lo único que cambia es el alto, que sí
+   interpola. */
+.project-card.expanded .project-media {
+    /* Para que la tapa ampliada pase por encima del título y del celular. */
+    z-index: 2;
+}
+
+/* `top`/`left`/`width` y **no** `inset: 0`: fijar `top` y `bottom` juntos
+   sobredetermina la caja y el alto que se le pida queda ignorado. */
+.project-card.expanded .project-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        object-fit 0s 0.4s;
+}
+
+.project-card.expanded .project-media:hover {
+    /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
+    overflow: visible;
+}
+
+.project-card.expanded .project-media:hover .project-cover {
+    height: min(58vh, 470px);
+    /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
+       bandas laterales que deja `contain`. */
+    object-fit: contain;
+    background: var(--bg-primary);
+    box-shadow: 0 26px 60px rgb(var(--sombra-rgb) / 0.55);
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
 }
 
 .project-img-placeholder {
@@ -73,6 +309,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
 }
 
 .project-img-placeholder::before {
@@ -88,34 +325,57 @@
     z-index: 1;
 }
 
+/* El relleno horizontal sigue a `--marco` para que la descripción y los tags
+   arranquen en la misma vertical que el marco y el nombre. En reposo eso es 0
+   —no hay caja de la que despegarse—; expandida, el mismo aire que el marco. */
 .project-info {
-    padding: 1.25rem;
+    padding: 0.9rem var(--marco) var(--marco);
 }
 
+/* La tipografía del nombre, que en larson es lo que más pesa de la tarjeta:
+   geométrica, bold y con las líneas bien juntas. Sin interletrado negativo —en la
+   referencia las letras están holgadas, no comprimidas. */
 .project-title {
-    font-size: 1.2rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.1rem + 0.9vw, 2rem);
     font-weight: 700;
+    /* Ancho e interletrado copiados de la referencia: las letras son anchas y
+       **separadas**, no comprimidas. Yo había puesto interletrado negativo, que es
+       lo contrario. */
+    font-stretch: 112%;
+    letter-spacing: 0.05em;
+    line-height: 1.06;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    /* Reparte las líneas para que no quede una palabra sola abajo. Con nombres
+       como "Modelos Predictivos y Análisis con IA" pasaba siempre. */
+    text-wrap: balance;
 }
 
-.project-desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
+/* El título **es** el botón que abre la tarjeta. Hereda todo del `h3` para que
+   siga leyéndose como un título y no como un control: lo que lo delata es el
+   cursor, el color al pasar por encima y el anillo de foco. */
+.project-title-btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.project-title-btn:hover {
+    color: var(--accent-text);
 }
 
 .project-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-bottom: 1rem;
-}
-
-.project-actions {
-    display: flex;
-    gap: 0.75rem;
 }
 
 .project-link {
@@ -133,16 +393,8 @@
     color: var(--accent-text);
 }
 
-.project-toggle {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--accent-text);
-    font-weight: 600;
-    font-size: 0.8rem;
-    cursor: pointer;
-    font-family: var(--font-sans);
-}
+/* Sin `.project-toggle`: el botón "Más información" se fue y ahora el control es
+   el propio título (`.project-title-btn`), como en la referencia. */
 
 /* Contenido extra que aparece al expandir */
 .project-extra {
@@ -157,15 +409,22 @@
     margin-bottom: 1rem;
 }
 
-.project-card.expanded .project-desc {
-    display: none;
+/* Descripción, tags y repo. Con celular esto cae en su columna derecha —de ahí que
+   no fije ancho ni dirección propia más allá de apilar—; sin celular ocupa el
+   ancho del bloque. */
+.project-aparte {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
 }
 
 .project-fulldesc {
     font-size: 0.9rem;
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 1rem;
+    line-height: 1.65;
+    /* ~65 caracteres: más ancho que esto y el ojo pierde el renglón al volver. */
+    max-width: 62ch;
 }
 
 /* Un solo marco limpio para las capturas, con el mismo borde y radio que la
@@ -181,8 +440,12 @@
     overflow: hidden;
 }
 
+/* Alto acotado en vez de `aspect-ratio: 4/3`. La tarjeta abierta ocupa la fila
+   entera, así que tres columnas de 4/3 daban huecos de 274px de alto y la sección
+   se pasaba de pantalla — justamente lo que no puede pasar. El tope va en `vh`
+   porque el presupuesto es la altura de la ventana, no el ancho de la tarjeta. */
 .project-gallery-item {
-    aspect-ratio: 4 / 3;
+    height: clamp(92px, 13vh, 140px);
     background: var(--bg-secondary);
     display: flex;
     align-items: center;
@@ -191,19 +454,472 @@
     font-size: 1.6rem;
 }
 
+/* ── El celular de las demos (tamalsen) ───────────────────────────────────
+   En reposo flota y gira; al elegir una demo se endereza y queda quieto de
+   frente, con el video adentro.
+
+   La perspectiva vive en la escena y la rotación en un único elemento. **Sin
+   `transform-style: preserve-3d` a propósito:** el celular es plano, así que sus
+   hijos se aplanan en su plano y el conjunto viaja como una sola capa compuesta.
+   Con `preserve-3d` cada hijo se re-rasterizaría por frame, que es lo que causó
+   el problema térmico de las figuras. */
+.fono-bloque {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.fono-escena {
+    perspective: 1100px;
+    display: grid;
+    place-items: center;
+    padding: 0.75rem 0;
+}
+
+/* El cuerpo del iPhone. El grosor **no** son caras 3D: es un `box-shadow` sólido
+   desplazado, que con la inclinación se lee como el canto del aparato. Caras de
+   verdad exigirían `preserve-3d` y su re-rasterizado por frame. */
+.fono {
+    position: relative;
+    width: min(205px, 60%);
+    padding: 8px;
+    background: linear-gradient(145deg, #3a3a41 0%, #16161a 38%, #0b0b0f 60%, #2c2c33 100%);
+    border-radius: 30px;
+    box-shadow:
+        /* el canto */
+        7px 5px 0 -2px #1b1b20,
+        11px 8px 0 -4px #2f2f36,
+        /* la sombra en el piso */
+        0 28px 60px rgb(var(--sombra-rgb) / 0.5);
+    animation: fono-girar 16s ease-in-out infinite;
+    /* La misma pose que el fotograma 0% del giro. Es lo que hace invisible el
+       reingreso: al volver, la transición termina justo acá y el giro arranca en
+       este mismo valor. */
+    transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px);
+    /* Lleva el celular desde donde el giro lo haya dejado hasta el frente sin
+       salto: la transición arranca del valor calculado en ese instante. */
+    transition: transform var(--demo-anim), width var(--demo-anim);
+}
+
+/* Los botones del canto. Van sobre el borde y giran con el cuerpo. */
+.fono-lateral {
+    position: absolute;
+    width: 2px;
+    border-radius: 2px;
+    background: #3d3d45;
+}
+
+.fono-lateral-izq {
+    left: -2px;
+    top: 22%;
+    height: 13%;
+}
+
+.fono-lateral-der {
+    right: -2px;
+    top: 28%;
+    height: 9%;
+}
+
+/* Con la tarjeta cerrada el celular sigue maquetado —`.project-extra` lo tapa con
+   `max-height: 0`, no lo desmonta—, así que sin esto el giro seguiría corriendo
+   en la GPU sobre algo que nadie ve. Es exactamente el patrón que nos costó el
+   problema térmico: una transformación permanente en un elemento invisible. */
+.project-card:not(.expanded) .fono {
+    animation-play-state: paused;
+}
+
+/* Quieto, de frente y un poco más grande. La escala va en el `transform` y no en
+   el `width` para no disparar un relayout. */
+/* Con la ventana contraída sobra alto: el celular lo toma creciendo de ancho, que
+   es lo que fija su alto (la pantalla es 1:2).
+
+   Y **sin la escala** del estado de demo: `scale(1.1)` sobre un celular de este
+   tamaño lo agrandaba 75px más allá de su caja de layout, y esa parte la recortaba
+   el `overflow: hidden` del bloque expandible — se comían los bordes de arriba y
+   abajo. Acá ya es grande por ancho; no necesita escalarse. */
+.project-card.is-reproduciendo .fono {
+    width: min(300px, 70%);
+}
+
+.project-card.is-reproduciendo .fono.is-demo {
+    transform: none;
+}
+
+/* Mientras vuelve al giro, la animación no puede estar: una animación de keyframes
+   le gana al `transform` declarado, así que con ella puesta no habría transición
+   que ver — el celular saltaría a la pose inicial de una. Sin ella, la transición
+   lo lleva suave hasta esa pose, y recién ahí `PhoneDemo` saca la clase. */
+.fono.is-volviendo {
+    animation: none;
+}
+
+.fono.is-demo {
+    animation: none;
+    transform: rotateZ(0deg) rotateY(0deg) scale(1.1);
+}
+
+/* Diagonal fija y giro sobre el eje vertical. No da la vuelta completa a
+   propósito: sin caras 3D, pasado los 90° se vería la pantalla espejada. */
+@keyframes fono-girar {
+    0% { transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px); }
+    50% { transform: rotateZ(-8deg) rotateY(24deg) translateY(5px); }
+    100% { transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px); }
+}
+
+/* La proporción la fija la pantalla y el celular la envuelve: así el bisel no
+   entra en la cuenta y la pantalla calza exacta con el video (720×1440). */
+.fono-pantalla {
+    aspect-ratio: 1 / 2;
+    width: 100%;
+    border-radius: 23px;
+    overflow: hidden;
+    background: #000;
+}
+
+/* El video es **intocable**: sin `pointer-events` no hay menú contextual ni
+   controles del navegador encima de la pantalla del celular. Todo se maneja desde
+   la barra de abajo. */
+.fono-pantalla :is(img, video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* En pantalla completa se invierte: ahí el video **es** la interfaz, así que
+   recupera el puntero —los controles nativos los enciende `PhoneDemo`— y pasa a
+   `contain`, porque `cover` recortaría un video vertical contra una pantalla
+   apaisada. */
+.fono-pantalla video:fullscreen {
+    object-fit: contain;
+    pointer-events: auto;
+    background: #000;
+}
+
+.fono-controles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.fono-ayuda {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.fono-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.fono-boton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+        transform 0.12s ease;
+}
+
+.fono-boton:hover {
+    color: var(--accent-text);
+    border-color: var(--accent);
+}
+
+/* Respuesta al apretar. Sin esto el botón se siente muerto entre el click y el
+   momento en que el celular termina de enderezarse, que son casi 900ms. */
+.fono-boton:active {
+    transform: translateY(1px);
+}
+
+.fono-boton.is-activa {
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* ── La barra del reproductor ─────────────────────────────────────────────
+   Panel al estilo de un reproductor de música: nombre de la pista a la izquierda,
+   transporte al centro, tiempos a la derecha, y la aguja al **ras del borde de
+   abajo** en vez de entre los tiempos.
+
+   El fondo es el mismo degradado del sol de la página —`--sol-nucleo` y
+   `--sol-halo` sobre la superficie de tarjeta—, así que son literalmente los
+   colores del fondo y cambia solo con el tema. En la referencia ese lugar lo ocupa
+   una foto; acá un degradado, que además no obliga a conseguir una imagen por
+   demo. */
+.fono-barra {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem 1.15rem;
+    border-radius: 10px;
+    overflow: hidden;
+    background:
+        radial-gradient(120% 190% at 10% -10%, var(--sol-nucleo), transparent 60%),
+        radial-gradient(95% 165% at 88% 115%, var(--sol-halo), transparent 68%),
+        var(--bg-card);
+    box-shadow: 0 0 30px var(--accent-glow-raw),
+        0 16px 40px rgb(var(--sombra-rgb) / 0.4);
+}
+
+/* Nombre de la demo y proyecto, como pista y álbum. */
+.fono-pista {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.fono-pista-nombre {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.25;
+}
+
+.fono-pista-album {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.fono-transporte {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+.fono-icono {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.12s ease;
+}
+
+.fono-icono:hover {
+    color: var(--accent-text);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.fono-icono:active {
+    transform: scale(0.92);
+}
+
+/* El de reproducir es el principal: círculo relleno y más grande, como en la
+   referencia. */
+.fono-play {
+    width: 2.6rem;
+    height: 2.6rem;
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.fono-play:hover {
+    background: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+/* Tiempos: el transcurrido manda, el total acompaña. */
+.fono-tiempos {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.fono-tiempo-actual {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.fono-secundarios {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+/* Un solo aspecto para las dos barras. */
+.fono-rango {
+    appearance: none;
+    height: 3px;
+    background: color-mix(in srgb, var(--text-secondary) 35%, transparent);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.fono-volumen {
+    flex-shrink: 0;
+    width: 3.6rem;
+    /* Mismo criterio que la aguja: alto de agarre cómodo, línea fina. */
+    height: 16px;
+    background: none;
+}
+
+/* Los pseudo-elementos de cada motor van en **reglas separadas**, nunca en una
+   lista separada por comas: si el navegador no entiende uno de los selectores,
+   descarta la regla entera. Agrupados, Chrome tiraba el bloque por el
+   `::-moz-range-track` y la línea del volumen quedaba invisible. */
+.fono-volumen::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--nivel, 100%),
+            color-mix(in srgb, var(--text-secondary) 38%, transparent) var(--nivel, 100%));
+}
+
+.fono-volumen::-moz-range-track {
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--nivel, 100%),
+            color-mix(in srgb, var(--text-secondary) 38%, transparent) var(--nivel, 100%));
+}
+
+.fono-volumen::-webkit-slider-thumb {
+    margin-top: -4px;
+}
+
+.fono-rango::-webkit-slider-thumb {
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    background: var(--accent);
+    border-radius: 50%;
+}
+
+.fono-rango::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+}
+
+/* La aguja, a todo el ancho contra el borde de abajo.
+
+   **El área de agarre y la línea visible son cosas distintas.** El input mide 18px
+   de alto para poder agarrarlo; la línea de 5px se dibuja en la pista, centrada
+   dentro de ese alto. Con los 4px de antes había que acertarle a una franja de
+   cuatro píxeles, y errarle un poco significaba clickear la tarjeta.
+
+   `--avance` lo calcula el componente: un `input[type=range]` no tiene forma
+   nativa de pintar lo recorrido. */
+.fono-aguja {
+    appearance: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 18px;
+    background: none;
+    cursor: pointer;
+}
+
+.fono-aguja::-webkit-slider-runnable-track {
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--avance, 0%),
+            color-mix(in srgb, var(--text-secondary) 28%, transparent) var(--avance, 0%));
+}
+
+.fono-aguja::-moz-range-track {
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--avance, 0%),
+            color-mix(in srgb, var(--text-secondary) 28%, transparent) var(--avance, 0%));
+}
+
+.fono-aguja::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg-card) 70%, transparent);
+    /* Centrar el tirador sobre una pista de 5px: la mitad de la diferencia. */
+    margin-top: -4.5px;
+}
+
+.fono-aguja::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg-card) 70%, transparent);
+}
+
+@media (max-width: 700px) {
+    /* En angosto el panel se apila y los secundarios pasan abajo. */
+    .fono-barra {
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .fono-pista {
+        flex-basis: 100%;
+    }
+}
+
+/* El giro es decoración: sin él el celular sigue mostrando lo mismo. Y la
+   coreografía de poner la demo —0.85s de foto contrayéndose y celular creciendo—
+   es justo el tipo de movimiento grande que hay que apagar acá: con la variable en
+   0s, los cinco pedazos pasan a ser instantáneos de una sola vez. */
+@media (prefers-reduced-motion: reduce) {
+    .project-card {
+        --demo-anim: 0s;
+    }
+
+    .fono {
+        animation: none;
+        transform: none;
+    }
+
+    .fono.is-demo {
+        transform: none;
+    }
+}
+
 @media (max-width: 768px) {
-    .project-card,
-    .project-card.featured {
+    .fono-bloque {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .project-card {
         width: 100%;
-        order: 0 !important;
     }
 
     .project-media {
         height: 160px;
-    }
-
-    .project-card.featured .project-media {
-        height: 180px;
     }
 }
 /* ── Modo compacto ──────────────────────────────────────────────────────
@@ -213,53 +929,76 @@
     padding: clamp(1rem, 2.2vh, 2rem) 2rem;
 }
 
-.projects.is-compact .project-card,
-.projects.is-compact .project-card.featured {
+.projects.is-compact .project-card {
     width: calc(33.333% - 1rem);
 }
 
-.projects.is-compact .project-media,
-.projects.is-compact .project-card.featured .project-media {
-    height: clamp(48px, 7vh, 66px);
+/* Más alta que la franja de antes: con la ventana de larson la foto tiene que
+   leerse como foto. El tope lo pone la pantalla — tres filas más el encabezado de
+   la sección—, y el aire lo liberaron los tags, que acá no se muestran. */
+.projects.is-compact .project-media {
+    height: clamp(112px, 15.3vh, 156px);
+}
+
+/* La ventana de larson **también acá**, que es el estado por defecto: barra,
+   diagonal y recuadro, todo a escala. Lo único que se sacrifica es el tamaño del
+   nombre, porque siete tarjetas en tres filas dentro de una pantalla no toleran
+   el cuerpo grande. */
+.projects.is-compact .project-card {
+    --trazo: 2px;
+    --barra: 15px;
+    --notch: 2.6rem;
+    --corte: 0.6rem;
+    --aire: 0.7rem;
+}
+
+.projects.is-compact .project-card.expanded {
+    --marco: 0.7rem;
+}
+
+/* En la referencia la tarjeta chica es **solo** marco y nombre. Los tags y el
+   link al repo no van; el link ya vive dentro del bloque expandible. */
+.projects.is-compact .project-card:not(.expanded) .project-tags {
+    display: none;
 }
 
 .projects.is-compact .project-icon {
     font-size: 1.8rem;
 }
 
-.projects.is-compact .project-info {
-    padding: clamp(0.45rem, 0.8vh, 0.65rem) 0.9rem;
+/* Más chico que en la vista grande, pero no tanto como antes: la referencia le da
+   mucho peso al nombre. El techo lo puso la pantalla — con más de esto, los
+   nombres que envuelven a dos líneas desbordan las tres filas. */
+.projects.is-compact .project-title {
+    font-size: clamp(1.1rem, 0.95rem + 0.45vw, 1.35rem);
 }
 
+.projects.is-compact .project-info {
+    padding: clamp(0.35rem, 0.6vh, 0.55rem) var(--marco) var(--marco);
+}
+
+/* El tamaño lo fija la regla de más arriba; acá solo el espacio de abajo. Antes
+   este bloque repetía `font-size` y, por venir después, pisaba al otro. */
 .projects.is-compact .project-title {
-    font-size: 0.95rem;
     margin-bottom: 0.35rem;
 }
 
-.projects.is-compact .project-desc {
-    display: none;
-}
-
-.projects.is-compact .project-tags {
-    margin-bottom: 0.5rem;
-}
-
-/* Al expandir una tarjeta vuelve su descripción */
+/* Abierta ocupa la fila entera. Pisa al `calc(33.333% ...)` de la grilla, que es
+   más específico por venir del contenedor. */
 .projects.is-compact .project-card.expanded {
     width: 100%;
 }
 
-.projects.is-compact .project-card.expanded .project-desc {
-    display: block;
-}
-
+/* Bastante más alta que antes: recortada a 162px del mockup se veía una tirita.
+   El techo es que la tarjeta abierta entre **con aire arriba y abajo** en el
+   espacio útil: la ventana menos el navbar fijo (~74px) menos unos 40px de
+   respiro a cada lado. El encabezado de la sección no cuenta. */
 .projects.is-compact .project-card.expanded .project-media {
-    height: 220px;
+    height: clamp(190px, 28.5vh, 285px);
 }
 
 @media (max-width: 900px) {
-    .projects.is-compact .project-card,
-    .projects.is-compact .project-card.featured {
+    .projects.is-compact .project-card {
         width: 100%;
     }
 }

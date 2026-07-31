@@ -1,5 +1,6 @@
 .hero {
-    min-height: 100vh;
+    /* Ver la nota en App.css: `dvh` evita el salto de la barra de iOS. */
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -50,31 +51,214 @@
     max-width: 600px;
 }
 
-.hero-greeting {
-    /* Saludo en mono */
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    color: var(--accent-text);
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+/* ── La ventana del nombre ────────────────────────────────────────────────
+   Misma ventana que las tarjetas de Proyectos —marco grueso, barra de título
+   con los tres cuadraditos— con tres diferencias:
+
+   1. el marco va en degradado y no en un color plano;
+   2. no lleva el recuadro de la esquina inferior izquierda: ese recuadro es lo
+      que marca "esto es un proyecto", y el hero no lo es;
+   3. detrás hay un segundo contorno corrido que hace de sombra, como en la
+      referencia.
+
+   Los tokens son los mismos nombres que en Projects.css a propósito, pero
+   locales: no se comparten porque acá el trazo es más grueso —es una sola
+   ventana grande, no siete chicas— y compartirlos ataría los dos tamaños. */
+.hero-ventana {
+    --trazo: 4px;
+    --barra: 26px;
+    --corrido: 12px;
+    /* Cinco paradas: de la punta oscura sube al acento, pasa por el brillo en el
+       medio y baja simétrico. Antes eran cuatro y las dos puntas eran el acento,
+       o sea que el recorrido entero cabía entre el acento y el brillo. */
+    --degrade: linear-gradient(115deg,
+            var(--degrade-sombra) 0%,
+            var(--accent) 20%,
+            var(--degrade-medio) 48%,
+            var(--accent) 76%,
+            var(--degrade-sombra) 100%);
+    position: relative;
+    /* El corrimiento de la sombra vive dentro de la caja para que el contorno de
+       atrás no se meta debajo del texto de abajo. */
+    margin-bottom: calc(1.5rem + var(--corrido));
+    /* Ancho de la columna, no del contenido. Antes era `fit-content` y daba lo
+       mismo por accidente: el `max-content` del nombre —las dos palabras en una
+       sola línea— pasaba los 600px de la columna y quedaba recortado ahí. Al pasar
+       el nombre a SVG ese `max-content` se volvió el ancho del dibujo, mucho menor,
+       y la ventana se achicó sola. Con `100%` el ancho es el de siempre y no
+       depende de cómo esté hecho el nombre. */
+    width: 100%;
 }
 
+/* El contorno de atrás. Es un elemento y no un `box-shadow`: hace falta que sea
+   un trazo hueco del mismo grosor, y una sombra siempre es una silueta rellena. */
+.hero-ventana-sombra {
+    position: absolute;
+    inset: 0;
+    transform: translate(var(--corrido), var(--corrido));
+    border: var(--trazo) solid color-mix(in srgb, var(--accent) 34%, transparent);
+    pointer-events: none;
+}
+
+/* Borde con degradado y **fondo transparente**, para que se vea el fondo real de
+   la página. Va con `border-image` y no con el truco de dos fondos que usa
+   Proyectos: ese truco necesita pintar la caja de relleno con un color opaco para
+   tapar el degradado de abajo, o sea que exige fondo. `border-image` pinta solo
+   el borde y deja el interior sin tocar.
+
+   Es también lo que hace la referencia: su ventana es un SVG donde el marco es un
+   trazo relleno y el interior no existe. */
+.hero-marco {
+    position: relative;
+    border: var(--trazo) solid transparent;
+    border-image: var(--degrade) 1;
+}
+
+.hero-barra {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: var(--barra);
+    padding-inline: 8px;
+    background: var(--degrade);
+}
+
+/* De contorno y no rellenos, como en la referencia: rellenos se leerían como
+   los botones de verdad de una ventana.
+
+   El trazo es el color de la página **entero**, no al 50% como en Proyectos: allá
+   la barra es un verde medio plano y medio tono alcanza, acá es el degradado y en
+   tema claro el 50% se quedaba en 1.04:1 contra el tramo claro de la barra. Al
+   100% da 3.6:1 en el peor punto, y además es lo que hace la referencia — en su
+   SVG los cuadraditos son el color de fondo, opaco. */
+.hero-barra span {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--bg-primary);
+}
+
+.hero-ventana-cuerpo {
+    padding: 1.5rem 1.75rem 1.25rem;
+}
+
+/* ── Se dibujan al entrar ─────────────────────────────────────────────────
+   Mismo espíritu que el logo: aparecer progresivamente y escalonado, arrancando
+   cuando cae la pantalla de carga. Son animaciones de afuera del loader, así que la
+   regla global de `index.css` las tiene pausadas en su primer cuadro hasta ahí.
+
+   El orden es marco → nombre → rol, encadenado y no simultáneo.
+
+   El estado tapado vive adentro de cada `@keyframes` y no en la regla base, por lo
+   mismo que en el logo: si la animación no llegara a correr, el hero quedaría
+   recortado para siempre. Así, lo que se ve por defecto es todo. */
+
+/* El marco crece **desde la esquina superior izquierda**, hacia la derecha y hacia
+   abajo a la vez: los dos lados del `inset` se abren juntos. */
+.hero-ventana {
+    animation: heroEsquina 1.3s cubic-bezier(0.55, 0.05, 0.25, 1) backwards;
+}
+
+@keyframes heroEsquina {
+    from {
+        clip-path: inset(0 100% 100% 0);
+    }
+
+    to {
+        clip-path: inset(0 -20% -20% 0);
+    }
+}
+
+/* El nombre no está acá: lo dibuja `NombreTrazado`, trazando el contorno de cada
+   letra de verdad. El rol sí aparece letra por letra con `steps()`, que hace que el
+   recorte avance a saltos del ancho de un caracter. `--letras-rol` lo pone el JSX
+   para que siga al idioma. */
+.hero-role {
+    animation: heroLetras 0.85s steps(var(--letras-rol, 21), end) 1.15s backwards;
+}
+
+@keyframes heroLetras {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+        clip-path: inset(0 -20% 0 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hero-ventana,
+    .hero-role {
+        animation: none;
+    }
+}
+
+/* El nombre con los puntos al lado. `flex-start` y no `center` porque el nombre
+   ocupa dos líneas: centrado, los puntos quedarían a la altura del renglón de
+   abajo en vez de al lado del primero. */
+.hero-nombre-fila {
+    display: flex;
+    /* `stretch` y no `flex-start`: los puntos toman el alto del nombre entero, o
+       sea que acompañan los dos renglones y se recalculan solos si alguna vez son
+       uno o tres. */
+    align-items: stretch;
+    gap: 0.7rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Los seis puntos. En la referencia son ocho discos en dos columnas inclinadas
+   6°; acá van seis, que es lo pedido, con la misma inclinación.
+
+   Se dibujan con una máscara y no con seis elementos ni con un SVG: así el color
+   es literalmente `var(--degrade)` —el mismo degradado del marco, que sigue al
+   tema— en vez de una copia de sus paradas que habría que mantener en dos lados.
+   La máscara es un solo punto que se repite en una grilla de 2×3. */
+.hero-puntos {
+    /* En `em` sobre el tamaño del nombre, así los puntos escalan con él. */
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    --punto: 0.085em;
+    --col: 0.28em;
+    --fila: 0.25em;
+    flex-shrink: 0;
+    width: calc(var(--col) * 2);
+    /* Sin `height`: lo da el `stretch` del contenedor. Los márgenes lo meten
+       dentro de la altura de mayúscula, arriba y abajo. */
+    margin-block: 0.28em 0.16em;
+    background: var(--degrade);
+    transform: skewX(-6deg);
+    -webkit-mask-image: radial-gradient(circle at center,
+            #000 calc(var(--punto) / 2), transparent calc(var(--punto) / 2 + 0.5px));
+    mask-image: radial-gradient(circle at center,
+            #000 calc(var(--punto) / 2), transparent calc(var(--punto) / 2 + 0.5px));
+    -webkit-mask-size: var(--col) var(--fila);
+    mask-size: var(--col) var(--fila);
+    /* `round` y no el `repeat` por defecto: con el alto variable, la última fila
+       caía cortada al medio y se veía un punto mordido. `round` estira apenas la
+       celda para que entre un número entero de filas. */
+    -webkit-mask-repeat: round;
+    mask-repeat: round;
+}
+
+/* Ya no pinta texto: el nombre visible es el SVG de `NombreTrazado`. Queda la caja
+   y el `font-size`, que es de donde el SVG saca su `em` — así el nombre sigue
+   escalando con el mismo `clamp()` de siempre. */
 .hero-name {
     font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.1;
-    margin-bottom: 0.75rem;
-    letter-spacing: -1px;
+    line-height: 0;
 }
 
 .hero-role {
-    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-family: var(--font-pixel);
+    font-size: 24px;
     color: var(--accent-text);
-    font-weight: 600;
-    margin-bottom: 1.5rem;
+    /* Silkscreen solo tiene el 400: sin esto el navegador le sintetiza una negrita
+       engordando los píxeles, que es justo lo que rompe una tipografía de grilla. */
+    font-weight: 400;
+    /* Las mayúsculas de Silkscreen son anchas y los espacios angostos; un poco de
+       interletrado la separa del renglón de arriba sin agrandarla. */
+    letter-spacing: 0.06em;
+    line-height: 1.5;
 }
 
 .hero-bio {
@@ -88,11 +272,6 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
-}
-
-.hero-socials {
-    display: flex;
-    gap: 1rem;
 }
 
 .hero-visual {
@@ -113,46 +292,142 @@
     display: block;
     cursor: pointer;
     transform: translateY(-4.5rem);
-    filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.35));
+    filter: drop-shadow(0 24px 50px rgb(var(--sombra-rgb) / 0.35));
 }
 
+/* Es un botón: baja a Trayectoria con el mismo desplazamiento que usan los links
+   del navbar. Hereda `cursor: none` del cursor propio, así que lo que lo delata
+   como control es el aumento del anillo del cursor y el foco visible. */
 .scroll-indicator {
     position: absolute;
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
+    padding: 6px;
+    border: 0;
+    background: none;
+    /* Área táctil de 44px aunque el dibujo mida 52 y el padding sea chico */
+    min-width: 44px;
+    min-height: 44px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.scroll-line {
-    width: 2px;
-    height: 40px;
-    background: var(--accent);
-    border-radius: 2px;
-    position: relative;
-    overflow: hidden;
+.scroll-indicator:hover {
+    transform: translateX(-50%) translateY(3px);
 }
 
-.scroll-line::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background: var(--bg-primary);
-    animation: scrollAnim 2s ease-in-out infinite;
+.scroll-indicator:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 6px;
 }
 
-/* translateY y no `top`: mismo motivo que en el loader, es un bucle infinito.
-   Los porcentajes son relativos al alto propio (50% de la línea). */
-@keyframes scrollAnim {
-    0% {
-        transform: translateY(-100%);
+/* ── El mouse animado ─────────────────────────────────────────────────────
+   Los porcentajes de los keyframes son los cuadros del Lottie original
+   divididos por 125 (el largo del loop): 16→12.8%, 28→22.4%, 40→32%, 74→59.2%,
+   84→67.2%, 100→80%. Las cuatro animaciones comparten duración y arrancan
+   juntas, así que las etapas quedan sincronizadas sin retardos a mano. */
+.scroll-mouse {
+    display: block;
+    width: 52px;
+    height: 52px;
+}
+
+.scroll-cuerpo {
+    stroke: var(--text-secondary);
+    stroke-dasharray: 100;
+    animation: scrollCuerpo 5s linear infinite;
+}
+
+.scroll-trazo {
+    stroke: var(--accent);
+    stroke-dasharray: 100;
+    animation: scrollTrazo 5s linear infinite;
+}
+
+.scroll-linea {
+    stroke: var(--accent);
+    stroke-dasharray: 100;
+    animation: scrollLinea 5s linear infinite;
+}
+
+.scroll-chevron {
+    stroke: var(--accent);
+    stroke-dasharray: 100;
+    animation: scrollChevron 5s linear infinite;
+}
+
+.scroll-rueda {
+    animation: scrollRueda 5s ease-in-out infinite;
+}
+
+/* El contorno gris se dibuja, se queda, se barre y se vuelve a dibujar. El salto
+   de -100 a 100 pasa en el mismo cuadro: con el trazo ya fuera de la pantalla no
+   se ve, y es lo que evita que el redibujado venga "de vuelta" en reversa. */
+@keyframes scrollCuerpo {
+    0% { stroke-dashoffset: 100; }
+    13% { stroke-dashoffset: 0; }
+    60% { stroke-dashoffset: 0; }
+    67% { stroke-dashoffset: -100; }
+    67.01% { stroke-dashoffset: 100; }
+    80%, 100% { stroke-dashoffset: 0; }
+}
+
+/* El acento pasa por encima del contorno gris ya dibujado */
+@keyframes scrollTrazo {
+    0%, 12.8% { stroke-dashoffset: 100; }
+    22.4%, 60% { stroke-dashoffset: 0; }
+    67.2%, 100% { stroke-dashoffset: -100; }
+}
+
+@keyframes scrollLinea {
+    0%, 16% { stroke-dashoffset: 100; }
+    22%, 59% { stroke-dashoffset: 0; }
+    67%, 100% { stroke-dashoffset: -100; }
+}
+
+@keyframes scrollChevron {
+    0%, 22.4% { stroke-dashoffset: 100; }
+    32%, 60% { stroke-dashoffset: 0; }
+    67.2%, 100% { stroke-dashoffset: -100; }
+}
+
+/* Dos rebotes de 8px y una tercera bajada, más larga, con la que se va. Es un
+   `transform` sobre un grupo del SVG: no toca el layout de la página. */
+@keyframes scrollRueda {
+    0%, 20.8% { transform: translateY(0); }
+    28.3% { transform: translateY(8px); }
+    35.7% { transform: translateY(0); }
+    43.7% { transform: translateY(8px); }
+    51.2%, 59.2% { transform: translateY(0); }
+    67.2%, 100% { transform: translateY(15px); }
+}
+
+/* Sin movimiento queda el mouse dibujado y quieto, que sigue diciendo lo mismo. */
+@media (prefers-reduced-motion: reduce) {
+
+    .scroll-cuerpo,
+    .scroll-trazo,
+    .scroll-linea,
+    .scroll-chevron,
+    .scroll-rueda {
+        animation: none;
+        stroke-dashoffset: 0;
     }
 
-    100% {
-        transform: translateY(200%);
+    .scroll-indicator:hover {
+        transform: translateX(-50%);
     }
+}
+
+/* Con el hero fuera de pantalla no hay nada que mirar y `stroke-dashoffset`
+   repinta en cada cuadro. Se congela en vez de ocultarse: al volver, retoma. */
+.scroll-indicator[data-animando="false"] :is(.scroll-cuerpo,
+    .scroll-trazo,
+    .scroll-linea,
+    .scroll-chevron,
+    .scroll-rueda) {
+    animation-play-state: paused;
 }
 
 @media (max-width: 768px) {
@@ -174,11 +449,27 @@
         justify-content: center;
     }
 
-    .hero-socials {
-        justify-content: center;
+    /* La ventana se ajusta al texto, así que en la columna centrada hay que
+       centrarla a mano. El trazo y el corrimiento bajan con ella: a 4px y 12px
+       la sombra se comía el ancho útil. */
+    .hero-ventana {
+        --trazo: 3px;
+        --barra: 20px;
+        --corrido: 8px;
+        margin-inline: auto;
+        text-align: left;
     }
 
-    .hero-video {
+    .hero-ventana-cuerpo {
+        padding: 1.1rem 1.15rem 0.9rem;
+    }
+
+    /* El múltiplo de 8 anterior: ver la nota de `.hero-role`. */
+    .hero-role {
+        font-size: 16px;
+    }
+
+        .hero-video {
         height: 460px;
         transform: translateY(-1.5rem);
     }
@@ -199,14 +490,16 @@
     /* la opacidad la fija la animación de entrada, en ui.css */
 }
 
+/* Corridas para dejar libre el riel de contacto, que ocupa los primeros
+   64px del borde izquierdo. */
 .fig-a {
     top: 16%;
-    left: 3%;
+    left: 7%;
 }
 
 .fig-b {
     bottom: 14%;
-    left: 8%;
+    left: 11%;
 }
 
 .fig-c {

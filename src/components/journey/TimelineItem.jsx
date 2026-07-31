@@ -1,5 +1,6 @@
 import { useLang } from '../../context/lang-context';
-import GalleryPlaceholder from '../ui/GalleryPlaceholder';
+import Gallery from '../ui/Gallery';
+import { getCover } from '../../lib/media';
 import NestedClients from './NestedClients';
 import NestedNodes from './NestedNodes';
 
@@ -39,13 +40,33 @@ export default function TimelineItem({
             <div className="timeline-dot">
                 <div className="timeline-dot-inner" />
             </div>
-            <div className="timeline-card">
+            {/* La foto va **fuera** de la ventana, a su costado externo. Por eso
+                el bloque: la ventana y la foto son hermanas, no una adentro de la
+                otra. Sale del índice de medios, así que aparece sola en cuanto haya
+                un archivo en `src/assets/media/timeline/<id>/`; mientras tanto queda
+                la inicial. */}
+            <div className="timeline-bloque">
                 <div className="timeline-card-image">
-                    <div className="timeline-img-placeholder">
-                        <span aria-hidden="true">{item.title.charAt(0)}</span>
-                    </div>
+                    {(() => {
+                        const tapa = getCover(`timeline/${item.id}`);
+                        return tapa
+                            ? <img src={tapa} alt="" loading="lazy" />
+                            : (
+                                <div className="timeline-img-placeholder">
+                                    <span aria-hidden="true">{item.title.charAt(0)}</span>
+                                </div>
+                            );
+                    })()}
                 </div>
-                <div className="timeline-card-content">
+
+                <div className="timeline-card">
+                    {/* La barra de título de la ventana, igual que en Proyectos. Los
+                        tres cuadraditos son de contorno, no rellenos: rellenos se
+                        leerían como los botones de verdad de una ventana. */}
+                    <div className="timeline-barra" aria-hidden="true">
+                        <span /><span /><span />
+                    </div>
+                    <div className="timeline-card-content">
                     <span className={`timeline-cat-label cat-${item.category}`}>
                         {item.category === 'work' ? t('nav.experience') : t('nav.academic')}
                     </span>
@@ -60,6 +81,7 @@ export default function TimelineItem({
                         {clients.length > 0 ? (
                             <NestedClients
                                 clients={clients}
+                                carpeta={`timeline/${item.id}`}
                                 abiertos={openClients}
                                 onToggle={onToggleClient}
                             />
@@ -68,7 +90,11 @@ export default function TimelineItem({
                         ) : (
                             <>
                                 {item.body && <p className="timeline-fulldesc">{item.body}</p>}
-                                <GalleryPlaceholder className="timeline-gallery" />
+                                <Gallery
+                                    className="timeline-gallery"
+                                    carpeta={`timeline/${item.id}`}
+                                    label={item.title}
+                                />
                             </>
                         )}
                     </div>
@@ -90,6 +116,7 @@ export default function TimelineItem({
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                         <span>{isExpanded ? t('projects.showLess') : t('projects.viewMore')}</span>
                     </button>
+                    </div>
                 </div>
             </div>
         </div>

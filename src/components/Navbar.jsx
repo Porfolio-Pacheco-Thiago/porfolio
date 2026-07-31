@@ -73,7 +73,7 @@ export default function Navbar() {
         <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} aria-label={t('nav.label')}>
             <div className="navbar-inner">
                 <button className="navbar-logo" onClick={() => goTo('about')} aria-label={t('hero.name')}>
-                    <Logo className="navbar-logo-img" alt="" />
+                    <Logo className="navbar-logo-img logo-dibuja" alt="" />
                 </button>
 
                 <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>

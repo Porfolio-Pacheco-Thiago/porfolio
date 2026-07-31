@@ -11,6 +11,9 @@ import { useEffect, useRef } from 'react';
  *   se aplican antes que `transform` y terminan multiplicando las coordenadas.
  * - Solo se activa con punteros finos. En pantallas táctiles no hay cursor que
  *   reemplazar, y ocultar el del sistema ahí sería un error.
+ * - El anillo **crece sobre lo tocable**. No es adorno: `ui.css` oculta el cursor
+ *   del sistema en todo el documento, así que sin esto no quedaría ninguna señal
+ *   de que algo se puede clickear.
  * - Se posiciona dentro de un `requestAnimationFrame`, así hay como mucho una
  *   escritura por frame por más eventos de mouse que lleguen.
  * - Con `prefers-reduced-motion` no se activa.
@@ -28,15 +31,23 @@ export default function Cursor() {
 
         document.documentElement.classList.add('tiene-cursor-propio');
 
-        let x = 0, y = 0, frame = 0;
+        // Qué cuenta como "tocable". Al ocultar el cursor del sistema se perdió la
+        // señal de que algo se puede clickear, y el anillo la reemplaza creciendo.
+        const TOCABLE = 'a, button, [role="button"], input, select, summary, label';
+
+        let x = 0, y = 0, frame = 0, objetivo = null;
         const pintar = () => {
             frame = 0;
             // Solo traslación: el escalado vive en el hijo.
             el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            // El `closest` corre una vez por frame y no por evento de mouse, que
+            // llegan de a decenas.
+            el.classList.toggle('is-control', !!objetivo?.closest?.(TOCABLE));
         };
         const mover = (e) => {
             x = e.clientX;
             y = e.clientY;
+            objetivo = e.target;
             if (!el.hasAttribute('data-vivo')) el.setAttribute('data-vivo', '');
             if (!frame) frame = requestAnimationFrame(pintar);
         };

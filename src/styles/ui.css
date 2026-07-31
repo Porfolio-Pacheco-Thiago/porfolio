@@ -265,13 +265,11 @@
 
 /* Área de toque de 44x44 sin alterar el tamaño visual del control: el
    pseudo-elemento agranda la zona clickeable hacia afuera. */
-.toggle-btn,
-.social-link {
+.toggle-btn {
     position: relative;
 }
 
-.toggle-btn::after,
-.social-link::after {
+.toggle-btn::after {
     content: '';
     position: absolute;
     inset: -4px;
@@ -338,8 +336,8 @@
 }
 
 .btn-primary {
-    background: var(--accent);
-    color: var(--accent-on);
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
 }
 
 .btn-primary:hover {
@@ -358,26 +356,6 @@
     transform: translateY(-2px);
 }
 
-/* Links a perfiles sociales (Hero y Footer) */
-.social-link {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    background: var(--bg-card);
-}
-
-.social-link:hover {
-    color: var(--accent-text);
-    border-color: var(--accent);
-    box-shadow: 0 0 15px var(--accent-glow-raw);
-    transform: translateY(-2px);
-}
 
 /* Nervaduras verticales de la pirámide: mismo trazo que las aristas, tono
    suave para que no compitan con la silueta. */
@@ -386,35 +364,15 @@
 }
 
 /* ── Regla: cada sección entra en una pantalla ────────────────────────────
-   Trayectoria medía 3,34 pantallas y Proyectos 2,23. El modo compacto es el
-   estado normal y el botón expande al detalle completo. */
-.section-toggle {
-    margin-top: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent-text);
-    background: transparent;
-    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-    border-radius: 999px;
-    padding: 0.4rem 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-}
+   Trayectoria medía 3,34 pantallas y Proyectos 2,23. Las dos tuvieron un botón
+   para alternar entre una vista densa y una completa; **ese botón ya no existe en
+   ninguna de las dos** —la vista densa es la única—, así que `.section-toggle` se
+   fue con él.
 
-.section-toggle:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-}
-
-.section-toggle:active {
-    transform: scale(0.97);
-}
-
-/* En compacto el encabezado ocupa menos: el margen de 4rem se come media
-   pantalla por sí solo. */
-.is-compact .section-header {
+   El encabezado achicado sí sigue: el margen de 4rem se come media pantalla por sí
+   solo. Ahora aplica a las dos secciones sin depender de una clase de modo. */
+.experience .section-header,
+.projects .section-header {
     margin-bottom: clamp(0.75rem, 1.8vh, 1.5rem);
 }
 
@@ -605,7 +563,7 @@
     width: 0;
     height: 0;
     pointer-events: none;
-    z-index: 9999;
+    z-index: var(--z-cursor);
     opacity: 0;
     transition: opacity 0.25s ease;
     will-change: transform;
@@ -615,8 +573,13 @@
     opacity: 1;
 }
 
-/* El anillo se dibuja centrado en el origen de su padre */
+/* El anillo se dibuja centrado en el origen de su padre.
+
+   Crece sobre lo que se puede tocar. No es decoración: al sacar el cursor del
+   sistema se perdió la señal de "esto es clickeable", y esta la reemplaza. */
 .cursor-anillo {
+    transition: width 0.18s ease, height 0.18s ease,
+        margin 0.18s ease, background-color 0.18s ease;
     position: absolute;
     top: 0;
     left: 0;
@@ -627,32 +590,70 @@
     border-radius: 50%;
 }
 
-.tiene-cursor-propio,
-.tiene-cursor-propio a,
-.tiene-cursor-propio button,
-.tiene-cursor-propio [role="button"] {
-    cursor: none;
+.cursor.is-control .cursor-anillo {
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    background-color: color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
-.tiene-cursor-propio input,
-.tiene-cursor-propio textarea {
-    cursor: text;
+/* Con el cursor propio activo, **nada** dibuja un cursor del sistema.
+
+   Va con `!important` a propósito: es un modo global que tiene que ganarle a
+   cualquier `cursor` declarado localmente, y hay una docena repartidos por las
+   secciones. Antes la lista era `a, button, [role=button]`, y por eso se colaba
+   la manito sobre las tarjetas —que son `div` con `cursor: pointer`— y la barra
+   de escribir sobre los sliders del reproductor, que son `<input>` y caían en la
+   regla de `cursor: text`.
+
+   Si alguna vez entra un campo de texto de verdad, necesita su propia excepción:
+   ahí el cursor de texto sí es información útil. */
+.tiene-cursor-propio,
+.tiene-cursor-propio * {
+    cursor: none !important;
 }
 
 /* ── Tarjetas oscuras del tema verde ──────────────────────────────────────
    Con la tarjeta en verde oscuro, el texto que va encima tiene que invertirse.
    Se redefinen los tokens en la propia tarjeta: como son variables CSS,
    heredan a todo lo de adentro sin tener que tocar una sola regla de texto. */
+/* Los botones de idioma y de tema entran acá porque se pintan con el mismo
+   `--bg-card`: son la misma superficie verde, en chico. */
+/* Ojo con Proyectos: va `.project-card.expanded` y no `.project-card` a secas.
+   Desde el rediseño de la Fase 5 la tarjeta cerrada **no es una superficie** —el
+   marco es la tarjeta, y el nombre queda sobre la página—, así que invertirle el
+   texto lo dejaba casi blanco sobre el verde claro: 1.91:1. Expandida sí vuelve a
+   tener fondo `--bg-card`, y ahí la inversión es correcta. */
 [data-theme="light"] .timeline-card,
-[data-theme="light"] .project-card,
-[data-theme="light"] .skills-category {
+[data-theme="light"] .project-card.expanded,
+[data-theme="light"] .skills-category,
+[data-theme="light"] .toggle-btn {
     --text-primary: #f2f7f4;
     --text-secondary: #b9d0c2;
     --accent-text: #6fd89a;
     --accent-glow: rgba(111, 216, 154, 0.14);
     --border: rgba(255, 255, 255, 0.16);
-    /* El realce superior blanco pleno era para tarjetas claras; sobre verde
-       oscuro sería una línea deslumbrante. */
+}
+
+/* El marco y la barra de la ventana se dan vuelta **solo en la tarjeta de proyecto
+   expandida**, donde quedan rodeados por la superficie verde oscura y con el verde
+   de afuera desaparecerían (1.27:1). El menta de `--accent-text` da 5.6:1 ahí.
+
+   La entrada de Trayectoria queda afuera a propósito aunque comparta el bloque de
+   arriba: su marco no está adentro de la superficie oscura, está **contra la
+   página**, así que necesita el valor de afuera. Con el de adentro medía 1.11:1. */
+[data-theme="light"] .project-card.expanded {
+    --proy-marco: var(--accent-text);
+    --proy-barra: var(--accent-text);
+}
+
+/* El realce superior blanco pleno era para tarjetas claras; sobre verde
+   oscuro sería una línea deslumbrante. Los botones quedan afuera: son de
+   36px y ahí la línea es la mitad del borde, además de que su `:hover`
+   reemplaza el `box-shadow` y la haría parpadear. */
+[data-theme="light"] .timeline-card,
+[data-theme="light"] .project-card.expanded,
+[data-theme="light"] .skills-category {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
 }
 
@@ -665,4 +666,280 @@
     --text-primary: #0d1f14;
     --text-secondary: #324439;
     color: var(--text-primary);
+}
+
+/* Las tres galerías son `ul`. El reset global ya les saca margen y relleno, pero
+   no la viñeta, así que va acá — en las tres a la vez, porque la estructura es la
+   misma y la grilla la define cada sección. */
+.timeline-gallery,
+.project-gallery,
+.nested-gallery {
+    list-style: none;
+}
+
+/* ── Galerías: contenido real ─────────────────────────────────────────────
+   Cada sección define el hueco en su propio CSS (medidas y grilla, que sí
+   difieren); acá va solo cómo se acomoda el medio adentro, que es idéntico en
+   las tres y por eso no puede vivir en el archivo de una sola.
+
+   Las capturas son apaisadas y llenan el hueco recortando lo que sobra. Los
+   videos son grabaciones de celular (1080×1920): con `cover` se vería una
+   franja del medio de la pantalla y nada más, así que entran enteros y a los
+   costados se ve el fondo del propio hueco —de ahí que no lleven `background`,
+   para que la banda siga el tema en vez de ser negra siempre. */
+.timeline-gallery-item.is-media,
+.project-gallery-item.is-media,
+.nested-gallery-item.is-media {
+    /* El punteado significa "acá todavía no hay nada"; con contenido, estorba. */
+    border-style: solid;
+    border-color: var(--border);
+    /* Sin esto el radio del hueco no recorta la imagen. */
+    overflow: hidden;
+}
+
+.timeline-gallery-item :is(img, video),
+.project-gallery-item :is(img, video),
+.nested-gallery-item :is(img, video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.timeline-gallery-item img,
+.project-gallery-item img,
+.nested-gallery-item img {
+    object-fit: cover;
+}
+
+.timeline-gallery-item video,
+.project-gallery-item video,
+.nested-gallery-item video {
+    object-fit: contain;
+}
+
+/* ── Riel de contacto (borde izquierdo) ───────────────────────────────────
+   Se despliega hacia la derecha mostrando el nombre de cada enlace.
+
+   `--riel-ancho` no es el ancho real del riel (55px plegado), sino la franja
+   del margen izquierdo que se le reserva: las figuras decorativas se corren en
+   función de ella, y el sobrante son los pocos px de aire entre ambos.
+   El riel es `position: fixed`: su relayout al abrirse no toca el flujo del
+   documento, que es la condición para que animar tamaño sea aceptable. */
+:root {
+    --riel-ancho: 64px;
+}
+
+.riel {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: var(--z-riel);
+}
+
+.riel-caja {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-left: none;
+    border-radius: 0 14px 14px 0;
+    background: var(--bg-primary-alpha);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.riel-lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+/* Separa el botón de los enlaces sin meter un elemento vacío de por medio */
+/* Separa los enlaces del botón de abrir/cerrar, que va debajo */
+.riel-lista::after {
+    content: '';
+    height: 1px;
+    background: var(--border);
+    margin: 0.2rem 0.3rem 0;
+}
+
+/* ── Foto de perfil, solo visible desplegado ──────────────────────────────
+   Colapsa en los dos ejes: las filas dan el barrido vertical y las columnas
+   evitan que, plegado, los 84px del círculo sigan marcando el ancho de la
+   caja (`overflow: hidden` recorta, pero no achica la contribución de ancho). */
+.riel-perfil {
+    display: grid;
+    grid-template-columns: 0fr;
+    grid-template-rows: 0fr;
+    transition: grid-template-columns 0.32s cubic-bezier(0.16, 0.84, 0.32, 1),
+        grid-template-rows 0.32s cubic-bezier(0.16, 0.84, 0.32, 1);
+}
+
+.riel-perfil-hueco {
+    overflow: hidden;
+}
+
+.riel-foto {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 0.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border);
+    /* Marcador mientras no haya archivo, ver src/data/perfil.js */
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--text-secondary);
+    opacity: 0;
+    scale: 0.85;
+    transition: opacity 0.22s ease, scale 0.32s cubic-bezier(0.16, 0.84, 0.32, 1);
+}
+
+.riel-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.riel.is-abierto .riel-perfil {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+
+.riel.is-abierto .riel-foto {
+    opacity: 1;
+    scale: 1;
+    transition-delay: 0.12s;
+}
+
+.riel-link {
+    display: grid;
+    /* icono | nombre. La segunda columna arranca en 0fr y crece a 1fr, que sí
+       interpola — `width: auto` no lo hace. */
+    grid-template-columns: 38px 0fr;
+    align-items: center;
+    height: 38px;
+    border-radius: 10px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease,
+        grid-template-columns 0.32s cubic-bezier(0.16, 0.84, 0.32, 1);
+}
+
+.riel-link>svg {
+    justify-self: center;
+}
+
+.riel-link:hover {
+    color: var(--accent-text);
+    background: var(--accent-glow);
+}
+
+.riel-link:active {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* El nombre: oculto por recorte, no por display, para poder animarlo */
+.riel-nombre {
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+}
+
+.riel-nombre>span {
+    display: block;
+    padding-right: 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.riel.is-abierto .riel-link {
+    grid-template-columns: 38px 1fr;
+}
+
+.riel.is-abierto .riel-nombre {
+    opacity: 1;
+    /* Se demora hasta que el hueco terminó de abrirse, si no el texto aparece
+       apretado contra el borde */
+    transition-delay: 0.12s;
+}
+
+/* La flecha apunta hacia donde va a crecer, y se da vuelta al abrirse */
+.riel-toggle {
+    color: var(--accent-text);
+}
+
+.riel-toggle>svg {
+    transition: transform 0.32s cubic-bezier(0.16, 0.84, 0.32, 1);
+}
+
+.riel.is-abierto .riel-toggle>svg {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .riel-link,
+    .riel-nombre,
+    .riel-perfil,
+    .riel-foto,
+    .riel-toggle>svg {
+        transition: none;
+    }
+}
+
+/* En móvil no hay margen lateral que ocupar: baja, se acuesta y no se
+   despliega — los nombres no entrarían. */
+@media (max-width: 900px) {
+    .riel {
+        top: auto;
+        bottom: 0;
+        left: 50%;
+        translate: -50% 0;
+    }
+
+    .riel-caja,
+    .riel-lista {
+        flex-direction: row;
+    }
+
+    .riel-caja {
+        border: 1px solid var(--border);
+        border-bottom: none;
+        border-radius: 14px 14px 0 0;
+    }
+
+    .riel-lista::after,
+    .riel-perfil {
+        display: none;
+    }
+
+    .riel-link,
+    .riel.is-abierto .riel-link {
+        grid-template-columns: 38px;
+    }
+
+    .riel-nombre,
+    .riel-toggle {
+        display: none;
+    }
+}
+
+/* ── El riel ocupa el margen izquierdo: las figuras de ese lado se corren ── */
+.wire-decor.at-left {
+    left: calc(-1 * var(--wire-size) / 2.6 + var(--riel-ancho));
+}
+
+@media (max-width: 900px) {
+    .wire-decor.at-left {
+        left: calc(-1 * var(--wire-size) / 2.6);
+    }
 }

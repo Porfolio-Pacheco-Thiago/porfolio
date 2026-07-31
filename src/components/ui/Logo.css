@@ -1,0 +1,94 @@
+/* El logo toma su color de `currentColor`, así que basta una línea por tema en
+   vez de dos archivos PNG. Los tonos son los del logo original, no los del
+   acento: son la marca y no tienen por qué seguir a la paleta. */
+.logo-marca {
+    color: var(--logo);
+    /* Sin `width`/`height` en el SVG: la relación sale del `viewBox`, y el alto lo
+       fija el CSS de cada lugar donde se usa, igual que cuando era un `img`. */
+    display: block;
+    overflow: visible;
+}
+
+/* ── El logo se dibuja solo ───────────────────────────────────────────────
+   Modificador reutilizable: lo usan la pantalla de carga y el logo del navbar.
+   Vive acá y no en `Loader.css` porque los tiempos dependen de cómo está armado
+   el SVG —del orden de los trazos y de `--k`—, o sea que son parte del logo.
+
+   Los tiempos salen de dos variables que `Logo.jsx` pone en cada elemento:
+   `--i`, su lugar en el orden de dibujo, y `--k`, cuánto tiene que durar ese
+   trazo relativo al más largo. El escalonado es por índice y los trazos vienen
+   ordenados de arriba-izquierda a abajo-derecha, así que la mano avanza por el
+   dibujo en vez de encenderlo a saltos.
+
+   El dibujado entero dura **1.0s** —el máximo de `delay + duration` sobre los 27
+   trazos, no una suma a ojo—.
+
+   **Cuándo arranca lo decide dónde está**, no una prop: el logo del loader está
+   adentro de `.loader`, que es lo único que la regla global de `index.css` no
+   pausa, así que se dibuja durante la carga. El del navbar está afuera, así que
+   queda pausado en su primer cuadro y arranca cuando la carga termina, junto con
+   el resto del sitio.
+
+   Se anima `stroke-dashoffset`, que repinta cada cuadro y no se compone en GPU.
+   Acá se banca: son 27 trazos chicos durante un segundo, una sola vez. */
+/* El estado "sin dibujar" vive dentro del `@keyframes`, no en la regla base, y no
+   es un capricho: si estuviera en la regla base y la animación no llegara a correr
+   —una pestaña abierta en segundo plano, un navegador con las animaciones
+   apagadas— el logo se quedaría **invisible**. Con el `from` adentro, lo que se ve
+   por defecto es el logo entero. */
+/* `--logo-vel` multiplica todos los tiempos: 1 es el segundo del loader. El logo
+   del navbar lo sube porque ahí la animación no compite con nada —la pantalla ya
+   está poblada— y a la velocidad del loader pasaba desapercibida. */
+.logo-dibuja {
+    --logo-vel: 1;
+}
+
+.logo-dibuja .logo-trazos path {
+    animation: logoTrazar calc((150ms + var(--k) * 405ms) * var(--logo-vel)) ease-out backwards;
+    animation-delay: calc(var(--i) * 23ms * var(--logo-vel));
+}
+
+@keyframes logoTrazar {
+    from {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+    }
+
+    to {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Los nodos aparecen detrás de la pluma, no todos al final: el desfase de 170ms
+   los deja caer sobre un trazo que ya pasó por ahí. `fill-box` es necesario para
+   que el `scale` de cada círculo gire sobre su propio centro y no sobre el
+   origen del SVG. */
+.logo-dibuja .logo-nodos circle {
+    transform-box: fill-box;
+    transform-origin: center;
+    /* Mismo motivo que arriba: la escala 0 vive en el `@keyframes`. */
+    animation: logoNodo calc(135ms * var(--logo-vel)) cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+    animation-delay: calc((170ms + var(--i) * 23ms) * var(--logo-vel));
+}
+
+@keyframes logoNodo {
+    from {
+        scale: 0;
+    }
+
+    to {
+        scale: 1;
+    }
+}
+
+/* Con `prefers-reduced-motion` el logo aparece dibujado y quieto. Alcanza con
+   sacar la animación justamente porque los estados iniciales están adentro del
+   `@keyframes` y no en la regla base. */
+@media (prefers-reduced-motion: reduce) {
+
+    .logo-dibuja .logo-trazos path,
+    .logo-dibuja .logo-nodos circle {
+        animation: none;
+    }
+}

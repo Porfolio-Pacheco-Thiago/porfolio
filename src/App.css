@@ -1,5 +1,8 @@
 .app {
-  min-height: 100vh;
+  /* `dvh` y no `vh`: en Safari de iOS `100vh` incluye la barra de direcciones que
+     después se retrae, así que la sección salta al scrollear. Con la regla de una
+     sección por pantalla ese salto se nota el doble. */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }

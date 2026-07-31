@@ -21,12 +21,14 @@ import { FiImage } from 'react-icons/fi';
 export default function GalleryPlaceholder({ className, itemClassName, count = 3, ...props }) {
     const claseHueco = itemClassName ?? `${className}-item`;
     return (
-        <div className={className} {...props}>
+        // Misma estructura que `Gallery`, para que las reglas de la grilla valgan
+        // igual con contenido y sin él.
+        <ul className={className} {...props}>
             {Array.from({ length: count }, (_, i) => (
-                <div key={i} className={claseHueco}>
+                <li key={i} className={claseHueco}>
                     <FiImage aria-hidden="true" />
-                </div>
+                </li>
             ))}
-        </div>
+        </ul>
     );
 }

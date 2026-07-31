@@ -12,9 +12,6 @@ export default function Journey() {
     const { t, getList } = useLang();
     const timelineRef = useRef(null);
     const [activeId, setActiveId] = useState(null);
-    // Regla de diseño: cada sección entra en una pantalla. El modo compacto es
-    // el estado normal; expandir es una acción explícita del usuario.
-    const [compacto, setCompacto] = useState(true);
     // null | 'academic' | 'work' — solo una línea puede ocultarse a la vez
     const [hidden, setHidden] = useState(null);
     // Acordeones por cliente de la línea de tiempo interna (Lovelytics)
@@ -137,37 +134,36 @@ export default function Journey() {
         .sort((a, b) => b.sort - a.sort);
 
     return (
-        <section id="journey" className={`experience has-decor ${compacto ? 'is-compact' : ''}`}>
+        <section id="journey" className="experience has-decor">
             <WireFigure kind="cube" detail={3} spin="flat" className="wire-decor at-left" size={880} line={7} seconds={150} tiltX={20} tiltZ={-10} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('journey.title')}</h2>
                 <p className="section-subtitle">{t('journey.subtitle')}</p>
-                <button
-                    type="button"
-                    className="section-toggle"
-                    onClick={() => setCompacto(c => !c)}
-                    aria-expanded={!compacto}
-                >
-                    {compacto ? t('section.expand') : t('section.collapse')}
-                </button>
+            </div>
+
+            {/* Los rótulos van **arriba de la línea y en el flujo**, no flotando
+                adentro. Cuando estaban posicionados en absoluto había que reservarles
+                lugar con un `padding-top` a ojo, y en modo compacto ese relleno
+                quedaba más chico que ellos: el rótulo "Académico" pisaba la esquina
+                de la primera tarjeta. Así el alto lo reservan ellos mismos. */}
+            <div className="timeline-ramas">
+                {['academic', 'work'].map(side => (
+                    <button
+                        key={side}
+                        type="button"
+                        className={`timeline-axis-label rama-${side} ${hidden === side ? 'is-collapsed' : ''}`}
+                        onClick={() => toggleHidden(side)}
+                        aria-pressed={hidden === side}
+                    >
+                        {t(side === 'work' ? 'nav.experience' : 'nav.academic')}
+                    </button>
+                ))}
             </div>
 
             <div className="timeline" ref={timelineRef}>
-                {['academic', 'work'].map(side => (
-                    <div
-                        key={side}
-                        className={`timeline-axis line-${side} ${hidden === side ? 'line-hidden' : ''}`}
-                    >
-                        <button
-                            type="button"
-                            className={`timeline-axis-label ${hidden === side ? 'is-collapsed' : ''}`}
-                            onClick={() => toggleHidden(side)}
-                            aria-pressed={hidden === side}
-                        >
-                            {t(side === 'work' ? 'nav.experience' : 'nav.academic')}
-                        </button>
-                    </div>
-                ))}
+                {/* Una sola línea en el medio: lo académico cae a la izquierda y lo
+                    laboral a la derecha. */}
+                <div className="timeline-axis" />
 
                 {items.map(item => (
                     <TimelineItem

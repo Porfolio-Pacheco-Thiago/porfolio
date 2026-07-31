@@ -6,11 +6,16 @@
         "experience": "Experiencia",
         "projects": "Proyectos",
         "academic": "Académico",
-        "skills": "Habilidades"
+        "skills": "Habilidades",
+        "contact": "Contacto"
     },
-    "section": {
-        "expand": "Ver todo",
-        "collapse": "Vista compacta"
+    "media": {
+        "imageOf": "Captura de",
+        "videoOf": "Video de"
+    },
+    "contact": {
+        "cta": "Contactame",
+            "close": "Cerrar"
     },
     "journey": {
         "title": "Experiencia y Formación",
@@ -122,11 +127,11 @@
         ]
     },
     "hero": {
-        "greeting": "Hola, soy",
         "name": "Thiago Pacheco",
         "role": "Ingeniero de Software",
         "bio": "A mis 21 años, soy Ingeniero de Software graduado de la Universidad de Buenos Aires, con la distinción de ser una de las únicas tres personas en la historia de la institución en completar la carrera en tiempo récord —un hito inalcanzado desde 1938—. Como Data Engineer Junior en Lovelytics, canalizo mi pasión hacia la arquitectura de soluciones de software robustas, destacándome en la intersección entre los sistemas distribuidos complejos y las tecnologías de inteligencia artificial de vanguardia.",
         "cta": "Ver Mi Trabajo",
+        "scroll": "Ir a Trayectoria",
         "contact": "Contactame"
     },
     "projects": {
@@ -135,6 +140,25 @@
         "viewRepo": "Ver Repositorio",
         "viewMore": "Más Información",
         "showLess": "Ver Menos",
+        "demoHint": "Elegí una demo para verla en el celular. Tocá de nuevo para volver.",
+        "player": {
+            "label": "Controles de la demo",
+            "of": "de",
+            "play": "Reproducir",
+            "back10": "Retroceder 10 segundos",
+            "forward10": "Adelantar 10 segundos",
+            "pause": "Pausar",
+            "mute": "Silenciar",
+            "unmute": "Activar sonido",
+            "volume": "Volumen",
+            "seek": "Posición del video",
+            "fullscreen": "Pantalla completa"
+        },
+        "demos": {
+            "complete-app": "La app completa",
+            "cover-ai": "Cover IA",
+            "shazam": "Identificar canción"
+        },
         "items": [
             {
                 "id": "melodia",

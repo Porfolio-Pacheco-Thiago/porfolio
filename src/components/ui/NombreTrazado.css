@@ -1,0 +1,75 @@
+/* El nombre trazado. La caja sale del `viewBox`; basta fijarle el ancho en `em` y
+   el alto lo saca de la relación. El `em` viene del `font-size` que le pone
+   `.hero-name`, así que el nombre sigue escalando con el mismo `clamp()` de antes. */
+.nombre-trazado {
+    display: block;
+    width: 5.006em;
+    max-width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+/* Dos capas: primero todos los contornos, después todos los rellenos. Ver la nota
+   del componente — con una sola capa las letras se apelmazan. */
+.nombre-contornos path {
+    fill: none;
+    stroke: url(#nombre-degrade);
+    stroke-width: var(--borde-nombre-svg, 170);
+    stroke-linejoin: round;
+}
+
+.nombre-rellenos path {
+    fill: var(--hero-nombre-relleno);
+    stroke: none;
+}
+
+/* ── Cada letra se dibuja sola, todas a la vez ────────────────────────────
+   Como el logo. Las 13 letras arrancan **en paralelo** —el `--i` solo mete unos
+   milisegundos de diferencia para que no se vea mecánico— y cada una traza su
+   propio contorno con `stroke-dashoffset`.
+
+   El relleno entra después, cuando el trazo ya cerró la letra: si entrara junto,
+   taparía el dibujo y no se vería el recorrido.
+
+   Los estados iniciales viven dentro de cada `@keyframes` y no en la regla base:
+   si la animación no llegara a correr —una pestaña en segundo plano, un navegador
+   con las animaciones apagadas— el nombre quedaría invisible. */
+.nombre-contornos path {
+    animation: nombreTrazar 1.05s ease-in-out backwards;
+    animation-delay: calc(0.5s + var(--i) * 17ms);
+}
+
+.nombre-rellenos path {
+    animation: nombreRellenar 0.45s ease-out backwards;
+    animation-delay: calc(1.3s + var(--i) * 17ms);
+}
+
+@keyframes nombreTrazar {
+    from {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+    }
+
+    to {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes nombreRellenar {
+    from {
+        fill-opacity: 0;
+    }
+
+    to {
+        fill-opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .nombre-contornos path,
+    .nombre-rellenos path {
+        animation: none;
+    }
+}

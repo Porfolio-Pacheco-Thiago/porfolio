@@ -1,10 +1,10 @@
 import { SiReact } from 'react-icons/si';
 import { useLang } from '../context/lang-context';
 import Logo from './ui/Logo';
-import SocialLinks from './ui/SocialLinks';
+import ContactButton from './ui/ContactButton';
 import './Footer.css';
 
-export default function Footer() {
+export default function Footer({ contactoAbierto, onContacto }) {
     const { t } = useLang();
 
     return (
@@ -15,7 +15,14 @@ export default function Footer() {
                         <span className="footer-logo"><Logo className="footer-logo-img" /></span>
                         <p className="footer-tagline">{t('hero.role')}</p>
                     </div>
-                    <SocialLinks className="footer-socials" size={18} />
+                    {/* Vuelve a llenar el hueco que dejaron los enlaces sociales
+                        al mudarse al riel, y cierra la página con la misma
+                        llamada con la que abre el hero. */}
+                    <ContactButton
+                        abierto={contactoAbierto}
+                        onCambio={onContacto}
+                        className="btn btn-primary"
+                    />
                 </div>
                 <div className="footer-bottom">
                     <p>{t('footer.copyright')}</p>

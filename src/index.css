@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Archivo:wdth,wght@112,400..700&family=Chakra+Petch:wght@600;700&family=Silkscreen&display=swap');
 
 /* Tailwind v4, para los componentes de shadcn/cult-ui. Todo lo de abajo es CSS
    propio sin capa, y en la cascada el CSS sin capa gana sobre el de @layer, así
@@ -50,6 +50,22 @@
   --accent-hover: #00c853;
   --accent-glow: rgba(0, 230, 118, 0.08);
   --accent-glow-raw: rgba(0, 230, 118, 0.2);
+
+  /* Color de las sombras, teñido con el verde del fondo en vez de negro puro: el
+     negro sobre un fondo con tinte se lee como un agujero gris.
+     Son los canales sueltos, no un color armado, para que cada sombra elija su
+     opacidad —`rgb(var(--sombra-rgb) / 0.2)`— sin que haya un token por nivel. */
+  --sombra-rgb: 2 20 11;
+
+  /* Escala de capas. Solo para lo que está `fixed` y compite a nivel de página;
+     los `z-index` chicos (0 a 3) de adentro de una sección son ordenamiento local
+     y no van acá. Los saltos de 100 dejan lugar para meter algo en el medio sin
+     renumerar. */
+  --z-fondo: -1;
+  --z-riel: 100;
+  --z-navbar: 200;
+  --z-loader: 300;
+  --z-cursor: 400;
   --text-primary: #f5f5f5;
   --text-secondary: #a0a0a0;
   --border: rgba(255, 255, 255, 0.08);
@@ -59,6 +75,25 @@
      llega hasta el peso 700, no tiene 800. */
   --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Solo para los nombres de proyecto. Inspeccionando la referencia, larson usa
+     **Grifter Bold con +0.05em de interletrado**: cuadrada, ancha y espaciada.
+     Grifter es comercial, así que va Archivo —variable, con eje de ancho— pedida
+     al 112% de ancho y peso 700, que es lo más cerca que se llega con una libre.
+     Montserrat estaba mal: es geométrica y redonda, no cuadrada. */
+  --font-display: 'Archivo', var(--font-sans);
+  /* Solo para el nombre del hero. No comparte token con `--font-display` a
+     propósito: esa es la de los nombres de proyecto, y son dos decisiones
+     distintas — si mañana cambia una, no tiene por qué arrastrar a la otra.
+     Se cargan los pesos 600 y 700: el 700 es el del tema oscuro y el 600 el del
+     claro, que lleva el relleno un punto más fino. */
+  --font-hero: 'Chakra Petch', var(--font-display);
+
+  /* Para el rol, debajo del nombre. Silkscreen es una tipografía de píxeles: su
+     dibujo está hecho sobre una grilla de 8px, así que **el cuerpo tiene que ser
+     múltiplo de 8** o los píxeles caen entre medio y el navegador los difumina.
+     Por eso el rol usa una medida fija y no un `clamp()` fluido, que da valores
+     fraccionarios. Un solo peso (400). */
+  --font-pixel: 'Silkscreen', var(--font-mono);
 
   /* Sol: el núcleo brillante y el halo que se abre a su alrededor. Fijo detrás
      de todo el sitio; en tema claro los mismos tonos, más tenues. */
@@ -71,6 +106,70 @@
   --accent-text: var(--accent);
   /* Texto sobre superficies pintadas con el acento */
   --accent-on: #0a0a0a;
+
+  /* Extremo claro de los degradados de marca (el marco del hero, el brillo de las
+     tarjetas de Proyectos). **No puede ser `white` fijo.** En oscuro el acento es
+     un verde brillante sobre fondo casi negro y mezclarlo con blanco lo aclara,
+     que es lo que se busca; en claro el acento es verde profundo sobre una página
+     verde media, y mezclarlo con blanco lo lleva justo a la luminosidad del fondo:
+     el degradado se volvía gris (11% de saturación) y quedaba en 1.09:1 contra la
+     página, o sea invisible en todo su tramo medio.
+     En claro, entonces, el extremo claro es otro verde —no el blanco—, que
+     mantiene 3.6:1 contra la página.
+
+     En oscuro tampoco es blanco puro: con `white` el tramo medio del degradado
+     llegaba a 78% de luminosidad contra el 45% del acento, un salto de 33 puntos
+     que se leía como un reflector. Este menta baja ese medio a 63%, o sea la mitad
+     del salto — sigue siendo un brillo, deja de encandilar. */
+  --degrade-luz: #7bffc0;
+
+  /* Los dos tonos del medio del degradado de marca. Salen como tokens y no
+     inline porque los usan el marco (un `linear-gradient` de CSS) y el nombre
+     trazado (un `linearGradient` de SVG), y un `stop-color` de SVG no puede
+     llevar un `color-mix()` anidado en una variable de gradiente. */
+  --degrade-medio: color-mix(in srgb, var(--accent) 30%, var(--degrade-luz));
+  --degrade-sombra-svg: var(--degrade-sombra);
+
+  /* Grosor del contorno del nombre en unidades del `viewBox` del SVG (1000 por
+     em), o sea el equivalente de los 0.17em que usaba el texto. */
+  --borde-nombre-svg: 170;
+
+  /* Extremo **oscuro** de los mismos degradados. Antes los dos extremos eran el
+     acento a secas, así que todo el recorrido iba del acento al brillo y volvía:
+     un rango de 18 puntos de luminosidad, que a lo ancho de un marco de 600px se
+     lee casi plano. Con este verde profundo en las puntas el recorrido pasa a 38
+     puntos y el degradado se nota, sin subir el brillo del pico.
+     El piso está puesto donde está porque es el color del marco: más oscuro que
+     esto no llega a 3:1 contra la página y el marco se empieza a perder. */
+  --degrade-sombra: #008c46;
+
+  /* El marco y la barra de título de las tarjetas de Proyectos. Son tokens y no
+     `color-mix()` sueltos en `Projects.css` porque el color con el que se atenúa
+     el acento **tiene que cambiar con el tema**: en oscuro se atenúa contra las
+     superficies grises, pero en claro esas superficies son casi blancas y el
+     resultado quedaba en 1.97:1 (barra) y 2.80:1 (marco) contra la página, o sea
+     por debajo del 3:1 que pide WCAG para gráficos. Atenuando contra el verde de
+     tarjeta, los dos suben a 5.2:1.
+     Ojo: en tema claro la tarjeta **expandida** es verde oscuro, así que ahí estos
+     dos se vuelven a dar vuelta — ver el bloque de tarjetas oscuras en `ui.css`. */
+  --proy-marco: color-mix(in srgb, var(--accent) 52%, var(--border));
+  --proy-barra: color-mix(in srgb, var(--accent) 62%, var(--bg-secondary));
+
+  /* Color de la marca. No sigue al acento a propósito: es el verde del logo tal
+     como estaba en los PNG originales (#43ec67 en oscuro, #018c1e en claro), y
+     una marca no tiene por qué moverse cuando se retoca la paleta. */
+  --logo: #43ec67;
+
+  /* Relleno de las letras del nombre del hero. Va aparte de `--text-primary`
+     porque no es texto que se lea por su color: lo que dibuja las letras es el
+     contorno grueso del acento, y el relleno solo tiene que separarse de él.
+     Se invierte con el tema: negro sobre el fondo oscuro, blanco sobre el claro. */
+  --hero-nombre-relleno: #000000;
+
+  /* Botón principal. En oscuro es el acento a secas; en claro se pinta con el
+     verde de las tarjetas: ver el bloque de abajo. */
+  --btn-primary-bg: var(--accent);
+  --btn-primary-fg: var(--accent-on);
 }
 
 [data-theme="light"] {
@@ -91,12 +190,38 @@
   --accent-hover: #06301a;
   --accent-glow: rgba(10, 61, 31, 0.10);
   --accent-glow-raw: rgba(10, 61, 31, 0.20);
+  --sombra-rgb: 6 34 19;
   --text-primary: #0d1f14;
   --text-secondary: #324439;
   --border: rgba(13, 31, 20, 0.16);
   --accent-text: #0a3d1f;
   /* El acento ahora es oscuro, así que encima va blanco y no negro */
   --accent-on: #ffffff;
+
+  /* Ver la nota de arriba: el relleno se invierte con el tema. */
+  --hero-nombre-relleno: #ffffff;
+
+  --logo: #018c1e;
+
+  /* Ver la nota de arriba: acá el blanco arruinaría el degradado. */
+  --degrade-luz: #3f7a58;
+  /* Ver la nota de arriba. Acá el rango se abre hacia abajo y no hacia arriba: el
+     pico ya está en el techo —más claro que eso no llega a 3:1 contra la página—,
+     así que lo que se estira es la punta oscura. */
+  --degrade-sombra: #052312;
+
+  /* Ver la nota de arriba: acá el acento se atenúa contra el verde de tarjeta y
+     no contra el casi-blanco de `--bg-secondary`. */
+  --proy-marco: color-mix(in srgb, var(--accent) 62%, var(--bg-card));
+  --proy-barra: color-mix(in srgb, var(--accent) 62%, var(--bg-card));
+
+  /* En claro el contorno del nombre es más grueso: ver la nota del tema oscuro. */
+  --borde-nombre-svg: 220;
+
+  /* El botón principal usa el mismo verde que las tarjetas, con el mismo texto
+     que va encima de ellas: 3.86:1 contra la página y 7.1:1 para el texto. */
+  --btn-primary-bg: var(--bg-card);
+  --btn-primary-fg: #f2f7f4;
 
   /* El sol se invierte con la paleta: sobre fondo verde, una luz verde no se
      ve. Pasa a ser luz blanca, que es lo que da la sensación de sol. */
@@ -112,6 +237,21 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Mientras la pantalla de carga está arriba, nada del resto del sitio se mueve.
+   No es "no animar": las animaciones se crean igual y quedan **pausadas en su
+   primer cuadro**, así que arrancan enteras cuando el loader se va en vez de
+   aparecer ya empezadas. Las transiciones sí se anulan, porque una transición no
+   se puede pausar — se aplicaría el estado final de una y la animación se perdería.
+
+   El `:not()` deja afuera al propio loader, que es lo único que tiene que moverse.
+   Va con `!important` porque compite contra reglas de componente que ya declaran
+   su `animation`, y `[data-cargando]` dura un segundo y medio: no hay riesgo de
+   que quede tapando algo. */
+html[data-cargando] :not(.loader):not(.loader *) {
+  animation-play-state: paused !important;
+  transition: none !important;
 }
 
 /* Animaciones de aparición */
@@ -178,7 +318,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: var(--z-fondo);
   pointer-events: none;
   background:
     /* rebote del piso */
@@ -190,12 +330,16 @@ body::before {
 }
 
 /* Viñeta suave en los bordes: refuerza que la luz viene del centro y no de
-   todos lados. Va aparte para no engordar el degradado del sol. */
+   todos lados. Va aparte para no engordar el degradado del sol.
+
+   Este negro **no** usa `--sombra-rgb` a propósito: no es la sombra de un objeto
+   sino una caída de luz sobre el fondo. Teñirla de verde le sacaría justamente lo
+   que hace, que es apagar el color hacia los bordes. */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: var(--z-fondo);
   pointer-events: none;
   background: radial-gradient(120% 95% at 50% 20%, transparent 55%, rgba(0, 0, 0, 0.28));
 }

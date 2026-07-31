@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { alTerminarCarga } from '../../lib/carga';
 
 /**
  * Figura de alambre decorativa que gira lentamente en 3D.
@@ -46,21 +47,28 @@ export default function WireFigure({
 }) {
     const ref = useRef(null);
 
+    // El observador se arma recién cuando la pantalla de carga se fue. Si mirara
+    // desde el vamos, `data-entered` se engancharía detrás del loader y la entrada
+    // desde el borde —que dura 3s— estaría terminada antes de que alguien la vea.
+    // Pausarla no alcanza: es una transición, y las transiciones no se pausan.
     useEffect(() => {
         if (!autoSpin) return;
         const el = ref.current;
         if (!el) return;
-        const io = new IntersectionObserver(
-            ([e]) => {
-                el.toggleAttribute('data-visible', e.isIntersecting);
-                // `data-entered` se engancha una sola vez: la entrada es un
-                // gesto de bienvenida, no algo que se repita en cada scroll.
-                if (e.isIntersecting) el.setAttribute('data-entered', '');
-            },
-            { rootMargin: '5% 0px' }
-        );
-        io.observe(el);
-        return () => io.disconnect();
+        let io = null;
+        const cancelar = alTerminarCarga(() => {
+            io = new IntersectionObserver(
+                ([e]) => {
+                    el.toggleAttribute('data-visible', e.isIntersecting);
+                    // `data-entered` se engancha una sola vez: la entrada es un
+                    // gesto de bienvenida, no algo que se repita en cada scroll.
+                    if (e.isIntersecting) el.setAttribute('data-entered', '');
+                },
+                { rootMargin: '5% 0px' }
+            );
+            io.observe(el);
+        });
+        return () => { cancelar(); io?.disconnect(); };
     }, [autoSpin]);
 
     return (
