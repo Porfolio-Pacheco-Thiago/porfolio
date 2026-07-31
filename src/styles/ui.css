@@ -283,7 +283,10 @@
 }
 
 .section-title {
-    font-size: clamp(2rem, 4vw, 3rem);
+    /* La misma que el nombre del hero: los títulos son la otra voz "de marca" de
+       la página, así que comparten familia en vez de caer en la de párrafo. */
+    font-family: var(--font-hero);
+    font-size: var(--titulo-fs);
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 0.5rem;

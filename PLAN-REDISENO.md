@@ -1030,9 +1030,90 @@ Por eso la entrada tiene un bloque (`.timeline-bloque`): la foto y la ventana so
 En el DOM la foto va siempre primero y en la rama laboral se invierte solo el orden
 visual (`row-reverse`), así el orden de lectura no depende del lado.
 
-Se estira al alto de la ventana en vez de flotar —una miniatura chica al lado de
-una caja más alta se lee como un error de alineación—, salvo al expandir la entrada,
-donde vuelve a su tamaño en lugar de estirarse por toda esa altura.
+Es **cuadrada y del alto de la ventana** (101px). Lo que va ahí es el **logo** de
+cada institución, no una foto del evento: en un cuadrado chico una foto de multitud
+no se lee. Lo elige `getLogo()`, que prefiere un archivo cuyo nombre empiece con
+`logo` y, cuando hay varios, el de nombre más corto —las carpetas traen el logo y su
+versión apaisada (`logo-grande-…`), que en un cuadrado deja dos franjas vacías—.
+Va con `object-fit: contain`, porque recortarle los bordes a un logo lo arruina, y
+sobre **fondo blanco**: varios son PNG con transparencia y sobre el verde oscuro de
+la tarjeta el de la Olimpiada se veía recortado en negro.
+
+El recuadro lleva **el color de la ventana de al lado y está pegado a ella**, con el
+trazo al doble (`--trazo-foto`, 4px contra 2): con el trazo fino se leía como el
+borde de una imagen y no como parte de la pieza —el borde compartido se dibuja una sola vez, si no quedaría doble—. Eso
+obligó a mover `--trazo` y `--barra` de `.timeline-card` a `.timeline-bloque`: la
+foto es hermana de la ventana, no hija, así que sin el token el `border` entero se
+volvía inválido y el color caía en `currentColor` —blanco en oscuro, casi negro en
+claro— en vez del de la ventana.
+
+**Las entradas laborales llevan el color de su rama en la pieza entera** —marco,
+barra y recuadro de la foto—, no solo en sus adornos como antes. Eso destapó dos
+cosas:
+
+- **En claro ese color era negro puro**, así que cada entrada laboral quedaba con
+  una banda negra cruzándola. Pasó a un **oliva** (`#2f4a12`), el mismo tono que en
+  oscuro pero bajado para separarse de la página verde clara: 4.8:1, muy cerca del
+  5.2 del marco académico. De paso se fueron los cinco `#000` sueltos que tenía la
+  rama laboral: ahora todos leen el token.
+- **El color de rama no sirve para el texto de adentro.** El marco se lee contra la
+  página, pero el período de la tarjeta se lee contra su superficie oscura: con el
+  mismo tono quedaba en **1.18:1** en claro y 3.49:1 en oscuro. Hay un token aparte,
+  `--work-texto`, con un oliva claro que da 4.8 y 8.1.
+
+La ubicación de Lovelytics pasó de "Estados Unidos" a "USA": con el texto largo su
+período se partía en dos renglones y esa entrada medía 15px más que las otras cinco.
+Ahora las seis miden lo mismo, y los 17px que se liberaron volvieron al aire entre
+entradas, que había quedado en 8px después de tres recortes seguidos.
+
+**El hueco entre el marco y el contenido mide lo mismo en los cuatro lados** (2px,
+medido en las seis entradas). Abajo medía el doble por dos motivos sumados: un
+`padding-bottom` en la ventana que repetía lo que ya hacía el margen del contenido, y
+que cuando el `min-height` estira la ventana al alto de la foto el sobrante caía todo
+ahí. La ventana pasó a ser una columna flex con el contenido en `flex: 1`, así el
+sobrante lo absorbe el contenido y no el hueco.
+
+**La foto y la ventana responden como una sola pieza.** El levantar y la sombra del
+hover se mudaron de la ventana al **bloque**: cuando eran de la ventana sola, al
+levantarse se despegaba de su foto y se veían como dos cosas sueltas. El borde sí se
+pinta en las dos, porque son dos bordes distintos. Verificado: con el hover puesto,
+foto y ventana quedan en el mismo `y`.
+
+Hacer click en la foto abre y cierra la entrada igual que hacerlo en la ventana —el
+manejador vive en `.timeline-item`, que las contiene a las dos—.
+
+La entrada de docencia en FIUBA no tenía carpeta: se le copió el escudo de la de
+graduación, así que las seis muestran su logo. Es un archivo duplicado de 32KB, pero
+mantiene la convención de una carpeta por `id` en vez de meter una excepción en el
+código.
+
+**Los logos se recortaron a mano**, todos menos el de FIUBA/UBA —ese ya llegaba
+borde a borde—: el de la Olimpiada tenía márgenes transparentes de sobra, el de
+FIUBAtón no era cuadrado (160×176), el del Pellegrini traía mucho blanco alrededor y
+el de Lovelytics tenía un anillo de aire. Se recortan al contenido y se centran en un
+lienzo cuadrado con 1% de margen; el `padding` que tenía la imagen en CSS también se
+fue.
+
+A los dos escudos de FIUBA y al de Lovelytics se les devolvió un margen mínimo: 2px
+**tal como se ven**, no en el archivo. Como cada imagen se escala a la caja de 101px,
+el marco se calcula al revés —`p = 2 · lado / (101 − 4)`—, o sea 9px de fuente en el
+de 447 y 5px en el de 247. Poner 2px crudos en el archivo habría sido invisible.
+
+Lo que queda de blanco **no se puede sacar sin cortar el logo**: los escudos son
+verticales y el de la Olimpiada apaisado, así que dentro de un cuadrado siempre
+sobra por el lado corto. Hoy ocupan entre el 71% y el 98% de su caja según el eje.
+
+**El tamaño es fijo, no derivado**, y esto costó dos intentos: el alto de la ventana
+lo decide su contenido, así que un `aspect-ratio` no puede sacar el ancho de una
+altura que todavía no se resolvió — se queda en 0 y la foto desaparece. Va al revés:
+el cuadrado mide lo que mide una ventana de un renglón por título, y la ventana lleva
+ese mismo valor de `min-height`. Coinciden por construcción.
+
+**Agrandar la foto obligó a ensanchar el timeline de 1040 a 1140px.** A 88px el
+cuadrado le comía tanto ancho a la ventana que tres títulos se partían en dos
+renglones, y eso sacaba la sección de pantalla (1003 contra 953). Los 100px extra los
+paga el margen y no el texto: con el timeline más ancho la ventana conserva sus
+~390px, ningún título se parte de más y la sección queda en 951.
 
 La foto sale del índice de medios (`getCover('timeline/<id>')`), así que **aparece
 sola en cuanto haya un archivo** en `src/assets/media/timeline/<id>/`. Las seis

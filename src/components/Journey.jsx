@@ -133,12 +133,20 @@ export default function Journey() {
         .map(item => ({ ...DEFAULT_META, ...journeyMeta[item.id], ...item }))
         .sort((a, b) => b.sort - a.sort);
 
+    // Las filas que de verdad ocupan lugar: si una rama está oculta las suyas miden
+    // 0 y no cuentan. La tarjeta abierta se estira desde su fila hasta los dos
+    // extremos del timeline, y para eso necesita saber cuántas filas tiene encima y
+    // cuántas debajo — todas del mismo alto, así que alcanza con contarlas.
+    const visibles = items.filter(item => hidden !== item.category);
+    const abierta = visibles.find(item => item.id === activeId);
+
     return (
-        <section id="journey" className="experience has-decor">
+        // El lado abierto lo mira todo lo que tiene que correrse: la línea y sus
+        // puntos, los dos bloques y los rótulos de rama.
+        <section id="journey" className="experience has-decor" data-abierto={abierta?.category}>
             <WireFigure kind="cube" detail={3} spin="flat" className="wire-decor at-left" size={880} line={7} seconds={150} tiltX={20} tiltZ={-10} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('journey.title')}</h2>
-                <p className="section-subtitle">{t('journey.subtitle')}</p>
             </div>
 
             {/* Los rótulos van **arriba de la línea y en el flujo**, no flotando
@@ -169,6 +177,9 @@ export default function Journey() {
                     <TimelineItem
                         key={item.id}
                         item={item}
+                        fila={visibles.indexOf(item)}
+                        filas={visibles.length}
+                        esUltima={item.id === visibles[visibles.length - 1]?.id}
                         isCollapsed={hidden === item.category}
                         isExpanded={activeId === item.id && hidden !== item.category}
                         onToggle={() => toggleItem(item.id)}

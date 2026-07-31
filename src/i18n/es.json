@@ -1,261 +1,264 @@
 {
-    "nav": {
-        "label": "Navegación principal",
-        "about": "Sobre Mí",
-        "journey": "Trayectoria",
-        "experience": "Experiencia",
-        "projects": "Proyectos",
-        "academic": "Académico",
-        "skills": "Habilidades",
-        "contact": "Contacto"
-    },
-    "media": {
-        "imageOf": "Captura de",
-        "videoOf": "Video de"
-    },
-    "contact": {
-        "cta": "Contactame",
-            "close": "Cerrar"
-    },
-    "journey": {
-        "title": "Experiencia y Formación",
-        "subtitle": "Mi trayectoria profesional y académica",
-        "items": [
-            {
-                "id": "lovelytics",
-                "title": "Lovelytics",
-                "subtitle": "Ingeniero de Datos Junior",
-                "period": "Diciembre 2025 — Presente",
-                "location": "Estados Unidos (Remoto)",
-                "desc": "Arquitectando pipelines de datos escalables e impulsando soluciones de ingeniería a nivel empresarial para clientes de primer nivel.",
-                "tags": [
-                    "Ingeniería de Datos",
-                    "Cloud",
-                    "Analytics"
-                ],
-                "clients": [
-                    {
-                        "id": "ypf",
-                        "label": "Cliente: YPF",
-                        "period": "Julio 2026 — Presente",
-                        "desc": "Desarrollo y mantenimiento de arquitecturas de datos robustas para el sector energético, con enfoque en procesamiento de alto rendimiento y soluciones analíticas escalables."
-                    },
-                    {
-                        "id": "gp",
-                        "label": "Cliente: GP (Grupo Petersen)",
-                        "period": "Enero 2026 — Julio 2026",
-                        "desc": "Diseño y optimización de pipelines de datos escalables para procesar datos financieros minoristas de alto volumen, mejorando la fiabilidad de los datos y la infraestructura en la nube."
-                    },
-                    {
-                        "id": "dataschool",
-                        "label": "Capacitación: data:school (Databricks)",
-                        "period": "Diciembre 2025",
-                        "desc": "Completé el programa de capacitación intensivo 'data:school', enfocado en la arquitectura de Databricks, computación distribuida y prácticas avanzadas de ingeniería de datos."
-                    }
-                ]
-            },
-            {
-                "id": "fiubaton",
-                "title": "FIUBAtón 2025",
-                "subtitle": "Ganador — Competencia de Ingeniería",
-                "period": "2025",
-                "location": "Universidad de Buenos Aires",
-                "desc": "Campeón del principal hackathon de ingeniería de la facultad, desarrollando una solución tecnológica ganadora validada por ejecutivos de la industria y funcionarios gubernamentales.",
-                "body": "Ganador del primer puesto en el FIUBAtón 2025, la competencia de ingeniería más importante de la Facultad de Ingeniería (FIUBA). Liderando un equipo colaborativo, diseñamos una solución innovadora para un desafío de alto impacto del mundo real. Nuestro proyecto obtuvo el voto ganador de un distinguido panel compuesto por ejecutivos corporativos, inversores y altas autoridades nacionales.",
-                "tags": [
-                    "Competencia",
-                    "Innovación",
-                    "Ingeniería"
-                ]
-            },
-            {
-                "id": "teaching",
-                "title": "Universidad de Buenos Aires (UBA) - FIUBA",
-                "subtitle": "Ayudante de Cátedra y Mentor de Proyectos",
-                "period": "Agosto 2024 — Presente",
-                "nodes": [
-                    {
-                        "id": "is2",
-                        "label": "Ingeniería de Software 2 - Mentor",
-                        "period": "Marzo 2026 — Presente",
-                        "desc": "Ayudante de Cátedra y Mentor. Guiando a grupos de estudiantes a través del desarrollo integral de réplicas de plataformas full-stack. Responsable del seguimiento ágil semanal, mentoría arquitectónica y revisión de código."
-                    },
-                    {
-                        "id": "algos-segundo",
-                        "label": "Teoría de Algoritmos - Ayudante Segundo",
-                        "period": "Marzo 2025 — Presente",
-                        "desc": "Ascendido a Ayudante Segundo por excelencia académica. Responsable de impartir clases, evaluar proyectos complejos y gestionar la estructura organizativa de la cátedra."
-                    },
-                    {
-                        "id": "algos-adhonorem",
-                        "label": "Teoría de Algoritmos - Ayudante Ad-honorem",
-                        "period": "Agosto 2024 — Febrero 2025",
-                        "desc": "Comencé como Ayudante Ad-honorem (Corrector). Encargado de la evaluación de parciales y trabajos prácticos, brindando feedback técnico detallado a los alumnos."
-                    }
-                ]
-            },
-            {
-                "id": "uba",
-                "title": "Universidad de Buenos Aires (UBA)",
-                "subtitle": "Ingeniería en Software",
-                "period": "Graduado en tiempo récord",
-                "desc": "Me convertí en la tercera persona en toda la historia de la institución en obtener el título de Ingeniero de Software en tiempo récord —un logro sin precedentes e inalcanzado desde 1938.",
-                "tags": [
-                    "Récord Académico Histórico"
-                ]
-            },
-            {
-                "id": "olympiad",
-                "title": "Olimpiada Nacional de Informática",
-                "subtitle": "2do Puesto — Nivel Nacional",
-                "period": "16 años",
-                "desc": "Obtuve el 2do puesto a nivel nacional en la Olimpiada Argentina de Informática, demostrando habilidades de élite en la resolución algorítmica de problemas con tan solo 16 años.",
-                "tags": [
-                    "Medallista de Plata Nacional"
-                ]
-            },
-            {
-                "id": "pellegrini",
-                "title": "Escuela Superior de Comercio Carlos Pellegrini",
-                "subtitle": "Educación Secundaria",
-                "period": "Graduado",
-                "desc": "Exalumno de la Escuela Superior de Comercio Carlos Pellegrini, ampliamente reconocida como una de las instituciones académicas más rigurosas y prestigiosas de Argentina.",
-                "tags": [
-                    "Educación Secundaria de Élite"
-                ]
-            }
+  "nav": {
+    "label": "Navegación principal",
+    "about": "Sobre Mí",
+    "journey": "Trayectoria",
+    "experience": "Experiencia",
+    "projects": "Proyectos",
+    "academic": "Académico",
+    "skills": "Habilidades",
+    "contact": "Contacto"
+  },
+  "media": {
+    "imageOf": "Captura de",
+    "videoOf": "Video de"
+  },
+  "contact": {
+    "cta": "Contactame",
+    "close": "Cerrar"
+  },
+  "journey": {
+    "title": "Experiencia y Formación",
+    "items": [
+      {
+        "id": "lovelytics",
+        "title": "Lovelytics",
+        "subtitle": "Ingeniero de Datos Junior",
+        "period": "Diciembre 2025 — Presente",
+        "location": "EE. UU. (Remoto)",
+        "desc": "Arquitectando pipelines de datos escalables e impulsando soluciones de ingeniería a nivel empresarial para clientes de primer nivel.",
+        "tags": [
+          "Ingeniería de Datos",
+          "Cloud",
+          "Analytics"
+        ],
+        "clients": [
+          {
+            "id": "ypf",
+            "label": "Cliente: YPF",
+            "period": "Julio 2026 — Presente",
+            "desc": "Desarrollo y mantenimiento de arquitecturas de datos robustas para el sector energético, con enfoque en procesamiento de alto rendimiento y soluciones analíticas escalables."
+          },
+          {
+            "id": "gp",
+            "label": "Cliente: GP (Grupo Petersen)",
+            "period": "Enero 2026 — Julio 2026",
+            "desc": "Diseño y optimización de pipelines de datos escalables para procesar datos financieros minoristas de alto volumen, mejorando la fiabilidad de los datos y la infraestructura en la nube."
+          },
+          {
+            "id": "dataschool",
+            "label": "Capacitación: data:school (Databricks)",
+            "period": "Diciembre 2025",
+            "desc": "Completé el programa de capacitación intensivo 'data:school', enfocado en la arquitectura de Databricks, computación distribuida y prácticas avanzadas de ingeniería de datos."
+          }
         ]
-    },
-    "hero": {
-        "name": "Thiago Pacheco",
-        "role": "Ingeniero de Software",
-        "bio": "A mis 21 años, soy Ingeniero de Software graduado de la Universidad de Buenos Aires, con la distinción de ser una de las únicas tres personas en la historia de la institución en completar la carrera en tiempo récord —un hito inalcanzado desde 1938—. Como Data Engineer Junior en Lovelytics, canalizo mi pasión hacia la arquitectura de soluciones de software robustas, destacándome en la intersección entre los sistemas distribuidos complejos y las tecnologías de inteligencia artificial de vanguardia.",
-        "cta": "Ver Mi Trabajo",
-        "scroll": "Ir a Trayectoria",
-        "contact": "Contactame"
-    },
-    "projects": {
-        "title": "Proyectos",
-        "subtitle": "Proyectos de Ingeniería Destacados",
-        "viewRepo": "Ver Repositorio",
-        "viewMore": "Más Información",
-        "showLess": "Ver Menos",
-        "demoHint": "Elegí una demo para verla en el celular. Tocá de nuevo para volver.",
-        "player": {
-            "label": "Controles de la demo",
-            "of": "de",
-            "play": "Reproducir",
-            "back10": "Retroceder 10 segundos",
-            "forward10": "Adelantar 10 segundos",
-            "pause": "Pausar",
-            "mute": "Silenciar",
-            "unmute": "Activar sonido",
-            "volume": "Volumen",
-            "seek": "Posición del video",
-            "fullscreen": "Pantalla completa"
-        },
-        "demos": {
-            "complete-app": "La app completa",
-            "cover-ai": "Cover IA",
-            "shazam": "Identificar canción"
-        },
-        "items": [
-            {
-                "id": "melodia",
-                "title": "Melodía",
-                "shortDesc": "Una plataforma full-stack de streaming de música altamente avanzada, diseñada con una interfaz fluida y capacidades revolucionarias de IA.",
-                "fullDesc": "Una ambiciosa recreación full-stack de Spotify que iguala su infraestructura principal de streaming e introduce dos funcionalidades disruptivas. Cuenta con un avanzado motor de reconocimiento de audio (estilo Shazam) capaz de identificar canciones mediante tarareo o sonido ambiente. Además, integra un motor de 'Cover IA' en tiempo real, permitiendo a los usuarios mapear sin problemas el modelo vocal de cualquier artista en cualquier pista, generando sin esfuerzo crossovers como Michael Jackson interpretando un himno de Queen.",
-                "tags": [
-                    "IA",
-                    "Música",
-                    "Full Stack",
-                    "Machine Learning"
-                ]
-            },
-            {
-                "id": "vibetrip",
-                "title": "VibeTrip",
-                "shortDesc": "Un ecosistema full-stack integral para el descubrimiento de viajes, modelado a partir de TripAdvisor.",
-                "fullDesc": "Una plataforma full-stack robusta inspirada en TripAdvisor, diseñada para facilitar el descubrimiento de viajes a nivel global. Cuenta con una interfaz UI/UX fluida para la exploración de destinos, reseñas dinámicas generadas por usuarios y herramientas interactivas de planificación de viajes, todo respaldado por una arquitectura de base de datos altamente optimizada.",
-                "tags": [
-                    "Full Stack",
-                    "Web App",
-                    "Viajes"
-                ]
-            },
-            {
-                "id": "cassandra-engine",
-                "title": "Motor de Cassandra",
-                "shortDesc": "Un motor de base de datos Cassandra distribuido y de alto rendimiento, programado completamente desde cero en Rust.",
-                "fullDesc": "Una implementación desde cero y sin dependencias externas de un motor de base de datos distribuida Apache Cassandra, escrito íntegramente en Rust. Este sistema se adhiere estrictamente a los protocolos nativos de Cassandra —incluyendo el protocolo binario CQL y el protocolo Gossip para el descubrimiento de nodos P2P—, garantizando tolerancia a fallos, alta disponibilidad y una rigurosa consistencia de datos a través de clústeres distribuidos.",
-                "tags": [
-                    "Rust",
-                    "Bases de Datos",
-                    "Sistemas Distribuidos",
-                    "Bajo Nivel"
-                ]
-            },
-            {
-                "id": "specforge",
-                "title": "SpecForge",
-                "shortDesc": "Una plataforma CLI impulsada por IA para Property-Based Testing (PBT) automatizado y detección de vulnerabilidades en APIs.",
-                "fullDesc": "Mi tesis de grado: una sofisticada plataforma CLI diseñada para realizar Property-Based Testing (PBT) en APIs, agnóstica al lenguaje de programación. Integra grandes modelos de lenguaje (LLMs) con un análisis avanzado de Árboles de Sintaxis Abstracta (AST) y extracción profunda de lógica de código. Mediante un motor propietario de síntesis de esquemas, SpecForge genera de forma autónoma suites de pruebas exhaustivas para exponer casos límite, descubrir vulnerabilidades de seguridad y someter a pruebas de estrés los límites de volumen en cualquier endpoint.",
-                "tags": [
-                    "CLI",
-                    "IA/LLM",
-                    "Testing",
-                    "Tesis"
-                ]
-            },
-            {
-                "id": "predictive-models",
-                "title": "Modelos Predictivos y Análisis con IA",
-                "shortDesc": "Una suite de modelos avanzados de machine learning para análisis predictivo, clustering y clasificación de sentimientos con PNL.",
-                "fullDesc": "Diseñé un portafolio diverso de pipelines avanzados de machine learning. Esto abarca modelos predictivos robustos para el pronóstico del clima y precios inmobiliarios aprovechando Random Forest y XGBoost, junto con sofisticadas arquitecturas de ensamble de PNL (Voting/Stacking, Naive Bayes, Redes Neuronales) para un análisis de sentimientos de reseñas de películas altamente preciso.",
-                "tags": [
-                    "Machine Learning",
-                    "Python",
-                    "PNL",
-                    "XGBoost"
-                ]
-            },
-            {
-                "id": "monopoly",
-                "title": "Motor de Monopoly",
-                "shortDesc": "Un motor de juego de Monopoly completamente funcional construido desde cero en Java, con gestión de estado compleja y temas de UI personalizados.",
-                "fullDesc": "Desarrollé un motor de juego de Monopoly personalizado completamente desde cero utilizando Java, demostrando un sólido dominio de la Programación Orientada a Objetos (POO). El proyecto cuenta con una implementación robusta de mecánicas de juego complejas —incluyendo gestión de propiedades, subastas y lógica bancaria— complementada con interfaces gráficas personalizadas.",
-                "tags": [
-                    "Java",
-                    "POO",
-                    "Juego"
-                ]
-            },
-            {
-                "id": "zorro-ocas",
-                "title": "Zorro y Ocas (Assembly)",
-                "shortDesc": "Un juego de terminal basado en lógica programado estrictamente en lenguaje Ensamblador para dominar la arquitectura de CPU y gestión de memoria.",
-                "fullDesc": "Un riguroso proyecto técnico que consiste en un juego de terminal basado en lógica desarrollado íntegramente en lenguaje Ensamblador de bajo nivel. Este proyecto fue construido explícitamente para dominar la gestión de memoria de bajo nivel, la arquitectura de CPU y la interacción directa con el hardware, presentando una ejecución algorítmica altamente optimizada.",
-                "tags": [
-                    "Assembly",
-                    "Bajo Nivel",
-                    "Juego"
-                ]
-            }
+      },
+      {
+        "id": "fiubaton",
+        "title": "FIUBAtón 2025",
+        "subtitle": "1er Puesto — Solución Ganadora",
+        "period": "Octubre 2025",
+        "location": "Hackathon Industrial",
+        "desc": "Campeón del principal hackathon de ingeniería de la facultad, desarrollando una solución tecnológica ganadora validada por ejecutivos de la industria y funcionarios gubernamentales.",
+        "body": "Ganador del primer puesto en el FIUBAtón 2025, la competencia de ingeniería más importante de la Facultad de Ingeniería (FIUBA). Liderando un equipo colaborativo, diseñamos una solución innovadora para un desafío de alto impacto del mundo real. Nuestro proyecto obtuvo el voto ganador de un distinguido panel compuesto por ejecutivos corporativos, inversores y altas autoridades nacionales.",
+        "tags": [
+          "Competencia",
+          "Innovación",
+          "Ingeniería"
         ]
+      },
+      {
+        "id": "teaching",
+        "title": "Universidad de Buenos Aires (FIUBA)",
+        "subtitle": "Ayudante de Cátedra y Mentor de Proyectos",
+        "period": "Agosto 2024 — Presente",
+        "nodes": [
+          {
+            "id": "is2",
+            "label": "Ingeniería de Software 2 - Mentor",
+            "period": "Marzo 2026 — Presente",
+            "desc": "Ayudante de Cátedra y Mentor. Guiando a grupos de estudiantes a través del desarrollo integral de réplicas de plataformas full-stack. Responsable del seguimiento ágil semanal, mentoría arquitectónica y revisión de código."
+          },
+          {
+            "id": "algos-segundo",
+            "label": "Teoría de Algoritmos - Ayudante Segundo",
+            "period": "Marzo 2025 — Presente",
+            "desc": "Ascendido a Ayudante Segundo por excelencia académica. Responsable de impartir clases, evaluar proyectos complejos y gestionar la estructura organizativa de la cátedra."
+          },
+          {
+            "id": "algos-adhonorem",
+            "label": "Teoría de Algoritmos - Ayudante Ad-honorem",
+            "period": "Agosto 2024 — Febrero 2025",
+            "desc": "Comencé como Ayudante Ad-honorem (Corrector). Encargado de la evaluación de parciales y trabajos prácticos, brindando feedback técnico detallado a los alumnos."
+          }
+        ],
+        "location": "Buenos Aires"
+      },
+      {
+        "id": "uba",
+        "title": "Universidad de Buenos Aires (UBA)",
+        "subtitle": "Ingeniería Informática / de Software",
+        "period": "2023 — 2026",
+        "desc": "Me convertí en la tercera persona en toda la historia de la institución en obtener el título de Ingeniero de Software en tiempo récord —un logro sin precedentes e inalcanzado desde 1938.",
+        "tags": [
+          "Récord Académico Histórico"
+        ],
+        "location": "Graduado en tiempo récord"
+      },
+      {
+        "id": "olympiad",
+        "title": "Olimpiada Nacional de Informática",
+        "subtitle": "2do Puesto (Medalla de Plata)",
+        "period": "2020",
+        "desc": "Obtuve el 2do puesto a nivel nacional en la Olimpiada Argentina de Informática, demostrando habilidades de élite en la resolución algorítmica de problemas con tan solo 16 años.",
+        "tags": [
+          "Medallista de Plata Nacional"
+        ],
+        "location": "Competencia Nacional"
+      },
+      {
+        "id": "pellegrini",
+        "title": "Escuela Superior de Comercio Carlos Pellegrini",
+        "subtitle": "Educación Secundaria (Perito Mercantil)",
+        "period": "2017 — 2021",
+        "desc": "Exalumno de la Escuela Superior de Comercio Carlos Pellegrini, ampliamente reconocida como una de las instituciones académicas más rigurosas y prestigiosas de Argentina.",
+        "tags": [
+          "Educación Secundaria de Élite"
+        ],
+        "location": "Prestigio Nacional"
+      }
+    ]
+  },
+  "hero": {
+    "name": "Thiago Pacheco",
+    "role": "Ingeniero de Software",
+    "bio": "A mis 21 años, soy Ingeniero de Software graduado de la Universidad de Buenos Aires, con la distinción de ser una de las únicas tres personas en la historia de la institución en completar la carrera en tiempo récord —un hito inalcanzado desde 1938—. Como Data Engineer Junior en Lovelytics, canalizo mi pasión hacia la arquitectura de soluciones de software robustas, destacándome en la intersección entre los sistemas distribuidos complejos y las tecnologías de inteligencia artificial de vanguardia.",
+    "cta": "Ver Mi Trabajo",
+    "scroll": "Ir a Trayectoria",
+    "contact": "Contactame"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "subtitle": "Proyectos de Ingeniería Destacados",
+    "viewRepo": "Ver Repositorio",
+    "viewMore": "Más Información",
+    "showLess": "Ver Menos",
+    "demoHint": "Elegí una demo para verla en el celular. Tocá de nuevo para volver.",
+    "player": {
+      "label": "Controles de la demo",
+      "of": "de",
+      "play": "Reproducir",
+      "back10": "Retroceder 10 segundos",
+      "forward10": "Adelantar 10 segundos",
+      "pause": "Pausar",
+      "mute": "Silenciar",
+      "unmute": "Activar sonido",
+      "volume": "Volumen",
+      "seek": "Posición del video",
+      "fullscreen": "Pantalla completa"
     },
-    "skills": {
-        "title": "Habilidades",
-        "subtitle": "Tecnologías y herramientas con las que trabajo",
-        "categories": {
-            "languages": "Lenguajes",
-            "frameworks": "Frameworks y Librerías",
-            "tools": "Nube y Herramientas",
-            "databases": "Bases de Datos",
-            "concepts": "Conceptos Core"
-        }
+    "demos": {
+      "complete-app": "La app completa",
+      "cover-ai": "Cover IA",
+      "shazam": "Identificar canción"
     },
-    "footer": {
-        "copyright": "© 2025 Thiago Pacheco. Todos los derechos reservados.",
-        "madeWith": "Hecho con React"
+    "items": [
+      {
+        "id": "melodia",
+        "title": "Melodía",
+        "shortDesc": "Una plataforma full-stack de streaming de música altamente avanzada, diseñada con una interfaz fluida y capacidades revolucionarias de IA.",
+        "fullDesc": "Una ambiciosa recreación full-stack de Spotify que iguala su infraestructura principal de streaming e introduce dos funcionalidades disruptivas. Cuenta con un avanzado motor de reconocimiento de audio (estilo Shazam) capaz de identificar canciones mediante tarareo o sonido ambiente. Además, integra un motor de 'Cover IA' en tiempo real, permitiendo a los usuarios mapear sin problemas el modelo vocal de cualquier artista en cualquier pista, generando sin esfuerzo crossovers como Michael Jackson interpretando un himno de Queen.",
+        "tags": [
+          "IA",
+          "Música",
+          "Full Stack",
+          "Machine Learning"
+        ]
+      },
+      {
+        "id": "vibetrip",
+        "title": "VibeTrip",
+        "shortDesc": "Un ecosistema full-stack integral para el descubrimiento de viajes, modelado a partir de TripAdvisor.",
+        "fullDesc": "Una plataforma full-stack robusta inspirada en TripAdvisor, diseñada para facilitar el descubrimiento de viajes a nivel global. Cuenta con una interfaz UI/UX fluida para la exploración de destinos, reseñas dinámicas generadas por usuarios y herramientas interactivas de planificación de viajes, todo respaldado por una arquitectura de base de datos altamente optimizada.",
+        "tags": [
+          "Full Stack",
+          "Web App",
+          "Viajes"
+        ]
+      },
+      {
+        "id": "cassandra-engine",
+        "title": "Motor de Cassandra",
+        "shortDesc": "Un motor de base de datos Cassandra distribuido y de alto rendimiento, programado completamente desde cero en Rust.",
+        "fullDesc": "Una implementación desde cero y sin dependencias externas de un motor de base de datos distribuida Apache Cassandra, escrito íntegramente en Rust. Este sistema se adhiere estrictamente a los protocolos nativos de Cassandra —incluyendo el protocolo binario CQL y el protocolo Gossip para el descubrimiento de nodos P2P—, garantizando tolerancia a fallos, alta disponibilidad y una rigurosa consistencia de datos a través de clústeres distribuidos.",
+        "tags": [
+          "Rust",
+          "Bases de Datos",
+          "Sistemas Distribuidos",
+          "Bajo Nivel"
+        ]
+      },
+      {
+        "id": "specforge",
+        "title": "SpecForge",
+        "shortDesc": "Una plataforma CLI impulsada por IA para Property-Based Testing (PBT) automatizado y detección de vulnerabilidades en APIs.",
+        "fullDesc": "Mi tesis de grado: una sofisticada plataforma CLI diseñada para realizar Property-Based Testing (PBT) en APIs, agnóstica al lenguaje de programación. Integra grandes modelos de lenguaje (LLMs) con un análisis avanzado de Árboles de Sintaxis Abstracta (AST) y extracción profunda de lógica de código. Mediante un motor propietario de síntesis de esquemas, SpecForge genera de forma autónoma suites de pruebas exhaustivas para exponer casos límite, descubrir vulnerabilidades de seguridad y someter a pruebas de estrés los límites de volumen en cualquier endpoint.",
+        "tags": [
+          "CLI",
+          "IA/LLM",
+          "Testing",
+          "Tesis"
+        ]
+      },
+      {
+        "id": "predictive-models",
+        "title": "Modelos Predictivos y Análisis con IA",
+        "shortDesc": "Una suite de modelos avanzados de machine learning para análisis predictivo, clustering y clasificación de sentimientos con PNL.",
+        "fullDesc": "Diseñé un portafolio diverso de pipelines avanzados de machine learning. Esto abarca modelos predictivos robustos para el pronóstico del clima y precios inmobiliarios aprovechando Random Forest y XGBoost, junto con sofisticadas arquitecturas de ensamble de PNL (Voting/Stacking, Naive Bayes, Redes Neuronales) para un análisis de sentimientos de reseñas de películas altamente preciso.",
+        "tags": [
+          "Machine Learning",
+          "Python",
+          "PNL",
+          "XGBoost"
+        ]
+      },
+      {
+        "id": "monopoly",
+        "title": "Motor de Monopoly",
+        "shortDesc": "Un motor de juego de Monopoly completamente funcional construido desde cero en Java, con gestión de estado compleja y temas de UI personalizados.",
+        "fullDesc": "Desarrollé un motor de juego de Monopoly personalizado completamente desde cero utilizando Java, demostrando un sólido dominio de la Programación Orientada a Objetos (POO). El proyecto cuenta con una implementación robusta de mecánicas de juego complejas —incluyendo gestión de propiedades, subastas y lógica bancaria— complementada con interfaces gráficas personalizadas.",
+        "tags": [
+          "Java",
+          "POO",
+          "Juego"
+        ]
+      },
+      {
+        "id": "zorro-ocas",
+        "title": "Zorro y Ocas (Assembly)",
+        "shortDesc": "Un juego de terminal basado en lógica programado estrictamente en lenguaje Ensamblador para dominar la arquitectura de CPU y gestión de memoria.",
+        "fullDesc": "Un riguroso proyecto técnico que consiste en un juego de terminal basado en lógica desarrollado íntegramente en lenguaje Ensamblador de bajo nivel. Este proyecto fue construido explícitamente para dominar la gestión de memoria de bajo nivel, la arquitectura de CPU y la interacción directa con el hardware, presentando una ejecución algorítmica altamente optimizada.",
+        "tags": [
+          "Assembly",
+          "Bajo Nivel",
+          "Juego"
+        ]
+      }
+    ]
+  },
+  "skills": {
+    "title": "Habilidades",
+    "subtitle": "Tecnologías y herramientas con las que trabajo",
+    "categories": {
+      "languages": "Lenguajes",
+      "frameworks": "Frameworks y Librerías",
+      "tools": "Nube y Herramientas",
+      "databases": "Bases de Datos",
+      "concepts": "Conceptos Core"
     }
+  },
+  "footer": {
+    "copyright": "© 2025 Thiago Pacheco. Todos los derechos reservados.",
+    "madeWith": "Hecho con React"
+  }
 }

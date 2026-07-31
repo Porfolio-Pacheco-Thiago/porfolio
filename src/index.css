@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Archivo:wdth,wght@112,400..700&family=Chakra+Petch:wght@600;700&family=Silkscreen&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Archivo:wdth,wght@112,400..700&family=Chakra+Petch:wght@600;700&family=Silkscreen:wght@400;700&display=swap');
 
 /* Tailwind v4, para los componentes de shadcn/cult-ui. Todo lo de abajo es CSS
    propio sin capa, y en la cascada el CSS sin capa gana sobre el de @layer, así
@@ -87,6 +87,9 @@
      Se cargan los pesos 600 y 700: el 700 es el del tema oscuro y el 600 el del
      claro, que lleva el relleno un punto más fino. */
   --font-hero: 'Chakra Petch', var(--font-display);
+  /* El cuerpo de los títulos de sección es un token porque hay que descontarlo
+     desde fuera del título: ver el margen del encabezado en Journey.css. */
+  --titulo-fs: clamp(2rem, 4vw, 3rem);
 
   /* Para el rol, debajo del nombre. Silkscreen es una tipografía de píxeles: su
      dibujo está hecho sobre una grilla de 8px, así que **el cuerpo tiene que ser

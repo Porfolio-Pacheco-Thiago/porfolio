@@ -15,6 +15,11 @@ const VIDEO = /\.(mp4|webm)$/i;
 // `x-poster.webp` no es un elemento de la galería: es la portada de `x.mp4`.
 // Sin portada, un `<video preload="none">` se dibuja como un rectángulo negro.
 const POSTER = /-poster\.webp$/i;
+// El logo de la institución, frente a las fotos del evento. Se distingue por el
+// nombre porque es lo único que se sabe de un archivo sin cargarlo.
+const ES_LOGO = /^logo/i;
+// Y entre los logos, la versión apaisada: la que va sola, de lado a lado.
+const ES_APAISADO = /(grande|largo)/i;
 
 /**
  * Las rutas agrupadas por carpeta contenedora, para poder pedir una sola.
@@ -98,6 +103,62 @@ export function getImagenes(carpeta, excluir) {
  * @returns {string|undefined} `undefined` si la carpeta está vacía o solo tiene
  *                             videos sin portada; ahí la tarjeta usa su ícono.
  */
+/**
+ * El logo de una entrada, para la miniatura cuadrada del costado.
+ *
+ * Prefiere un archivo cuyo nombre empiece con `logo`, que es como quedaron
+ * cargados: cada carpeta tiene el logo de la institución más las fotos del
+ * evento, y en un cuadrado chico una foto de multitud no se lee. Si no hay
+ * ninguno cae en `getCover`, así una carpeta sin logo igual muestra algo.
+ *
+ * @param {string} carpeta
+ * @returns {string|undefined}
+ */
+export function getLogo(carpeta) {
+    const logos = getMedia(carpeta).filter(
+        m => m.tipo === 'imagen' && ES_LOGO.test(m.nombre) && !ES_APAISADO.test(m.nombre),
+    );
+    if (!logos.length) return getCover(carpeta);
+    // Descarta la versión apaisada explícitamente: en un cuadrado queda con dos franjas
+    // vacías. Antes se elegía "el de nombre más corto", que funcionaba de casualidad;
+    // al unificarse las carpetas en `logo-grande.*`, en Olimpiada ese nombre pasó a ser
+    // más corto que `logo-olimpiadas.png` y el apaisado se colaba en la miniatura. El
+    // nombre sigue siendo la única señal —las medidas no se conocen sin cargar el
+    // archivo—, pero ahora la regla dice lo que quiere decir. El más corto queda solo
+    // como desempate entre cuadrados.
+    logos.sort((a, b) => a.nombre.length - b.nombre.length);
+    return logos[0].src;
+}
+
+/**
+ * El logo apaisado de una entrada, para la tarjeta abierta: `logo-grande.jpeg`,
+ * `logo-fiuba-largo.png`. Va solo, ocupando todo el ancho, porque un logo largo con
+ * una foto al lado queda diminuto.
+ *
+ * Devuelve `undefined` si la carpeta no tiene uno: no cae en el cuadrado, que ya se
+ * ve en la miniatura y estirado a todo el ancho sería una mancha.
+ *
+ * @param {string} carpeta
+ * @returns {string|undefined}
+ */
+export function getLogoApaisado(carpeta) {
+    return getMedia(carpeta).find(
+        m => m.tipo === 'imagen' && ES_LOGO.test(m.nombre) && ES_APAISADO.test(m.nombre),
+    )?.src;
+}
+
+/**
+ * Los medios de una carpeta **sin los logos**: las fotos del evento, que son las que
+ * pueden ir de a varias por renglón. Los logos tienen su lugar propio —el cuadrado al
+ * costado de la tarjeta cerrada y el apaisado arriba de la abierta— y repetirlos en la
+ * galería los mostraba una tercera vez.
+ *
+ * @param {string} carpeta
+ */
+export function getFotos(carpeta) {
+    return getMedia(carpeta).filter(m => !ES_LOGO.test(m.nombre));
+}
+
 export function getCover(carpeta) {
     const medios = getMedia(carpeta);
     // Una imagen llamada `cover.*` gana sobre el orden alfabético. Sin esto, la

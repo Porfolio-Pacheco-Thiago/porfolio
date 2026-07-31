@@ -1,261 +1,264 @@
 {
-    "nav": {
-        "label": "Main navigation",
-        "about": "About",
-        "journey": "Journey",
-        "experience": "Experience",
-        "projects": "Projects",
-        "academic": "Academic",
-        "skills": "Skills",
-        "contact": "Contact"
-    },
-    "media": {
-        "imageOf": "Screenshot of",
-        "videoOf": "Video of"
-    },
-    "contact": {
-        "cta": "Contact me",
-            "close": "Close"
-    },
-    "journey": {
-        "title": "Experience & Education",
-        "subtitle": "My professional and academic path",
-        "items": [
-            {
-                "id": "lovelytics",
-                "title": "Lovelytics",
-                "subtitle": "Data Engineer Junior",
-                "period": "December 2025 — Present",
-                "location": "United States (Remote)",
-                "desc": "Architecting scalable data pipelines and driving enterprise-level engineering solutions for top-tier clients.",
-                "tags": [
-                    "Data Engineering",
-                    "Cloud",
-                    "Analytics"
-                ],
-                "clients": [
-                    {
-                        "id": "ypf",
-                        "label": "Client: YPF",
-                        "period": "July 2026 — Present",
-                        "desc": "Engineered and maintained robust data architectures for the energy sector, focusing on high-performance data processing and scalable analytic solutions."
-                    },
-                    {
-                        "id": "gp",
-                        "label": "Client: GP (Grupo Petersen)",
-                        "period": "January 2026 — July 2026",
-                        "desc": "Designed and optimized scalable data pipelines to process high-volume retail financial data, enhancing data reliability and cloud execution infrastructure."
-                    },
-                    {
-                        "id": "dataschool",
-                        "label": "Training: data:school (Databricks)",
-                        "period": "December 2025",
-                        "desc": "Completed the 'data:school' intensive training program, focusing on Databricks architecture, distributed computing, and advanced data engineering practices."
-                    }
-                ]
-            },
-            {
-                "id": "fiubaton",
-                "title": "FIUBAtón 2025",
-                "subtitle": "Winner — Engineering Competition",
-                "period": "2025",
-                "location": "Universidad de Buenos Aires",
-                "desc": "Champion of the faculty's premier engineering hackathon, delivering a winning tech solution validated by industry executives and government officials.",
-                "body": "First-place winner at FIUBAtón 2025, the flagship engineering competition hosted by the Faculty of Engineering (FIUBA). Leading a collaborative team, we engineered an innovative solution to a high-stakes, real-world challenge. Our project secured the winning vote from a distinguished panel of corporate executives, investors, and high-ranking national authorities.",
-                "tags": [
-                    "Competition",
-                    "Innovation",
-                    "Engineering"
-                ]
-            },
-            {
-                "id": "teaching",
-                "title": "Universidad de Buenos Aires (UBA) - FIUBA",
-                "subtitle": "Teaching Assistant & Project Mentor",
-                "period": "August 2024 — Present",
-                "nodes": [
-                    {
-                        "id": "is2",
-                        "label": "Software Engineering 2 - Mentor",
-                        "period": "March 2026 — Present",
-                        "desc": "Serving as a Teaching Assistant and Mentor. Guiding student groups through the end-to-end development of full-stack platform replicas. Responsible for conducting weekly agile tracking, architectural mentoring, and code reviews."
-                    },
-                    {
-                        "id": "algos-segundo",
-                        "label": "Theory of Algorithms - Ayudante Segundo",
-                        "period": "March 2025 — Present",
-                        "desc": "Promoted to Ayudante Segundo due to academic excellence. Responsible for conducting teaching sessions, grading complex projects, and managing the organizational structure of the course."
-                    },
-                    {
-                        "id": "algos-adhonorem",
-                        "label": "Theory of Algorithms - Ayudante Ad-honorem",
-                        "period": "August 2024 — February 2025",
-                        "desc": "Started as an Ad-honorem Teaching Assistant (Grader). Tasked with evaluating exams and practical assignments, providing detailed technical feedback to students."
-                    }
-                ]
-            },
-            {
-                "id": "uba",
-                "title": "Universidad de Buenos Aires (UBA)",
-                "subtitle": "Software Engineering",
-                "period": "Graduated in record time",
-                "desc": "Became the third person in the institution's entire history to earn a Software Engineering degree in record time—an unprecedented achievement untouched since 1938.",
-                "tags": [
-                    "Historic Academic Record"
-                ]
-            },
-            {
-                "id": "olympiad",
-                "title": "National Informatics Olympiad",
-                "subtitle": "2nd Place — National Level",
-                "period": "Age 16",
-                "desc": "Secured 2nd place nationwide at the Argentine Informatics Olympiad, demonstrating elite algorithmic problem-solving skills at just 16 years old.",
-                "tags": [
-                    "National Silver Medalist"
-                ]
-            },
-            {
-                "id": "pellegrini",
-                "title": "Escuela Superior de Comercio Carlos Pellegrini",
-                "subtitle": "Secondary Education",
-                "period": "Graduated",
-                "desc": "Alumnus of the Escuela Superior de Comercio Carlos Pellegrini, widely recognized as one of Argentina's most rigorous and prestigious academic institutions.",
-                "tags": [
-                    "Elite Secondary Education"
-                ]
-            }
+  "nav": {
+    "label": "Main navigation",
+    "about": "About",
+    "journey": "Journey",
+    "experience": "Experience",
+    "projects": "Projects",
+    "academic": "Academic",
+    "skills": "Skills",
+    "contact": "Contact"
+  },
+  "media": {
+    "imageOf": "Screenshot of",
+    "videoOf": "Video of"
+  },
+  "contact": {
+    "cta": "Contact me",
+    "close": "Close"
+  },
+  "journey": {
+    "title": "Experience & Education",
+    "items": [
+      {
+        "id": "lovelytics",
+        "title": "Lovelytics",
+        "subtitle": "Junior Data Engineer",
+        "period": "December 2025 — Present",
+        "location": "U.S. (Remote)",
+        "desc": "Architecting scalable data pipelines and driving enterprise-level engineering solutions for top-tier clients.",
+        "tags": [
+          "Data Engineering",
+          "Cloud",
+          "Analytics"
+        ],
+        "clients": [
+          {
+            "id": "ypf",
+            "label": "Client: YPF",
+            "period": "July 2026 — Present",
+            "desc": "Engineered and maintained robust data architectures for the energy sector, focusing on high-performance data processing and scalable analytic solutions."
+          },
+          {
+            "id": "gp",
+            "label": "Client: GP (Grupo Petersen)",
+            "period": "January 2026 — July 2026",
+            "desc": "Designed and optimized scalable data pipelines to process high-volume retail financial data, enhancing data reliability and cloud execution infrastructure."
+          },
+          {
+            "id": "dataschool",
+            "label": "Training: data:school (Databricks)",
+            "period": "December 2025",
+            "desc": "Completed the 'data:school' intensive training program, focusing on Databricks architecture, distributed computing, and advanced data engineering practices."
+          }
         ]
-    },
-    "hero": {
-        "name": "Thiago Pacheco",
-        "role": "Software Engineer",
-        "bio": "At 21, I am a Software Engineering graduate from the University of Buenos Aires, holding the distinction of being one of only three individuals in the institution's history to complete the degree in record time—a milestone untouched since 1938. As a Junior Data Engineer at Lovelytics, I channel my passion into architecting robust software solutions, thriving at the intersection of complex distributed systems and cutting-edge AI technologies.",
-        "cta": "View My Work",
-        "scroll": "Go to Journey",
-        "contact": "Get in Touch"
-    },
-    "projects": {
-        "title": "Projects",
-        "subtitle": "Featured Engineering Projects",
-        "viewRepo": "View Repository",
-        "viewMore": "Learn More",
-        "showLess": "Show Less",
-        "demoHint": "Pick a demo to play it on the phone. Tap again to go back.",
-        "player": {
-            "label": "Demo controls",
-            "of": "of",
-            "play": "Play",
-            "back10": "Back 10 seconds",
-            "forward10": "Forward 10 seconds",
-            "pause": "Pause",
-            "mute": "Mute",
-            "unmute": "Unmute",
-            "volume": "Volume",
-            "seek": "Video position",
-            "fullscreen": "Fullscreen"
-        },
-        "demos": {
-            "complete-app": "The full app",
-            "cover-ai": "AI Cover",
-            "shazam": "Song ID"
-        },
-        "items": [
-            {
-                "id": "melodia",
-                "title": "Melodía",
-                "shortDesc": "A highly advanced, full-stack music streaming platform engineered with a seamless UI and groundbreaking AI capabilities.",
-                "fullDesc": "An ambitious, full-stack recreation of Spotify that matches its core streaming infrastructure while introducing two disruptive features. It boasts an advanced audio-recognition engine (Shazam-style) capable of identifying tracks via humming or ambient playback. Furthermore, it integrates a real-time 'AI Cover' engine, allowing users to seamlessly map any artist's vocal model onto any track—effortlessly engineering crossovers like Michael Jackson performing a Queen anthem.",
-                "tags": [
-                    "AI",
-                    "Music",
-                    "Full Stack",
-                    "Machine Learning"
-                ]
-            },
-            {
-                "id": "vibetrip",
-                "title": "VibeTrip",
-                "shortDesc": "A comprehensive, full-stack travel discovery ecosystem modeled after TripAdvisor.",
-                "fullDesc": "A robust, full-stack platform inspired by TripAdvisor, engineered to facilitate global travel discovery. It features a seamless UI/UX for destination exploration, dynamic user-generated reviews, and interactive trip-planning tools, all backed by a highly optimized database architecture.",
-                "tags": [
-                    "Full Stack",
-                    "Web App",
-                    "Travel"
-                ]
-            },
-            {
-                "id": "cassandra-engine",
-                "title": "Cassandra Engine",
-                "shortDesc": "A high-performance, distributed Cassandra database engine engineered entirely from scratch in Rust.",
-                "fullDesc": "A zero-dependency, ground-up implementation of an Apache Cassandra distributed database engine written entirely in Rust. This system strictly adheres to native Cassandra protocols—including the CQL binary protocol and Gossip protocol for peer-to-peer node discovery—ensuring fault tolerance, high availability, and rigorous data consistency across distributed clusters.",
-                "tags": [
-                    "Rust",
-                    "Databases",
-                    "Distributed Systems",
-                    "Low-Level"
-                ]
-            },
-            {
-                "id": "specforge",
-                "title": "SpecForge",
-                "shortDesc": "An AI-driven CLI platform for automated Property-Based Testing (PBT) and API vulnerability detection.",
-                "fullDesc": "My degree thesis: a sophisticated CLI platform designed for language-agnostic Property-Based Testing (PBT) of APIs. It integrates large language models (LLMs) with advanced Abstract Syntax Tree (AST) parsing and deep code logic extraction. By leveraging a proprietary schema synthesis engine, SpecForge autonomously generates comprehensive test suites to expose edge cases, unearth security vulnerabilities, and stress-test volume limits across any API endpoint.",
-                "tags": [
-                    "CLI",
-                    "AI/LLM",
-                    "Testing",
-                    "Thesis"
-                ]
-            },
-            {
-                "id": "predictive-models",
-                "title": "Predictive Models & AI Analysis",
-                "shortDesc": "A suite of advanced machine learning models for predictive analytics, clustering, and NLP sentiment classification.",
-                "fullDesc": "Engineered a diverse portfolio of advanced machine learning pipelines. This encompasses robust predictive models for weather forecasting and real estate pricing leveraging Random Forest and XGBoost, alongside sophisticated NLP ensemble architectures (Voting/Stacking, Naive Bayes, Neural Networks) for highly accurate film review sentiment analysis.",
-                "tags": [
-                    "Machine Learning",
-                    "Python",
-                    "NLP",
-                    "XGBoost"
-                ]
-            },
-            {
-                "id": "monopoly",
-                "title": "Monopoly Game Engine",
-                "shortDesc": "A fully functional Monopoly game engine built from scratch in Java, featuring complex state management and custom UI themes.",
-                "fullDesc": "Developed a custom Monopoly game engine entirely from scratch using Java, demonstrating a strong command of Object-Oriented Programming (OOP). The project features a robust implementation of complex game mechanics—including property management, player auctions, and banking logic—complemented by custom graphical interfaces.",
-                "tags": [
-                    "Java",
-                    "OOP",
-                    "Game"
-                ]
-            },
-            {
-                "id": "zorro-ocas",
-                "title": "Zorro y Ocas (Assembly)",
-                "shortDesc": "A logic-based terminal game programmed strictly in Assembly language to master CPU architecture and memory management.",
-                "fullDesc": "A rigorous technical project consisting of a logic-based terminal game developed entirely in low-level Assembly language. This project was explicitly built to master low-level memory management, CPU architecture, and direct hardware interaction, featuring highly optimized algorithmic execution.",
-                "tags": [
-                    "Assembly",
-                    "Low-Level",
-                    "Game"
-                ]
-            }
+      },
+      {
+        "id": "fiubaton",
+        "title": "FIUBAtón 2025",
+        "subtitle": "1st Place — Winning Solution",
+        "period": "October 2025",
+        "location": "Industrial Hackathon",
+        "desc": "Champion of the faculty's premier engineering hackathon, delivering a winning tech solution validated by industry executives and government officials.",
+        "body": "First-place winner at FIUBAtón 2025, the flagship engineering competition hosted by the Faculty of Engineering (FIUBA). Leading a collaborative team, we engineered an innovative solution to a high-stakes, real-world challenge. Our project secured the winning vote from a distinguished panel of corporate executives, investors, and high-ranking national authorities.",
+        "tags": [
+          "Competition",
+          "Innovation",
+          "Engineering"
         ]
+      },
+      {
+        "id": "teaching",
+        "title": "University of Buenos Aires (FIUBA)",
+        "subtitle": "Teaching Assistant & Project Mentor",
+        "period": "August 2024 — Present",
+        "nodes": [
+          {
+            "id": "is2",
+            "label": "Software Engineering 2 - Mentor",
+            "period": "March 2026 — Present",
+            "desc": "Serving as a Teaching Assistant and Mentor. Guiding student groups through the end-to-end development of full-stack platform replicas. Responsible for conducting weekly agile tracking, architectural mentoring, and code reviews."
+          },
+          {
+            "id": "algos-segundo",
+            "label": "Theory of Algorithms - Ayudante Segundo",
+            "period": "March 2025 — Present",
+            "desc": "Promoted to Ayudante Segundo due to academic excellence. Responsible for conducting teaching sessions, grading complex projects, and managing the organizational structure of the course."
+          },
+          {
+            "id": "algos-adhonorem",
+            "label": "Theory of Algorithms - Ayudante Ad-honorem",
+            "period": "August 2024 — February 2025",
+            "desc": "Started as an Ad-honorem Teaching Assistant (Grader). Tasked with evaluating exams and practical assignments, providing detailed technical feedback to students."
+          }
+        ],
+        "location": "Buenos Aires"
+      },
+      {
+        "id": "uba",
+        "title": "University of Buenos Aires (UBA)",
+        "subtitle": "Computer / Software Engineering",
+        "period": "2023 — 2026",
+        "desc": "Became the third person in the institution's entire history to earn a Software Engineering degree in record time—an unprecedented achievement untouched since 1938.",
+        "tags": [
+          "Historic Academic Record"
+        ],
+        "location": "Graduated in record time"
+      },
+      {
+        "id": "olympiad",
+        "title": "National Informatics Olympiad",
+        "subtitle": "2nd Place (Silver Medal)",
+        "period": "2020",
+        "desc": "Secured 2nd place nationwide at the Argentine Informatics Olympiad, demonstrating elite algorithmic problem-solving skills at just 16 years old.",
+        "tags": [
+          "National Silver Medalist"
+        ],
+        "location": "National Competition"
+      },
+      {
+        "id": "pellegrini",
+        "title": "Carlos Pellegrini School of Commerce",
+        "subtitle": "Secondary Education (Business Diploma)",
+        "period": "2017 — 2021",
+        "desc": "Alumnus of the Escuela Superior de Comercio Carlos Pellegrini, widely recognized as one of Argentina's most rigorous and prestigious academic institutions.",
+        "tags": [
+          "Elite Secondary Education"
+        ],
+        "location": "National Prestige"
+      }
+    ]
+  },
+  "hero": {
+    "name": "Thiago Pacheco",
+    "role": "Software Engineer",
+    "bio": "At 21, I am a Software Engineering graduate from the University of Buenos Aires, holding the distinction of being one of only three individuals in the institution's history to complete the degree in record time—a milestone untouched since 1938. As a Junior Data Engineer at Lovelytics, I channel my passion into architecting robust software solutions, thriving at the intersection of complex distributed systems and cutting-edge AI technologies.",
+    "cta": "View My Work",
+    "scroll": "Go to Journey",
+    "contact": "Get in Touch"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Featured Engineering Projects",
+    "viewRepo": "View Repository",
+    "viewMore": "Learn More",
+    "showLess": "Show Less",
+    "demoHint": "Pick a demo to play it on the phone. Tap again to go back.",
+    "player": {
+      "label": "Demo controls",
+      "of": "of",
+      "play": "Play",
+      "back10": "Back 10 seconds",
+      "forward10": "Forward 10 seconds",
+      "pause": "Pause",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "volume": "Volume",
+      "seek": "Video position",
+      "fullscreen": "Fullscreen"
     },
-    "skills": {
-        "title": "Skills",
-        "subtitle": "Technologies & tools I work with",
-        "categories": {
-            "languages": "Languages",
-            "frameworks": "Frameworks & Libraries",
-            "tools": "Cloud & Tools",
-            "databases": "Databases",
-            "concepts": "Core Concepts"
-        }
+    "demos": {
+      "complete-app": "The full app",
+      "cover-ai": "AI Cover",
+      "shazam": "Song ID"
     },
-    "footer": {
-        "copyright": "© 2025 Thiago Pacheco. All rights reserved.",
-        "madeWith": "Built with React"
+    "items": [
+      {
+        "id": "melodia",
+        "title": "Melodía",
+        "shortDesc": "A highly advanced, full-stack music streaming platform engineered with a seamless UI and groundbreaking AI capabilities.",
+        "fullDesc": "An ambitious, full-stack recreation of Spotify that matches its core streaming infrastructure while introducing two disruptive features. It boasts an advanced audio-recognition engine (Shazam-style) capable of identifying tracks via humming or ambient playback. Furthermore, it integrates a real-time 'AI Cover' engine, allowing users to seamlessly map any artist's vocal model onto any track—effortlessly engineering crossovers like Michael Jackson performing a Queen anthem.",
+        "tags": [
+          "AI",
+          "Music",
+          "Full Stack",
+          "Machine Learning"
+        ]
+      },
+      {
+        "id": "vibetrip",
+        "title": "VibeTrip",
+        "shortDesc": "A comprehensive, full-stack travel discovery ecosystem modeled after TripAdvisor.",
+        "fullDesc": "A robust, full-stack platform inspired by TripAdvisor, engineered to facilitate global travel discovery. It features a seamless UI/UX for destination exploration, dynamic user-generated reviews, and interactive trip-planning tools, all backed by a highly optimized database architecture.",
+        "tags": [
+          "Full Stack",
+          "Web App",
+          "Travel"
+        ]
+      },
+      {
+        "id": "cassandra-engine",
+        "title": "Cassandra Engine",
+        "shortDesc": "A high-performance, distributed Cassandra database engine engineered entirely from scratch in Rust.",
+        "fullDesc": "A zero-dependency, ground-up implementation of an Apache Cassandra distributed database engine written entirely in Rust. This system strictly adheres to native Cassandra protocols—including the CQL binary protocol and Gossip protocol for peer-to-peer node discovery—ensuring fault tolerance, high availability, and rigorous data consistency across distributed clusters.",
+        "tags": [
+          "Rust",
+          "Databases",
+          "Distributed Systems",
+          "Low-Level"
+        ]
+      },
+      {
+        "id": "specforge",
+        "title": "SpecForge",
+        "shortDesc": "An AI-driven CLI platform for automated Property-Based Testing (PBT) and API vulnerability detection.",
+        "fullDesc": "My degree thesis: a sophisticated CLI platform designed for language-agnostic Property-Based Testing (PBT) of APIs. It integrates large language models (LLMs) with advanced Abstract Syntax Tree (AST) parsing and deep code logic extraction. By leveraging a proprietary schema synthesis engine, SpecForge autonomously generates comprehensive test suites to expose edge cases, unearth security vulnerabilities, and stress-test volume limits across any API endpoint.",
+        "tags": [
+          "CLI",
+          "AI/LLM",
+          "Testing",
+          "Thesis"
+        ]
+      },
+      {
+        "id": "predictive-models",
+        "title": "Predictive Models & AI Analysis",
+        "shortDesc": "A suite of advanced machine learning models for predictive analytics, clustering, and NLP sentiment classification.",
+        "fullDesc": "Engineered a diverse portfolio of advanced machine learning pipelines. This encompasses robust predictive models for weather forecasting and real estate pricing leveraging Random Forest and XGBoost, alongside sophisticated NLP ensemble architectures (Voting/Stacking, Naive Bayes, Neural Networks) for highly accurate film review sentiment analysis.",
+        "tags": [
+          "Machine Learning",
+          "Python",
+          "NLP",
+          "XGBoost"
+        ]
+      },
+      {
+        "id": "monopoly",
+        "title": "Monopoly Game Engine",
+        "shortDesc": "A fully functional Monopoly game engine built from scratch in Java, featuring complex state management and custom UI themes.",
+        "fullDesc": "Developed a custom Monopoly game engine entirely from scratch using Java, demonstrating a strong command of Object-Oriented Programming (OOP). The project features a robust implementation of complex game mechanics—including property management, player auctions, and banking logic—complemented by custom graphical interfaces.",
+        "tags": [
+          "Java",
+          "OOP",
+          "Game"
+        ]
+      },
+      {
+        "id": "zorro-ocas",
+        "title": "Zorro y Ocas (Assembly)",
+        "shortDesc": "A logic-based terminal game programmed strictly in Assembly language to master CPU architecture and memory management.",
+        "fullDesc": "A rigorous technical project consisting of a logic-based terminal game developed entirely in low-level Assembly language. This project was explicitly built to master low-level memory management, CPU architecture, and direct hardware interaction, featuring highly optimized algorithmic execution.",
+        "tags": [
+          "Assembly",
+          "Low-Level",
+          "Game"
+        ]
+      }
+    ]
+  },
+  "skills": {
+    "title": "Skills",
+    "subtitle": "Technologies & tools I work with",
+    "categories": {
+      "languages": "Languages",
+      "frameworks": "Frameworks & Libraries",
+      "tools": "Cloud & Tools",
+      "databases": "Databases",
+      "concepts": "Core Concepts"
     }
+  },
+  "footer": {
+    "copyright": "© 2025 Thiago Pacheco. All rights reserved.",
+    "madeWith": "Built with React"
+  }
 }

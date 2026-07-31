@@ -9,9 +9,34 @@
 /* Timeline */
 .timeline {
     position: relative;
-    max-width: 1040px;
+    /* Ensanchado de 1040 a 1140 al agrandar las miniaturas: si no, el cuadrado le
+       comía ancho a la ventana, los títulos se partían en dos renglones y la
+       sección se iba de pantalla. Los 100px extra los paga el margen, no el texto. */
+    max-width: 1140px;
     margin: 0 auto;
     padding: 0 0 0.2rem;
+    /* ── Dónde está la línea ───────────────────────────────────────────────
+       Toda la geometría del timeline cuelga de este número: el eje, los puntos,
+       los conectores y el borde interno de los dos bloques. Al abrir una tarjeta
+       la línea se corre hacia el lado contrario y **todo lo demás la sigue solo**,
+       en el mismo tramo de transición: no hay una posición "abierta" escrita a
+       mano en cada regla que después haya que mantener sincronizada. */
+    --eje-x: 50%;
+    /* Lo que separa el borde interno del bloque de la línea: por ahí pasa el
+       conector. */
+    --hueco-eje: 6%;
+}
+
+/* Académico está a la izquierda, así que para abrirse necesita el ancho que hay a
+   la derecha y la línea se va hacia allá. Experiencia, al revés.
+   El estado vive en la sección y no en el timeline porque los rótulos también tienen
+   que enterarse, y son hermanos del timeline, no hijos. */
+.experience[data-abierto="academic"] .timeline {
+    --eje-x: 94%;
+}
+
+.experience[data-abierto="work"] .timeline {
+    --eje-x: 6%;
 }
 
 /* Un solo eje vertical, en el medio: lo académico cae a su izquierda y lo laboral
@@ -59,7 +84,8 @@
 }
 
 .timeline-axis {
-    left: 50%;
+    left: var(--eje-x);
+    transition: left 0.45s ease;
 }
 
 /* Los rótulos van arriba de la línea, en el flujo, uno a cada lado del centro.
@@ -67,38 +93,127 @@
    50%, o sea sobre la línea, sin depender de cuánto mida cada texto —"Académico" y
    "Experiencia" no miden lo mismo, así que centrar el par como bloque dejaría la
    línea adentro de una de las dos—. */
+/* Cada rótulo va **centrado sobre su columna**: justo arriba del centro del bloque
+   que tiene debajo, contando desde el borde de la foto hasta el borde interno de la
+   ventana. Por eso las columnas de esta grilla repiten la geometría del bloque —44%
+   a cada lado y el resto al medio— en vez de partir el ancho en dos mitades: con dos
+   mitades el rótulo caía sobre el centro de la **sección**, que no es el centro de
+   ninguna tarjeta. */
+/* Los rótulos quedan **a igual distancia** del título de la sección y de la primera
+   tarjeta. Las dos separaciones son cajas distintas —el margen de abajo del
+   encabezado y el de abajo de esta grilla—, así que salen de un mismo valor en vez
+   de dos números que se desincronizan al primer retoque.
+
+   Igual distancia **a la vista**, que no es igual distancia entre cajas: debajo del
+   título hay ~0,36em de interlineado vacío —la caja de la línea baja bastante más
+   que el trazo de la "y"— mientras que abajo el rótulo choca contra el borde duro
+   de la tarjeta. Con los dos márgenes iguales el hueco de arriba se veía casi al
+   doble, así que el de arriba descuenta ese sobrante y los dos aires ópticos
+   quedan en ~23px. Por eso el cuerpo del título es un token: hay que restarlo
+   desde acá, y en `em` no serviría porque este margen vive en el encabezado, que
+   está a 1rem y no al cuerpo del título.
+
+   La regla del encabezado necesita `.has-decor` solo para ganarle en especificidad
+   a la de `ui.css`, que fija el margen de Trayectoria y Proyectos juntas y ahí
+   sigue valiendo para Proyectos. */
+.experience {
+    --rotulo-aire: clamp(1.1rem, 2.4vh, 1.8rem);
+    /* Geometría del bloque (foto + ventana) y del hueco que le deja al eje. Los 4px
+       de más son los que la foto le sacó a la ventana al recuperar su borde interno:
+       sin ellos el título más largo —Carlos Pellegrini— se va a dos renglones y esa
+       tarjeta crece 20px sobre las otras cinco. Salen del hueco y no del borde
+       exterior, así que el bloque sigue arrancando en 0 y terminando en 100%. */
+    --bloque-ancho: calc(44% + 4px);
+    --bloque-hueco: calc(56% - 4px);
+    /* Lado del recuadro de la foto, marco incluido. Es un número fijo y no un
+       `aspect-ratio` porque el alto sale del `stretch` del flex y todavía no está
+       resuelto cuando habría que derivar el ancho: ahí el cuadrado da ancho 0.
+       Vale lo mismo que el alto de la ventana, así que el recuadro es cuadrado y
+       la imagen de adentro también (97x97). De paso es **el alto de la fila**: las
+       seis miden lo mismo, y de eso depende toda la cuenta de la tarjeta abierta. */
+    --foto: 105px;
+    --fila-aire: clamp(0.5rem, 1.1vh, 0.88rem);
+    /* De un tope de fila al siguiente. */
+    --fila-paso: calc(var(--foto) + var(--fila-aire));
+    /* El alto del rótulo se fija en vez de salir del relleno y el interlineado: es lo
+       que la tarjeta abierta gana al ocultarlos, así que tiene que ser un número
+       exacto y no 39,75px que dependen del cuerpo de la tipografía. */
+    --rotulo-alto: 2.5rem;
+    --rotulos-espacio: calc(var(--rotulo-alto) + var(--rotulo-aire));
+    /* Lo que respira el contenido contra el marco de la ventana. Es un token porque
+       el logo apaisado lo sangra para llegar al borde. */
+    --aire-ventana: 1rem;
+}
+
+.experience.has-decor .section-header {
+    margin-bottom: calc(var(--rotulo-aire) - 0.36 * var(--titulo-fs));
+}
+
+/* Sin esto el ajuste de arriba no se nota: el título trae 0.5rem de margen para
+   separarse del subtítulo —que acá ya no existe— y ese margen **colapsa** con el
+   del encabezado, así que el mayor de los dos manda y dejaba el hueco clavado en
+   8px. En las otras secciones el subtítulo sigue, y ahí el margen sigue haciendo
+   falta. */
+.experience.has-decor .section-title {
+    margin-bottom: 0;
+}
+
 .timeline-ramas {
-    max-width: 1040px;
-    margin: 0 auto 0.35rem;
+    max-width: 1140px;
+    margin: 0 auto var(--rotulo-aire);
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.8rem;
+    grid-template-columns: var(--bloque-ancho) 1fr var(--bloque-ancho);
 }
 
 .timeline-ramas> :first-child {
-    justify-self: end;
+    grid-column: 1;
+    justify-self: center;
 }
 
 .timeline-ramas> :last-child {
-    justify-self: start;
+    grid-column: 3;
+    justify-self: center;
 }
 
 .timeline-axis-label {
     white-space: nowrap;
+    /* La misma que "Ingeniero de Software", pero acá en negrita **de verdad**: a
+       este cuerpo el 400 de Silkscreen deja los palos de un píxel y el rótulo se
+       lee mal. El 700 es un archivo propio dibujado sobre la misma grilla, así que
+       engorda sin deformar —lo que sí hacía la negrita sintética del hero, que por
+       eso quedó en 400—. Por eso el `@import` pide ahora los dos pesos.
+       El interletrado sigue holgado porque sus mayúsculas son anchas y pegadas. */
+    font-family: var(--font-pixel);
     font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.04em;
     color: var(--accent-text);
     background: var(--bg-primary);
-    padding: 0.5rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--rotulo-alto);
+    padding: 0 1.25rem;
     border: 1px solid var(--accent);
     border-radius: 999px;
     cursor: pointer;
-    font-family: var(--font-sans);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
-        color 0.2s ease, border-color 0.2s ease;
+        color 0.2s ease, border-color 0.2s ease, opacity 0.3s ease,
+        visibility 0s 0.3s;
     z-index: 3;
+}
+
+/* Con una tarjeta abierta los rótulos se van: son 63px de alto que la ventana
+   aprovecha para crecer. Su renglón **se queda vacío en su lugar** —no se colapsa—
+   porque si se colapsara la sección se acortaría y todo lo de abajo saltaría, que es
+   justo lo que hay que evitar. `visibility` además los saca del foco y del lector de
+   pantalla; va sin retardo al volver para que se puedan tabular apenas reaparecen. */
+.experience[data-abierto] .timeline-axis-label {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
 }
 
 .timeline-axis-label:hover {
@@ -137,9 +252,9 @@
 }
 
 [data-theme="light"] .timeline-axis-label.rama-work.is-collapsed {
-    background: #000;
+    background: var(--work-color);
     color: #fff;
-    border-color: #000;
+    border-color: var(--work-color);
 }
 
 /* Cada rótulo crece hacia su lado al pasar el mouse, para no invadir el del otro. */
@@ -154,16 +269,21 @@
 }
 
 [data-theme="light"] .timeline-axis-label.rama-work {
-    color: #000;
-    border-color: #000;
+    color: var(--work-color);
+    border-color: var(--work-color);
 }
 
-/* Una sola columna central de tarjetas, apiladas una sobre otra */
+/* Una sola columna central de tarjetas, apiladas una sobre otra.
+   La fila tiene alto propio —el de la foto, que es el de las seis— porque su
+   contenido está posicionado en absoluto: al abrirse, la tarjeta se sale de la fila
+   y se estira sobre todo el timeline, y si la fila dependiera de ella el resto se
+   correría y la pantalla saltaría. Así el alto del timeline **no cambia nunca**. */
 .timeline-item {
     position: relative;
     width: 100%;
-    margin: 0 0 clamp(0.55rem, 1.2vh, 0.9rem);
-    max-height: 650px;
+    height: var(--foto);
+    margin: 0 0 var(--fila-aire);
+    max-height: var(--foto);
     cursor: pointer;
     text-align: left;
     overflow: visible;
@@ -171,8 +291,12 @@
         transform 0.45s ease, overflow 0s 0.45s;
 }
 
-/* El aire de la última no separa de nada y es una entrada entera de presupuesto. */
-.timeline-item:last-child {
+/* El aire de la última no separa de nada y es una entrada entera de presupuesto.
+   Es la última **visible**, no `:last-child`: con una rama oculta las de esa rama
+   miden 0 pero siguen en el DOM, y entonces la última que se ve arrastraba su aire
+   contra la nada. Eso además le sobraba a la cuenta de la tarjeta abierta, que da
+   por sentado que debajo de la última fila no queda nada. */
+.timeline-item.es-ultima {
     margin-bottom: 0;
 }
 
@@ -209,18 +333,20 @@
 }
 
 .timeline-item.cat-academic::before {
-    left: 44%;
-    width: 6%;
+    left: calc(var(--eje-x) - var(--hueco-eje));
+    width: var(--hueco-eje);
+    transition: left 0.45s ease, opacity 0.3s ease;
 }
 
 .timeline-item.cat-work::before {
-    left: 50%;
-    width: 6%;
+    left: var(--eje-x);
+    width: var(--hueco-eje);
     background: var(--work-color);
+    transition: left 0.45s ease, opacity 0.3s ease;
 }
 
 [data-theme="light"] .timeline-item.cat-work::before {
-    background: #000;
+    background: var(--work-color);
 }
 
 .timeline-dot {
@@ -239,13 +365,15 @@
     /* Apagado hasta que la línea lo alcanza */
     opacity: 0.4;
     transition: opacity 0.35s ease, box-shadow 0.3s ease, transform 0.3s ease,
-        border-color 0.3s ease;
+        border-color 0.3s ease, left 0.45s ease;
 }
 
-/* Los dos lados comparten la línea, así que los dos puntos van sobre ella. */
+/* Los dos lados comparten la línea, así que los dos puntos van sobre ella —y se
+   corren con ella al abrir una tarjeta: los puntos son lo único del resto de las
+   entradas que sigue a la vista. */
 .timeline-item.cat-academic .timeline-dot,
 .timeline-item.cat-work .timeline-dot {
-    left: 50%;
+    left: var(--eje-x);
 }
 
 .timeline-item.cat-work .timeline-dot {
@@ -257,11 +385,11 @@
 }
 
 [data-theme="light"] .timeline-item.cat-work .timeline-dot {
-    border-color: #000;
+    border-color: var(--work-color);
 }
 
 [data-theme="light"] .timeline-item.cat-work .timeline-dot-inner {
-    background: #000;
+    background: var(--work-color);
 }
 
 .timeline-dot-inner {
@@ -308,8 +436,6 @@
    —incluido el caso del tema claro, donde el acento se atenúa contra otra
    superficie—. */
 .timeline-card {
-    --trazo: 2px;
-    --barra: 10px;
     position: relative;
     z-index: 1;
     margin: 0;
@@ -317,23 +443,43 @@
        y las dos comparten esa mitad. */
     flex: 1;
     min-width: 0;
+    min-height: var(--foto, 101px);
     /* El hueco entre el marco y el contenido sale de este fondo asomando por el
        relleno de abajo, como en Proyectos. */
     background: var(--bg-primary);
     border: var(--trazo) solid var(--proy-marco);
-    padding-bottom: var(--trazo);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    /* Columna con el contenido en `flex: 1`: el hueco entre el marco y el contenido
+       tiene que medir lo mismo en los cuatro lados, y lo da el margen del contenido.
+       Sin el `flex`, cuando la ventana es más alta que su contenido —el `min-height`
+       la lleva al alto de la foto— el sobrante caía todo abajo y ese hueco quedaba
+       al doble que el de arriba. */
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s ease;
 }
 
-/* Los tres cuadraditos son de contorno, no rellenos: rellenos se leerían como los
-   botones de verdad de una ventana. */
+/* Es un `<button>`: el control que abre y cierra la entrada. Todo lo de acá abajo es
+   para que no se note —un botón trae borde, relleno y tipografía propios— salvo el
+   cursor y el anillo de foco, que sí queremos. */
 .timeline-barra {
     display: flex;
     align-items: center;
     gap: 3px;
+    width: 100%;
     height: var(--barra);
     padding-inline: 5px;
     background: var(--proy-barra);
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* El anillo va **para adentro**: la barra mide 10px y está pegada al marco, así que
+   por fuera se comería el borde de la ventana. Blanco en oscuro y casi negro en claro,
+   que es lo único que contrasta contra el verde de la barra en los dos temas. */
+.timeline-barra:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: -2px;
 }
 
 .timeline-barra span {
@@ -343,22 +489,32 @@
 }
 
 
-
-/* Lo académico a la izquierda de la línea, lo laboral a la derecha. */
+/* Lo académico a la izquierda de la línea, lo laboral a la derecha. Cada bloque
+   se apoya en su borde de la sección y llega hasta el hueco del eje: el ancho no se
+   escribe, sale de dónde esté la línea. Los 4px son los que la foto le sacó a la
+   ventana al recuperar su borde interno. */
 .timeline-item.cat-academic .timeline-bloque {
-    margin-left: auto;
-    margin-right: 56%;
+    left: 0;
+    right: calc(100% - var(--eje-x) + var(--hueco-eje) - var(--trazo-foto));
 }
 
 .timeline-item.cat-work .timeline-bloque {
-    margin-left: 56%;
-    margin-right: auto;
+    left: calc(var(--eje-x) + var(--hueco-eje) - var(--trazo-foto));
+    right: 0;
 }
 
-.timeline-item:hover .timeline-card {
-    border-color: var(--accent);
+/* ── Hover: la foto y la ventana responden como una sola pieza ────────────
+   El levantar y la sombra van en el **bloque**, no en la ventana: si fueran de la
+   ventana sola, al levantarse se despegaría de su foto y se verían como dos cosas
+   sueltas. El borde sí se pinta en las dos, porque son dos bordes distintos. */
+.timeline-item:hover .timeline-bloque {
     box-shadow: 0 8px 30px rgb(var(--sombra-rgb) / 0.2), 0 0 20px var(--accent-glow-raw);
     transform: translateY(-4px);
+}
+
+.timeline-item:hover .timeline-card,
+.timeline-item:hover .timeline-card-image {
+    border-color: var(--accent);
 }
 
 .timeline-item:hover .timeline-barra {
@@ -367,26 +523,83 @@
 
 /* Del lado de afuera, cuadrada y chica: es una miniatura, no una portada. */
 /* La foto es hermana de la ventana, no hija: va **afuera del cuadro verde**, a su
-   costado externo. Se estira al alto de la ventana en vez de quedar flotando —una
-   miniatura chica al lado de una caja más alta se lee como un error de alineación—. */
+   costado externo.
+
+   Los tokens del trazo viven acá y no en la ventana justamente por eso: el recuadro
+   de la foto los necesita, y cuando estaban en `.timeline-card` la foto quedaba sin
+   `--trazo`, el `border` entero se volvía inválido y el borde caía en `currentColor`
+   —blanco en oscuro, casi negro en claro— en vez del color de la ventana. */
 .timeline-bloque {
+    --trazo: 2px;
+    /* El recuadro de la foto va más grueso que el de la ventana: es un bloque de
+       color sólido y con el trazo fino se leía como un borde de imagen y no como
+       parte de la pieza. */
+    --trazo-foto: 4px;
+    --barra: 10px;
     display: flex;
+    /* En absoluto **siempre**, no solo al abrirse. Si cambiara de estático a
+       absoluto en el momento de abrir, la posición pasaría de resolverse por
+       márgenes a resolverse por `left/right` y el salto sería instantáneo: no hay
+       transición entre dos propiedades distintas. Estando siempre en absoluto, abrir
+       es mover cuatro números que ya estaban ahí, y por eso la tarjeta puede crecer
+       al mismo tiempo que la línea se corre. */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, opacity 0.3s ease,
+        top 0.45s ease, bottom 0.45s ease, left 0.45s ease, right 0.45s ease;
+    /* `stretch` para que el recuadro de la foto llegue al mismo alto que la
+       ventana de al lado, incluso cuando esa ventana crece porque su texto se
+       parte en dos renglones. */
     align-items: stretch;
-    gap: 0.45rem;
-    /* Cada bloque ocupa su mitad menos el hueco que la separa de la línea. */
-    width: 44%;
+    /* Pegados: la foto y la ventana comparten el borde, no hay hueco. */
+    gap: 0;
 }
 
+/* El recuadro de la foto: mismo trazo y mismo color que la ventana de al lado, y
+   pegado a ella. El ancho es **fijo y no derivado**: el alto lo decide el contenido
+   de la ventana, y un `aspect-ratio` no puede sacar el ancho de una altura que
+   todavía no se resolvió —se queda en 0—. Así que el ancho se fija en lo que mide
+   una ventana de un renglón por título (y la ventana lleva ese mismo valor de
+   `min-height`), y el alto lo iguala el `stretch` del bloque.
+
+   El fondo es **blanco** y no el de la tarjeta: lo que va acá son logos, y varios
+   son PNG con transparencia o JPG con fondo blanco. Sobre el verde oscuro de la
+   tarjeta, el de la Olimpiada se veía recortado en negro. */
 .timeline-card-image {
-    flex: 0 0 var(--foto, 54px);
+    flex: 0 0 var(--foto, 101px);
+    border: var(--trazo-foto) solid var(--proy-marco);
+    /* Sin esto el alto mínimo automático del flex —el de la imagen más sus dos
+       bordes— empuja la fila y cada entrada crece unos píxeles al engrosar el
+       trazo. El alto lo tiene que decidir la ventana, no la foto. */
+    min-height: 0;
+    background: #fff;
     overflow: hidden;
     position: relative;
+    transition: border-color 0.3s ease, flex-basis 0.45s ease, opacity 0.25s ease,
+        border-width 0.45s ease;
 }
 
+/* El borde compartido se dibuja una sola vez —el de la foto contra el de la ventana
+   daría trazo doble— y lo dibuja **la foto**, que es la que lo tiene grueso. Antes lo
+   ponía la ventana, y esa línea del medio quedaba en 2px contra los 4px del resto del
+   recuadro: se notaba más fina y encima le comía a la foto los 4px que la volvían
+   cuadrada (101x105 en vez de 105x105). */
+.timeline-item.cat-academic .timeline-card {
+    border-left: 0;
+}
+
+.timeline-item.cat-work .timeline-card {
+    border-right: 0;
+}
+
+/* `contain` y no `cover`: lo que va acá son logos, y recortarle los bordes a un
+   logo lo arruina. Es lo que además los mantiene cuadrados aunque el recuadro sea
+   más alto: el logo se centra y el resto queda en blanco. */
 .timeline-card-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
 }
 
@@ -394,6 +607,12 @@
    invierte el orden visual y no el del DOM: en el DOM la foto va siempre primero. */
 .timeline-item.cat-work .timeline-bloque {
     flex-direction: row-reverse;
+    /* Y la ventana entera —marco, barra y recuadro de la foto— toma el color de la
+       rama laboral, el mismo que ya usaban su rótulo, su punto y su conector. Antes
+       las dos ramas tenían el verde del acento y el color solo aparecía en los
+       adornos, no en la pieza. */
+    --proy-marco: var(--work-color);
+    --proy-barra: var(--work-color);
 }
 
 .timeline-img-placeholder {
@@ -424,10 +643,11 @@
 /* Embutido dentro del marco, con el hueco a los tres lados restantes: abajo lo
    pone el `padding-bottom` de la ventana. */
 .timeline-card-content {
+    flex: 1;
     margin: var(--trazo);
     background: var(--bg-card);
     /* Con la barra de título arriba, el renglón de aire de adentro es redundante. */
-    padding: clamp(0.3rem, 0.5vh, 0.45rem) 1rem;
+    padding: clamp(0.3rem, 0.5vh, 0.45rem) var(--aire-ventana);
     text-align: left;
 }
 
@@ -493,40 +713,63 @@
     margin-bottom: 0.75rem;
 }
 
-.timeline-read-more {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: none;
-    border: none;
-    color: var(--accent-text);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0;
-    transition: gap 0.2s ease;
-    font-family: var(--font-sans);
+/* Abierta deja de responder al mouse: el levantar y el resplandor son la señal de
+   "esto se abre", y una vez abierta esa señal ya no significa nada —queda un cuadro
+   de media pantalla temblando al pasar por encima—. Se cierra con el botón de abajo
+   o volviendo a hacer clic, y eso no necesita anunciarse moviendo la pieza. */
+.timeline-item.expanded:hover .timeline-bloque {
+    box-shadow: none;
+    transform: none;
 }
 
-.timeline-read-more:hover {
-    gap: 0.7rem;
+.timeline-item.expanded:hover .timeline-barra {
+    background: var(--proy-barra);
 }
 
-/* Expandida la ventana crece mucho a lo alto; la foto se queda arriba con su
-   tamaño en vez de estirarse a toda esa altura. */
+/* ── Abierta: la tarjeta ocupa el timeline entero ─────────────────────────
+   Se estira desde su fila hasta los dos extremos. Cuánto hay que subir y bajar sale
+   de la posición de la fila, que se sabe sin medir nada: las seis miden lo mismo, así
+   que de un tope al siguiente hay siempre `--fila-paso`. `--i` es cuántas filas tiene
+   encima y `--j` cuántas debajo, y los pone Journey.jsx contando **solo las visibles**
+   —si una rama está oculta sus filas no ocupan lugar y la cuenta sería otra—.
+
+   Medirlo con JS habría sido lo mismo pero con un `ResizeObserver` de por medio y un
+   frame de retraso; la fila es aritmética, así que es una cuenta de CSS. */
+.timeline-item.expanded .timeline-bloque {
+    top: calc(-1 * var(--i, 0) * var(--fila-paso) - var(--rotulos-espacio));
+    bottom: calc(-1 * var(--j, 0) * var(--fila-paso));
+    /* Por encima de los puntos y de la línea, que quedan del otro lado del hueco. */
+    z-index: 4;
+}
+
+/* La miniatura se va: abierta, la ventana usa todo el ancho y una foto de 105px
+   pegada al costado no aporta nada. Se encoge en vez de esconderse de golpe para
+   que acompañe a la ventana que crece. */
 .timeline-item.expanded .timeline-card-image {
-    align-self: flex-start;
-    height: var(--foto, 54px);
+    flex-basis: 0;
+    border-width: 0;
+    opacity: 0;
+    overflow: hidden;
 }
 
-/* Expansión en el lugar de la tarjeta del timeline */
-.timeline-item.expanded {
-    max-height: none;
+/* El resto de las tarjetas desaparece, pero **su fila sigue ocupando su lugar** y su
+   punto sigue encendido: la línea de tiempo queda entera, con sus seis marcas, y solo
+   se va el contenido. Su conector se apaga porque ya no lleva a ninguna ventana. */
+.experience[data-abierto] .timeline-item:not(.expanded) .timeline-bloque {
+    opacity: 0;
+    pointer-events: none;
 }
 
-/* Expandida crece a lo alto, no a lo ancho: con la línea en el medio, ensancharla
-   la haría cruzar al otro lado. */
+.experience[data-abierto] .timeline-item:not(.expanded)::before {
+    opacity: 0;
+}
+
+/* Cerrada, la ventana no dibuja su borde del lado de afuera: ahí está la foto, que
+   pone el suyo —más grueso— y sirve para las dos. Abierta la foto no está, así que ese
+   lado quedaba sin marco y la ventana se veía abierta por una punta. Vuelve a llevar
+   sus cuatro lados, todos del mismo grosor. */
 .timeline-item.expanded .timeline-card {
+    border: var(--trazo) solid var(--proy-marco);
     border-color: var(--accent);
 }
 
@@ -700,6 +943,14 @@
 }
 
 /* === Lado Experiencia (laboral): verde distinto al académico (oscuro) / negro (claro) === */
+/* El color de rama **para texto** es otro que el de los marcos: el de los marcos se
+   lee contra la página, y el texto de la tarjeta se lee contra la superficie oscura
+   de adentro. Con el mismo tono el período de las entradas laborales quedaba en
+   1.18:1 en claro y 3.49:1 en oscuro; con este oliva claro sube a 4.8 y 8.1. */
+.experience {
+    --work-texto: #a8d06a;
+}
+
 /* Va en la sección y no en `.timeline`: los rótulos de rama viven **afuera** del
    timeline desde que pasaron al flujo, y ahí `var(--work-color)` quedaba sin
    definir — el rótulo laboral perdía su color y su borde. */
@@ -707,12 +958,21 @@
     --work-color: #4e8c2a;
 }
 
+/* En claro no es negro puro: la rama laboral se identifica por un **oliva**, el
+   mismo tono que en oscuro pero bajado para separarse de la página verde clara
+   (4.8:1, muy cerca del 5.2 del marco académico). Con negro, ahora que el color
+   pinta el marco y la barra de cada entrada y no solo sus adornos, quedaban bandas
+   negras cruzando la sección. */
 [data-theme="light"] .experience {
-    --work-color: #000;
+    --work-color: #2f4a12;
 }
 
-.timeline-item.cat-work .timeline-period,
-.timeline-item.cat-work .timeline-read-more,
+.timeline-item.cat-work .timeline-period {
+    color: var(--work-texto);
+}
+
+/* La inicial va sobre el recuadro blanco de la foto, no sobre la tarjeta: ahí el
+   tono oscuro de la rama es el que se lee. */
 .timeline-item.cat-work .timeline-img-placeholder span {
     color: var(--work-color);
 }
@@ -727,8 +987,12 @@
     border-color: color-mix(in srgb, var(--work-color) 32%, transparent);
 }
 
-.timeline-item.cat-work:hover .timeline-card {
+.timeline-item.cat-work:hover .timeline-card,
+.timeline-item.cat-work:hover .timeline-card-image {
     border-color: var(--work-color);
+}
+
+.timeline-item.cat-work:hover .timeline-bloque {
     box-shadow: 0 8px 30px rgb(var(--sombra-rgb) / 0.2);
 }
 
@@ -797,6 +1061,54 @@
     display: none;
 }
 
+.timeline-item.expanded .timeline-banner {
+    display: block;
+}
+
+/* Abierta, la ventana tiene alto fijo —el del timeline— así que el contenido que no
+   entre scrollea adentro en vez de estirarla y sacar la sección de la pantalla. */
+.timeline-item.expanded .timeline-card-content {
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* El logo apaisado va **solo y de lado a lado**: nada al costado y sin recorte, así
+   que ancho completo y el alto que le toque por su proporción. Fondo blanco como las
+   miniaturas, porque los archivos son logos sobre blanco (o PNG transparentes que
+   sobre el verde de la ventana no se leerían).
+
+   Se dibuja recién al abrir la tarjeta —ver el bloque de abajo—: en reposo la fila
+   mide 105px y no entra nada más que las tres líneas de texto. */
+.timeline-banner {
+    display: none;
+    /* El mismo aire gris a los tres lados que la rodean. Arriba lo forman el relleno
+       del contenido (4,8px), el renglón verde (19,2px) y este margen (6,4px): 30,4px
+       en total, que es lo que vale `--aire-foto`. A los costados hay que descontar el
+       relleno lateral del contenido, que ya aporta 16 de esos 30. Si cambia el cuerpo
+       del renglón verde, el que hay que rehacer es este número. */
+    --aire-foto: 1.9rem;
+    --sangrado: calc(var(--aire-foto) - var(--aire-ventana));
+    margin-top: 0.4rem;
+    margin-inline: var(--sangrado);
+    width: calc(100% - 2 * var(--sangrado));
+    margin-bottom: 0.5rem;
+    /* Todas del mismo tamaño (935x125 al ancho actual), sin importar la proporción del
+       archivo: los logos van de 2,8 a 7,5 de relación y sueltos daban desde 125 hasta
+       330px de alto, o sea que cada tarjeta abierta se veía distinta. Se fija la caja
+       y `contain` mete el logo entero adentro —recortar un logo lo arruina—, así que lo
+       que sobra se rellena a los costados con el fondo. Es proporción y no alto en px
+       para que siga valiendo si la ventana cambia de ancho. */
+    aspect-ratio: 935 / 125;
+    object-fit: contain;
+    /* Con qué se rellena lo que sobra a los costados. Blanco puro por defecto; el que
+       tenga otro fondo lo declara en `data/journey.js`, medido de su archivo, para que
+       el relleno empalme con la imagen en vez de recuadrarla. */
+    background: var(--banner-fondo, #fff);
+    /* Del color del marco de su tarjeta: `--proy-marco` ya resuelve el verde del acento
+       o el oliva de la rama laboral, y por tema. */
+    border: var(--trazo) solid var(--proy-marco);
+}
+
 /* Al expandir una entrada vuelve todo su contenido */
 .timeline-item.expanded .timeline-desc {
     display: block;
@@ -806,12 +1118,4 @@
     display: flex;
 }
 
-/* El botón de "ver más" sobra en reposo: la tarjeta entera ya es clickeable y son
-   20px por seis entradas. Vuelve al expandirla. */
-.timeline-read-more {
-    display: none;
-}
 
-.timeline-item.expanded .timeline-read-more {
-    display: inline-flex;
-}

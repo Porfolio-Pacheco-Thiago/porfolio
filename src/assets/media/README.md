@@ -37,6 +37,16 @@ Subí acá las fotos/videos de cada una (cualquier nombre: `1.jpg`, `2.png`, `de
   la primera imagen por orden alfabético, y si solo hay videos, la portada del
   primero. Conviene que sea **apaisada**: en modo compacto esa franja mide ~66px
   de alto y una captura vertical queda reducida a una tirita.
+- **Logos de la línea de tiempo:** en `timeline/<id>/` los archivos que empiezan
+  con **`logo`** no son parte de la galería, tienen dos lugares propios:
+  - el **cuadrado** (`logo.png`, `logo-pelle.jpeg`) es la miniatura del costado de
+    la tarjeta cerrada. Si hay varios gana el de nombre más corto.
+  - el **apaisado**, que además lleva `grande` o `largo` en el nombre
+    (`logo-grande.jpeg`, `logo-fiuba-largo.png`), se muestra solo y de lado a lado
+    arriba de la galería cuando la tarjeta está abierta. Si no hay, no se muestra
+    ninguno: el cuadrado estirado a todo el ancho queda como una mancha.
+
+  Todo lo demás de la carpeta son las fotos del evento y van en la grilla.
 - **Portadas de video:** un archivo llamado `<video>-poster.webp` no se dibuja
   como un elemento más — se usa como `poster` del video con ese mismo nombre
   (`shazam.mp4` → `shazam-poster.webp`). Sin portada, el video se ve como un
