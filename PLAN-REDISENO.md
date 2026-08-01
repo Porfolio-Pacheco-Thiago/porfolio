@@ -950,13 +950,14 @@ perfil circular, y que los "Contactame" del hero y del pie lo abran y lo cierren
    `pointer-events: none` y que `play()` resuelva sin silenciar. Conviene mirarlo
    a ojo una vez en una pestaña en primer plano.
 
-### Fase 7 — Trayectoria y Habilidades 🔲
+### Fase 7 — Trayectoria ✅ · Habilidades 🔲
 
 Las dos únicas secciones que el rediseño **no tocó**. Nunca tuvieron fase propia
 —venían apareciendo como un ítem suelto en "qué sigue"—, así que quedan acá.
 
-**El rediseño de Trayectoria arrancó (2026-07-31).** Estuvo congelada mientras lo
-pensabas; la primera decisión ya está tomada y hecha:
+**Trayectoria está rehecha (2026-07-31).** Estuvo congelada mientras pensabas el
+rediseño; abajo van las diez decisiones que salieron, en el orden en que se tomaron.
+Habilidades sigue sin tocar.
 
 **Una sola línea de tiempo en el medio**, con lo académico a su izquierda y lo
 laboral a su derecha. Antes eran **dos ejes**, uno pegado a cada margen, cada uno
@@ -1030,11 +1031,18 @@ Por eso la entrada tiene un bloque (`.timeline-bloque`): la foto y la ventana so
 En el DOM la foto va siempre primero y en la rama laboral se invierte solo el orden
 visual (`row-reverse`), así el orden de lectura no depende del lado.
 
-Es **cuadrada y del alto de la ventana** (101px). Lo que va ahí es el **logo** de
+Es **cuadrada y del alto de la ventana** (105×105). Lo que va ahí es el **logo** de
 cada institución, no una foto del evento: en un cuadrado chico una foto de multitud
-no se lee. Lo elige `getLogo()`, que prefiere un archivo cuyo nombre empiece con
-`logo` y, cuando hay varios, el de nombre más corto —las carpetas traen el logo y su
-versión apaisada (`logo-grande-…`), que en un cuadrado deja dos franjas vacías—.
+no se lee. Lo elige `getLogo()`, que toma un archivo cuyo nombre empiece con `logo` y
+**descarta explícitamente los apaisados** —los que además dicen `grande` o `largo`—,
+que en un cuadrado dejan dos franjas vacías.
+
+La regla decía antes "el de nombre más corto", y funcionaba de casualidad: cuando las
+carpetas se unificaron en `logo-grande.*`, en Olimpiada ese nombre pasó a ser más
+corto que `logo-olimpiadas.png` y el apaisado se coló en la miniatura. El nombre sigue
+siendo la única señal —las medidas no se conocen sin cargar el archivo—, pero ahora la
+regla dice lo que quiere decir; el más corto quedó solo como desempate entre
+cuadrados.
 Va con `object-fit: contain`, porque recortarle los bordes a un logo lo arruina, y
 sobre **fondo blanco**: varios son PNG con transparencia y sobre el verde oscuro de
 la tarjeta el de la Olimpiada se veía recortado en negro.
@@ -1115,10 +1123,9 @@ renglones, y eso sacaba la sección de pantalla (1003 contra 953). Los 100px ext
 paga el margen y no el texto: con el timeline más ancho la ventana conserva sus
 ~390px, ningún título se parte de más y la sección queda en 951.
 
-La foto sale del índice de medios (`getCover('timeline/<id>')`), así que **aparece
-sola en cuanto haya un archivo** en `src/assets/media/timeline/<id>/`. Las seis
-carpetas ya existen y están vacías; mientras tanto se ve la inicial, que es lo que
-había antes.
+La foto sale del índice de medios, así que **aparece sola en cuanto haya un archivo**
+en `src/assets/media/timeline/<id>/`; sin ninguno se ve la inicial, que es lo que había
+antes. Las seis carpetas ya tienen su logo.
 
 El aire entre entradas pasó de **3px a 11px**, y eso obligó a rehacer el
 presupuesto de alto: con el espaciado real la sección se iba a 1008px contra los
@@ -1126,17 +1133,165 @@ presupuesto de alto: con el espaciado real la sección se iba a 1008px contra lo
 relleno de la sección, el del timeline, el aire bajo los rótulos, y el margen de la
 última entrada, que no separa de nada—. Quedó en **951px**.
 
-**El presupuesto está otra vez al límite**, como cuando se agregó la barra de
-título: no hay lugar para sumarle nada a una entrada sin sacar la sección de
-pantalla. Si más adelante hace falta, lo que queda por revisar es que **cada entrada
+**El presupuesto quedó otra vez al límite** en ese momento, como cuando se agregó la
+barra de título: no había lugar para sumarle nada a una entrada sin sacar la sección de
+pantalla (más abajo se afloja al irse el subtítulo). Si más adelante hace falta, lo que queda por revisar es que **cada entrada
 ocupa su propia fila** aunque alternen de lado: seis entradas apiladas son seis
 alturas, y compactarlas para que una laboral suba a llenar el hueco de la izquierda
 casi partiría el alto al medio. Es un cambio de layout distinto.
 
+**Quinta decisión: los rótulos se alinean con lo que anuncian.** Estaban en una
+grilla de dos mitades, así que cada botón caía pegado al centro de la **sección**, que
+no es el centro de ninguna tarjeta. Ahora la grilla repite la geometría del bloque
+—`44% 1fr 44%`— y cada rótulo va centrado en su columna: 639.9 contra 639.9 y 1272.1
+contra 1272.1, o sea al décimo de píxel sobre el centro del bloque que tiene debajo,
+contando desde el borde de la foto hasta el borde interno de la ventana.
+
+Se fue el subtítulo ("Mi trayectoria profesional y académica") y con él su clave en
+los dos JSON.
+
+**Las tipografías se repartieron por función**: los títulos de sección toman la del
+nombre del hero (Chakra Petch) y los rótulos de rama la del rol (Silkscreen). Dos
+ajustes que la de píxeles obliga: hubo que **pedir el peso 700 al `@import`**, porque
+solo estaba el 400 y la negrita sintética engorda los palos y rompe la grilla —el
+mismo motivo por el que "Ingeniero de Software" quedó en 400—, y el interletrado bajó
+a 0.04em porque sus mayúsculas son anchas y pegadas.
+
+**El aire alrededor de los rótulos es óptico, no de cajas.** Con los dos márgenes
+iguales el hueco de arriba se veía al doble: debajo del título hay ~0.36em de
+interlineado vacío —la caja de la línea baja bastante más que el trazo de la "y"—
+mientras que abajo el rótulo choca contra el borde duro de la tarjeta. El margen del
+encabezado descuenta ese sobrante (`calc(var(--rotulo-aire) - 0.36 * var(--titulo-fs))`,
+y por eso el cuerpo del título es un token: hay que restarlo desde afuera y en `em` no
+serviría, porque ese margen vive en el encabezado, que está a 1rem). Quedaron 22.88 y
+22.86 medidos desde la tinta.
+
+Eso solo no alcanzaba: el título trae 0.5rem de margen para separarse del subtítulo
+—que acá ya no existe— y ese margen **colapsa** con el del encabezado, así que el mayor
+de los dos mandaba y el hueco quedaba clavado en 8px sin importar el cálculo. Está en 0
+solo para Trayectoria; en las otras secciones el subtítulo sigue.
+
+**Sexta decisión: el recuadro de la foto se cierra por los cuatro lados.** La línea
+que comparte con la ventana la dibujaba la ventana, con su trazo de 2px contra los 4
+del resto del recuadro: se notaba más fina y le comía a la foto los píxeles que la
+volvían cuadrada (101×105 en vez de 105×105). Ahora la dibuja **la foto**, que es la
+que la tiene gruesa.
+
+Esos 4px se los sacaba a la ventana, y con la ventana más angosta "Escuela Superior de
+Comercio Carlos Pellegrini" se iba a dos renglones y esa tarjeta crecía 20px sobre las
+otras cinco. Se los devuelve por el otro lado: el bloque mide `44% + 4px` y el hueco
+hacia el eje `56% - 4px`, así que salen de la separación con la línea y no del borde
+exterior. El bloque sigue arrancando en 0 y terminando en 100%.
+
+**Séptima decisión: la tarjeta abierta ocupa la sección entera.** Al abrir una
+entrada la línea se corre al lado contrario —a la derecha si es académica, que está a
+la izquierda y necesita ese ancho; a la izquierda si es laboral— y la ventana se
+estira hasta cubrir todo el timeline, las dos cosas en el mismo tramo de 0.45s. El
+resto de las tarjetas se apaga pero **su fila sigue ocupando su lugar** y su punto
+sigue sobre la línea, así que la línea de tiempo queda entera con sus seis marcas. La
+miniatura se encoge hasta desaparecer en vez de irse de golpe.
+
+Cuatro cosas hicieron falta para que la pantalla **no se mueva**:
+
+- **El bloque está en absoluto siempre**, no solo al abrirse. Si cambiara de estático
+  a absoluto en ese momento, la posición pasaría de resolverse por márgenes a
+  resolverse por `left/right`, y entre dos propiedades distintas no hay transición:
+  sería un salto. Estando siempre absoluto, abrir es mover cuatro números que ya
+  estaban ahí.
+- **La fila tiene alto propio**, el de la foto. Como su contenido está fuera del flujo,
+  la ventana al abrirse no empuja nada y el alto del timeline es idéntico en todos los
+  estados: 685.5px medidos en cinco, con `scrollY` sin moverse un píxel.
+- **Cuánto sube y baja es aritmética, no medición.** Las seis filas miden lo mismo, así
+  que de un tope al siguiente hay siempre `--fila-paso`; React solo pasa cuántas filas
+  tiene encima y cuántas debajo, contando **las visibles** —si una rama está oculta sus
+  filas no ocupan lugar—. Medirlo con JS habría sido lo mismo con un `ResizeObserver` de
+  por medio y un frame de retraso.
+- **Toda la geometría cuelga de `--eje-x`**: el eje, los puntos, los conectores y el
+  borde interno de los dos bloques. El lado abierto mueve esa variable y el resto la
+  sigue solo, sin una posición "abierta" escrita a mano en cada regla.
+
+Los rótulos de rama **también desaparecen** y le ceden sus 63px a la ventana, que pasa
+de 682 a 745px de alto. Su renglón se queda vacío en su lugar: si se colapsara, la
+sección se acortaría y todo lo de abajo saltaría. Por eso el alto del rótulo pasó a ser
+un número fijo (`--rotulo-alto`) en vez de salir del relleno más el interlineado, que
+daba 39.75px: es exactamente lo que la ventana gana, así que tiene que ser exacto.
+
+Un bug que apareció al probar rama oculta + tarjeta abierta: el `margin-bottom: 0`
+estaba en `:last-child`, y con una rama oculta la última **visible** arrastraba su aire
+contra la nada, dejando la ventana 14px corta. Ahora es una clase que pone React.
+
+Abierta, la ventana deja de responder al mouse: el levantar y el resplandor son la
+señal de "esto se abre" y una vez abierta no significan nada. El contenido que no entre
+scrollea adentro, así la sección sigue entrando en una pantalla.
+
+**Octava decisión: el logo apaisado de la institución.** Cada carpeta puede traer,
+además del cuadrado, una versión apaisada (`logo-grande.*`), que la tarjeta abierta
+muestra **sola, entre el renglón verde y el título**. El orden del contenido quedó:
+renglón verde → logo apaisado → título → texto → etiquetas → fotos. Vive fuera del
+contenedor que se despliega y se esconde en reposo por CSS, con la misma regla que ya
+usaban la descripción y las etiquetas, así la fila cerrada sigue midiendo 105px.
+
+**Todas miden lo mismo: 935×125.** Sueltas iban de 125 a 330px de alto —los archivos
+van de 2.8 a 7.5 de relación— y cada tarjeta abierta se veía distinta. Va como
+proporción y no como alto en píxeles, para que siga valiendo si la ventana cambia de
+ancho, y con `contain`: recortar un logo lo arruina, así que lo que sobra se rellena a
+los costados.
+
+**El relleno no es blanco: es el color del propio archivo**, medido de sus columnas de
+borde izquierda y derecha, que son las que quedan pegadas al relleno. Pellegrini da
+`#20394f` con 100% de uniformidad, FIUBAtón `#f7f7f7` —crema, no blanco puro; con
+`#fff` se notaba un recuadro más claro alrededor del logo— y UBA, docencia y Lovelytics
+blanco, que es el valor por defecto. **Olimpiada no tiene *un* color**: su fondo de
+circuitos va de `#191b3f` a `#1c1d49`, así que rellena con ese degradado y cada costado
+empalma con el borde que tiene al lado. El campo (`bannerFondo`, en `data/journey.js`)
+acepta cualquier valor de `background`, así que el degradado no necesitó un caso
+especial, y un `'transparent'` deja el logo directo sobre la ventana.
+
+Ese `'transparent'` se probó en Lovelytics y **no sirve todavía**: el PNG tiene alfa de
+verdad, pero es un logo dibujado para fondo blanco —luminancia media 49.6 sobre 255,
+66% de sus píxeles por debajo de 60, ninguno claro—, así que sobre la ventana oscura
+queda negro sobre negro. Hace falta una versión clara del logo. Que un archivo tenga
+canal alfa no quiere decir que se lea sobre oscuro, y por eso la decisión es de la
+entrada y no del archivo.
+
+El recuadro lleva **borde del color de su ventana** (`--proy-marco`, que ya resuelve
+verde o oliva y por tema).
+
+**Novena decisión: la barra de título es el control.** Se fue el botón de "ver más" /
+"ver menos": la tarjeta entera se abre con un clic, en reposo eran 20px por seis
+entradas y abierta un renglón suelto al final.
+
+Pero **no se podía simplemente borrar**: era el único control enfocable de la tarjeta.
+El `div` de afuera lleva `onClick` como atajo de mouse y a propósito no tiene `role` ni
+`tabIndex`, porque adentro hay botones de verdad —los acordeones por cliente— y un
+control dentro de otro es inválido. Sin el botón, abrir una entrada dejaba de ser
+posible con el teclado.
+
+La barra de título era el único lugar donde podía ir uno: está arriba del todo, fuera
+del área con los acordeones. Es un `<button>` con el título de la entrada como nombre
+accesible y `aria-expanded` / `aria-controls` —el patrón de divulgación de siempre—.
+Se ve idéntica: un botón trae borde, relleno y tipografía propios y todo eso se anula;
+lo único que se suma es el cursor y un anillo de foco, que va **hacia adentro**
+(`outline-offset: -2px`) porque la barra mide 10px y por fuera se comería el marco.
+
+**Décima: las fotos pasaron a WebP.** De 5.35 MB a 542 KB, con el lado largo a 900px:
+el hueco de la galería mide 322px como máximo, así que quedan casi 3× de margen para
+pantallas densas. Las de FIUBAtón venían a 4895px de ancho, unas quince veces lo que se
+ve. Los logos no se tocaron: pesan entre 11 y 45KB. No hizo falta tocar código —el
+índice ya incluía `.webp` y el orden alfabético de la galería no cambió—.
+
+Las galerías dejaron de dibujar los logos, que aparecían ahí una tercera vez además de
+la miniatura y del apaisado. Efecto colateral: Olimpiada solo tenía logos, así que su
+galería quedó vacía y muestra el marcador de posición.
+
+**El presupuesto se aflojó**: la sección quedó en **922px** contra los 953 de la
+pantalla. Los 30px salieron del subtítulo que se fue. Sigue sin sobrar para agregarle
+renglones a una entrada cerrada.
+
 El resto de la sección sigue igual y con la deuda anotada abajo.
 
-**Habilidades no está congelada explícitamente**, pero como las dos comparten los
-mismos patrones conviene decidirlas juntas.
+**Habilidades queda sola**: es la única sección que el rediseño no tocó, y ahora
+tiene modelo del cual copiar.
 
 Relevado en vivo, para cuando se retome:
 
@@ -1309,22 +1464,17 @@ sale de vista. Se **congela**, no se oculta: al volver retoma donde estaba.
 
 ## 6. Qué sigue
 
-Las fases 4 y 5 están cerradas, y **Trayectoria quedó congelada**: se va a pensar
-un rediseño completo de esa sección más adelante, no propagarle el lenguaje actual
-(ver Fase 7).
+Las fases 1, 2, 3, 4, 5 y 7 (Trayectoria) están cerradas. Lo que queda **sin
+depender de una decisión tuya**:
 
-Las fases 1, 2, 3, 4 y 5 están cerradas. Lo que queda **sin depender de una
-decisión tuya**:
-
-1. **Fase 7 pero solo Habilidades.** Es la otra sección sin tocar y no está
-   congelada. Ojo: comparte los mismos patrones que Trayectoria, así que hacerla
-   sola deja las dos con lenguajes distintos hasta que se resuelva la otra. Ver la
-   pregunta 36.
-2. 🐞 **El bug de layout de Trayectoria** —el rótulo del eje tapando la primera
-   tarjeta— es independiente del rediseño y se puede corregir solo. Ver la
-   pregunta 37.
+1. **Habilidades**, la única sección que el rediseño no tocó. Ahora tiene modelo:
+   Trayectoria ya pasó por esto y comparte con ella los mismos patrones.
+2. **El logo apaisado de Lovelytics en versión clara**, para poder sacarle el
+   rectángulo blanco. El mecanismo está hecho y probado; falta el archivo (ver la
+   octava decisión de la Fase 7).
 3. **Limpiar deuda.** Las tres de la lista de abajo, sobre todo `is-compact`, que
-   son 19 selectores que siempre aplican.
+   son 19 selectores que siempre aplican **en Proyectos** —en Trayectoria ya se
+   fusionaron con sus reglas base—.
 
 Y lo que **sí depende de vos**:
 
@@ -1406,7 +1556,7 @@ cambio de arquitectura, no un efecto.
 *Respuesta:*
 esto quizas seria mejor hacerlo en un rama individualmente, para ver como quedaria y que tan pesado se hace, ya que quizas ralentiza tanto la pagina que conviene no implementarlo
 
-### 36. ¿Habilidades entra en el congelamiento de Trayectoria?
+### 36. ¿Habilidades entra en el congelamiento de Trayectoria? *(resuelta: Trayectoria ya está hecha)*
 
 Congelaste Trayectoria para pensarle un rediseño completo. **Habilidades no la
 nombraste**, pero comparte exactamente los mismos patrones —tarjeta genérica,
