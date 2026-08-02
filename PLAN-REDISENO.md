@@ -153,7 +153,7 @@ Es la referencia más ambiciosa. Son cuatro comportamientos distintos:
 
 ---
 
-### 2.5 vanho — letras en diagonal que se enderezan al pasar el mouse 🔲
+### 2.5 vanho — letras en diagonal que se enderezan al pasar el mouse ❌ (descartada)
 
 **Qué se ve:** texto inclinado en perspectiva hacia el fondo; al pasar el mouse
 se pone más paralelo a la pantalla y cambia de color.
@@ -862,11 +862,33 @@ perfil circular, y que los "Contactame" del hero y del pie lo abran y lo cierren
 
 **Ya no depende del CV:** la entrada se oculta sola mientras `href` sea `null`.
 
-### Fase 6 — Ambicioso, a decidir aparte 🔲
+### Fase 6 — Ambicioso, a decidir aparte 🟡
 
-1. 🔲 Las figuras se reorganizan para formar el logo al pasar el mouse por
-   ciertas palabras.
-2. 🔴 "As featured in". Sigue sin contenido definido (pregunta 6).
+1. 🟡 Las figuras se reorganizan para formar el logo al pasar el mouse por
+   ciertas palabras. **En rama aparte** (respuesta 8): es un cambio de
+   arquitectura y el riesgo es el rendimiento, así que se prueba primero y se
+   decide viéndolo correr. Ya hubo un problema térmico con las figuras.
+2. 🟡 **"As featured in" — contenido definido** (respuesta 6). Va con el título
+   *"Con la confianza y el respaldo de"* / *"Trusted and recognized by"* y seis
+   logos: Lovelytics, Toyota, Grupo Petersen, FIUBA, FIUBAtón y la Olimpiada.
+
+   Los seis ya están en el repo, pero **ninguno sirve como está** y el problema es
+   distinto en cada uno. Medido:
+
+   | Logo | Archivo | Qué le pasa |
+   |---|---|---|
+   | Lovelytics | PNG con alfa | letras oscuras (luminancia 49,6; 66% por debajo de 60): sobre fondo oscuro no se ve |
+   | Toyota | PNG con alfa | igual, oscuro (luminancia 90,5) |
+   | Grupo Petersen | PNG con alfa | blanco puro (luminancia 255): no se ve sobre fondo claro |
+   | FIUBA | JPEG | fondo blanco horneado |
+   | FIUBAtón | JPEG | fondo crema `#f7f7f7` horneado |
+   | Olimpiada | JPEG | fondo azul en degradado `#191b3f` → `#1c1d49` |
+
+   Los tres JPEG tienen fondo plano o casi, así que se les puede recortar por
+   color. Los tres PNG ya tienen alfa; lo que hace falta es **unificar el tono**:
+   recolorearlos a un solo color —o darles contorno, como propusiste para
+   Lovelytics— para que la fila se lea como un conjunto y no como seis logos
+   pegados. Decidir eso es lo que falta.
 3. ✅ **Celular 3D con las demos. Hecho** — `ui/PhoneDemo.jsx`, respuesta a la
    pregunta 16.
 
@@ -1464,25 +1486,26 @@ sale de vista. Se **congela**, no se oculta: al volver retoma donde estaba.
 
 ## 6. Qué sigue
 
-Las fases 1, 2, 3, 4, 5 y 7 (Trayectoria) están cerradas. Lo que queda **sin
-depender de una decisión tuya**:
+Las fases 1, 2, 3, 4, 5 y 7 (Trayectoria) están cerradas, y **las preguntas
+abiertas ya están respondidas**: la 5 se descartó, la 6 tiene contenido y la 8 va a
+una rama aparte. Lo que queda **sin depender de una decisión tuya**:
 
 1. **Habilidades**, la única sección que el rediseño no tocó. Ahora tiene modelo:
    Trayectoria ya pasó por esto y comparte con ella los mismos patrones.
-2. **El logo apaisado de Lovelytics en versión clara**, para poder sacarle el
-   rectángulo blanco. El mecanismo está hecho y probado; falta el archivo (ver la
-   octava decisión de la Fase 7).
-3. **Limpiar deuda.** Las tres de la lista de abajo, sobre todo `is-compact`, que
-   son 19 selectores que siempre aplican **en Proyectos** —en Trayectoria ya se
-   fusionaron con sus reglas base—.
+2. **"As featured in"** (Fase 6.2): el contenido está definido; lo que falta es
+   preparar los seis logos —fondos, tono— y decidir cómo se unifican. Ver la fase.
+3. **Las figuras como sistema** (Fase 6.1), en rama aparte y midiendo el costo.
+4. **Limpiar deuda.** Las de la lista de abajo, sobre todo `is-compact`, que son 19
+   selectores que siempre aplican **en Proyectos** —en Trayectoria ya se fusionaron
+   con sus reglas base—.
 
 Y lo que **sí depende de vos**:
 
-4. Capturas de los otros 6 proyectos y enlaces reales de contacto (`socials.js`
+5. Capturas de los otros 6 proyectos y enlaces reales de contacto (`socials.js`
    todavía apunta a `https://github.com/` y `thiago@example.com`). **Es lo que más
    se nota**: seis de las siete tarjetas muestran un ícono en vez de una imagen.
-5. Las preguntas 5, 6 y 8, que dejaste en pendiente, y las 36 y 37, que quedaron
-   sin responder.
+6. El logo apaisado de Lovelytics en versión clara, si querés sacarle el rectángulo
+   blanco en Trayectoria. El mecanismo está hecho y probado; falta el archivo.
 
 **Estado tipográfico**, que quedó repartido en cuatro tokens:
 
@@ -1538,6 +1561,9 @@ Solo hace falta responderla si querés que vaya **en el hero**, porque entonces
 entra en la Fase 4. Si va en otro lado, puede esperar.
 
 *Respuesta:* por ahora lo dejamos sin definir, probablemente sea lo ultimo que hagamos y cuando hagamos el resto de cosas, haremos una lista de posibles lugares donde hacerlo.
+No se aplicara
+
+**Cerrada: no va.** Las letras en diagonal de vanho quedan fuera del rediseño.
 
 ### 6. ¿Qué contenido tendría "as featured in"?
 
@@ -1545,7 +1571,12 @@ Es lo único que traba la Fase 6.2. ¿Premios, la FIUBAtón, la Olimpiada, medio
 Si no hay contenido real, lo más honesto es no ponerlo.
 
 *Respuesta:*
-no los definimos todavia, dejemeslo en pediente, podemos saltearlo por el momento.
+pondremos el titulo de 🇪🇸 CON LA CONFIANZA Y EL RESPALDO DE
+
+🇬🇧 TRUSTED AND RECOGNIZED BY
+pondremos los logos de:
+lolveytics, toyota, grupo petersen, fiuba, fiubaton, olimpiadas de informatica. 
+Pero deberemos sacarle el fondo a los que tenemos, y en algunos agregar un bordeado, ya que lovelytics en fondo negro no se ve bien, pero si le agregamos un bordeado blanco a las letras se podra poner, o si le cambiamos nosotros el color a las letras
 
 ### 8. ¿Las figuras siguen siendo cuatro o pasan a ser un sistema único?
 
