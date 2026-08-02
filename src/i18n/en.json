@@ -26,30 +26,43 @@
         "subtitle": "Junior Data Engineer",
         "period": "December 2025 — Present",
         "location": "U.S. (Remote)",
-        "desc": "Architecting scalable data pipelines and driving enterprise-level engineering solutions for top-tier clients.",
-        "tags": [
-          "Data Engineering",
-          "Cloud",
-          "Analytics"
-        ],
+        "desc": "Lovelytics is a premier US-based data and AI consulting firm. Within the company, I stand out as one of the youngest members and the only engineer of my age, delivering accelerated results and demonstrating performance that exceeds standard expectations for my experience level.",
         "clients": [
           {
-            "id": "ypf",
-            "label": "Client: YPF",
+            "id": "toyota",
+            "label": "Client: Toyota",
             "period": "July 2026 — Present",
-            "desc": "Engineered and maintained robust data architectures for the energy sector, focusing on high-performance data processing and scalable analytic solutions."
+            "desc": "Developing and maintaining robust data architectures for the automotive sector. The project focuses on building high-performance processing systems and deploying scalable analytics solutions to drive enterprise decision-making.",
+            "tags": [
+              "Data Architecture",
+              "High Performance",
+              "Scalable Analytics",
+              "Automotive"
+            ]
           },
           {
             "id": "gp",
             "label": "Client: GP (Grupo Petersen)",
             "period": "January 2026 — July 2026",
-            "desc": "Designed and optimized scalable data pipelines to process high-volume retail financial data, enhancing data reliability and cloud execution infrastructure."
+            "desc": "Engineered and optimized data pipelines to process over 250 TB of retail financial data. I took part in the client's technological modernization process, participating in the repository migration from Atlas to GitLab and transitioning data workflows from Apache Hue/Hive to highly efficient Apache Spark environments.",
+            "tags": [
+              "Data Pipelines",
+              "Cloud",
+              "Financial Data",
+              "Reliability"
+            ]
           },
           {
             "id": "dataschool",
             "label": "Training: data:school (Databricks)",
             "period": "December 2025",
-            "desc": "Completed the 'data:school' intensive training program, focusing on Databricks architecture, distributed computing, and advanced data engineering practices."
+            "desc": "Completed the 'data:school' intensive training program, focusing on Databricks architecture, distributed computing, and advanced data engineering practices.",
+            "tags": [
+              "Databricks",
+              "Distributed Computing",
+              "Data Engineering",
+              "Training"
+            ]
           }
         ]
       },
@@ -59,8 +72,7 @@
         "subtitle": "1st Place — Winning Solution",
         "period": "October 2025",
         "location": "Industrial Hackathon",
-        "desc": "Champion of the faculty's premier engineering hackathon, delivering a winning tech solution validated by industry executives and government officials.",
-        "body": "First-place winner at FIUBAtón 2025, the flagship engineering competition hosted by the Faculty of Engineering (FIUBA). Leading a collaborative team, we engineered an innovative solution to a high-stakes, real-world challenge. Our project secured the winning vote from a distinguished panel of corporate executives, investors, and high-ranking national authorities.",
+        "desc": "Secured 1st place overall among 450+ competitors in the faculty's premier engineering hackathon. Led a collaborative team to engineer an innovative tech solution during a continuous 36-hour challenge, solving high-stakes problems sponsored by 5+ leading IT corporations.",
         "tags": [
           "Competition",
           "Innovation",
@@ -75,21 +87,21 @@
         "nodes": [
           {
             "id": "is2",
-            "label": "Software Engineering 2 - Mentor",
+            "label": "Software Engineering 2 - Project Mentor",
             "period": "March 2026 — Present",
-            "desc": "Serving as a Teaching Assistant and Mentor. Guiding student groups through the end-to-end development of full-stack platform replicas. Responsible for conducting weekly agile tracking, architectural mentoring, and code reviews."
+            "desc": "Joined the teaching staff to help accommodate a massive surge in course enrollments. To date, I have successfully guided the end-to-end development of 2 full-stack projects, simulating real-world agile production environments for teams of 6 students each through architectural mentorship and code reviews."
           },
           {
             "id": "algos-segundo",
             "label": "Theory of Algorithms - Ayudante Segundo",
             "period": "March 2025 — Present",
-            "desc": "Promoted to Ayudante Segundo due to academic excellence. Responsible for conducting teaching sessions, grading complex projects, and managing the organizational structure of the course."
+            "desc": "Following a highly successful first semester with excellent student feedback regarding my teaching quality, grading, and mentoring, I was recognized by the Head of Chair. I was promoted to Ayudante Segundo after just one semester and while still an undergraduate student—a remarkably rare achievement at the university."
           },
           {
             "id": "algos-adhonorem",
             "label": "Theory of Algorithms - Ayudante Ad-honorem",
             "period": "August 2024 — February 2025",
-            "desc": "Started as an Ad-honorem Teaching Assistant (Grader). Tasked with evaluating exams and practical assignments, providing detailed technical feedback to students."
+            "desc": "Joined the teaching staff to help tackle the course's overwhelming demand, which faced over 500 applications for only 100 available spots. I was responsible for grading, evaluating, and providing detailed technical tracking for students."
           }
         ],
         "location": "Buenos Aires"
@@ -99,7 +111,7 @@
         "title": "University of Buenos Aires (UBA)",
         "subtitle": "Computer / Software Engineering",
         "period": "2023 — 2026",
-        "desc": "Became the third person in the institution's entire history to earn a Software Engineering degree in record time—an unprecedented achievement untouched since 1938.",
+        "desc": "Completed the rigorous degree program in just 3.5 years, drastically outperforming both the official 6-year curriculum and the historical 8-year average. I became the third person in the faculty's history to achieve this record-breaking graduation time, a milestone untouched since 1938.",
         "tags": [
           "Historic Academic Record"
         ],
@@ -110,7 +122,7 @@
         "title": "National Informatics Olympiad",
         "subtitle": "2nd Place (Silver Medal)",
         "period": "2020",
-        "desc": "Secured 2nd place nationwide at the Argentine Informatics Olympiad, demonstrating elite algorithmic problem-solving skills at just 16 years old.",
+        "desc": "Achieved 2nd place nationwide, competing against the top 90 participants in the country. Demonstrated elite algorithmic problem-solving capabilities and resilience at just 16 years old.",
         "tags": [
           "National Silver Medalist"
         ],
@@ -121,7 +133,7 @@
         "title": "Carlos Pellegrini School of Commerce",
         "subtitle": "Secondary Education (Business Diploma)",
         "period": "2017 — 2021",
-        "desc": "Alumnus of the Escuela Superior de Comercio Carlos Pellegrini, widely recognized as one of Argentina's most rigorous and prestigious academic institutions.",
+        "desc": "Graduated from one of Argentina's most prestigious and academically rigorous institutions. Secured admission in 23rd place strictly by merit, following a grueling year-long evaluation process where an average of 1,800 applicants compete for only 450 available spots.",
         "tags": [
           "Elite Secondary Education"
         ],

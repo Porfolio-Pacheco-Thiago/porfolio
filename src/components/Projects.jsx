@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { SiGithub } from 'react-icons/si';
 import { useLang } from '../context/lang-context';
@@ -6,7 +6,6 @@ import { projectMeta } from '../data/projects';
 import Gallery from './ui/Gallery';
 import PhoneDemo from './ui/PhoneDemo';
 import { getCover, getVideos, getImagenes } from '../lib/media';
-import { desplazarA } from '../lib/scroll';
 import WireFigure from './ui/WireFigure';
 import './Projects.css';
 
@@ -17,68 +16,23 @@ export default function Projects() {
     // contrae y el celular se queda con ese espacio.
     const [reproduciendoId, setReproduciendoId] = useState(null);
     const activaRef = useRef(null);
-    // Los nodos de cada tarjeta, para poder centrar la que se abre, y el de la
-    // sección, para centrarla al cerrar.
-    const tarjetasRef = useRef(new Map());
-    const seccionRef = useRef(null);
+    const grillaRef = useRef(null);
     const items = getList('projects.items');
-
-    /**
-     * Centra un elemento en el espacio útil: la ventana menos el navbar.
-     *
-     * No sirve `scrollIntoView({ block: 'center' })`, que centra contra la ventana
-     * entera: el navbar es fijo y le come los primeros ~84px, así que el borde de
-     * arriba queda tapado. El navbar se mide en vez de hardcodearlo, porque su alto
-     * cambia cuando la página está scrolleada.
-     *
-     * Si el elemento es más alto que ese espacio, `sobra` da negativo y lo que
-     * queda es un recorte parejo arriba y abajo — que es lo que se quiere para la
-     * grilla, más alta que la pantalla por unos pocos píxeles.
-     */
-    const centrar = useCallback((el) => {
-        if (!el) return;
-        const nav = document.querySelector('.navbar');
-        const tapa = nav ? nav.getBoundingClientRect().height : 0;
-        const caja = el.getBoundingClientRect();
-        const sobra = window.innerHeight - tapa - caja.height;
-        const destino = caja.top + window.scrollY - tapa - sobra / 2;
-
-        // Con curva propia y no con `behavior: 'smooth'`: la duración del suavizado
-        // nativo la fija el navegador —unos 300ms en Chrome— y no hay forma de
-        // alargarla, así que sobre estos saltos se sentía abrupto. `desplazarA`
-        // también respeta `prefers-reduced-motion` y cancela el anterior si se
-        // encadenan dos.
-        desplazarA(Math.max(0, destino), 900);
-    }, []);
-
-    /**
-     * Deja la sección encuadrada igual que el link "Proyectos" del navbar: el tope
-     * de la sección contra el tope de la ventana.
-     *
-     * **No se centra**, aunque parezca lo simétrico: la sección mide 948px contra
-     * 953 de ventana, así que a ras de arriba entra entera, y centrarla la corría
-     * 24px hacia abajo metiéndole el título debajo del navbar. Es lo mismo que hace
-     * `scrollIntoView({ block: 'start' })`, con el desplazamiento propio para que
-     * dure lo mismo que el resto.
-     */
-    const encuadrarSeccion = useCallback(() => {
-        const sec = seccionRef.current;
-        if (!sec) return;
-        desplazarA(Math.max(0, sec.getBoundingClientRect().top + window.scrollY), 900);
-    }, []);
-
-    /**
-     * Centra la tarjeta abierta. Comprueba la clase en el momento en vez de
-     * recordar la intención: si hubo otro click en el medio, esta ya no es la
-     * abierta y no hay que tocar nada.
-     */
-    const centrarTarjeta = useCallback((id) => {
-        const el = tarjetasRef.current.get(id);
-        if (el?.classList.contains('expanded')) centrar(el);
-    }, [centrar]);
 
     const toggle = (id) => {
         const cerrando = expandedId === id;
+        // Se le clava el alto a la grilla antes de tocar nada. Las tarjetas que no se
+        // abren quedan ocultas **pero en su lugar** (ver Projects.css), pero la que sí
+        // se abre pasa a posición absoluta y sale del flujo: sin eso la grilla se queda
+        // con seis tarjetas, o sea dos filas en vez de tres, y se acorta igual. Es la
+        // única medición que quedó, y reemplaza a todo el scroll de recentrado.
+        const grilla = grillaRef.current;
+        if (grilla && !cerrando && expandedId === null) {
+            grilla.style.height = `${grilla.getBoundingClientRect().height}px`;
+        }
+        const soltarGrilla = () => {
+            if (grilla && cerrando) grilla.style.height = '';
+        };
         const run = () => flushSync(() => {
             setExpandedId(prev => (prev === id ? null : id));
             // Al cerrar, el `<video>` no se desmonta —el bloque queda en el DOM para
@@ -90,15 +44,13 @@ export default function Projects() {
         // Si no está soportada, cambia directo.
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // Al abrir se centra la tarjeta; al cerrar, la sección. Sin lo segundo la
-        // página queda donde estaba la tarjeta abierta y, como vuelven las siete, eso
-        // cae en un punto cualquiera de la grilla.
-        const acomodar = () => (cerrando ? encuadrarSeccion() : centrarTarjeta(id));
-
+        // Acá iba un scroll de reacomodo —centrar la tarjeta al abrir, encuadrar la
+        // sección al cerrar—. Ya no hace falta: la grilla no cambia de alto, así que la
+        // tarjeta abierta aparece exactamente sobre el lugar que ya estabas mirando y
+        // la página no se mueve. Ver la regla de `visibility` en Projects.css.
         if (!document.startViewTransition || reduced) {
             run();
-            // Un frame para que el layout ya esté aplicado cuando se mida.
-            requestAnimationFrame(acomodar);
+            soltarGrilla();
             return;
         }
         // Las View Transitions no se interrumpen solas: sin esto, clickear
@@ -110,7 +62,7 @@ export default function Projects() {
         // superpuestas y scrollear la página por debajo se nota.
         transicion.finished.finally(() => {
             if (activaRef.current === transicion) activaRef.current = null;
-            acomodar();
+            soltarGrilla();
         });
     };
 
@@ -118,14 +70,14 @@ export default function Projects() {
         // `is-compact` fija y sin botón de vista: esta sección tiene una sola
         // densidad. La clase queda porque es la que gobierna todo el CSS de la
         // grilla —Journey sigue usándola con su toggle—, pero acá ya no alterna.
-        <section ref={seccionRef} id="projects" className="projects has-decor is-compact">
+        <section id="projects" className="projects has-decor is-compact">
             <WireFigure kind="tetrahedron" detail={3} spin="flat" className="wire-decor at-right" size={720} line={7} seconds={115} tiltX={14} tiltZ={16} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('projects.title')}</h2>
                 <p className="section-subtitle">{t('projects.subtitle')}</p>
             </div>
 
-            <div className="projects-grid">
+            <div className="projects-grid" ref={grillaRef}>
                 {items.map((item, index) => {
                     const { Icon, repo } = projectMeta[item.id] ?? {};
                     const isExpanded = expandedId === item.id;
@@ -167,10 +119,6 @@ export default function Projects() {
                         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                         <div
                             key={item.id}
-                            ref={el => {
-                                if (el) tarjetasRef.current.set(item.id, el);
-                                else tarjetasRef.current.delete(item.id);
-                            }}
                             className={`project-card reveal-fade ${isExpanded ? 'expanded' : ''} ${reproduciendoId === item.id ? 'is-reproduciendo' : ''}`}
                             style={{
                                 // Escalonado acotado: cada tarjeta se revela por su cuenta al
@@ -189,38 +137,6 @@ export default function Projects() {
                             onClick={e => {
                                 if (e.target.closest('.fono-barra')) return;
                                 toggle(item.id);
-                            }}
-                            /* Al poner o sacar una demo, la foto se contrae o vuelve y la
-                               tarjeta cambia de alto: el centrado anterior deja de valer y
-                               queda descentrada. Se recentra cuando **termina** la
-                               transición —no al disparar el cambio—, porque a mitad de la
-                               animación el alto todavía no es el final. Las transiciones
-                               burbujean, así que alcanza con escuchar en la tarjeta.
-
-                               Se escuchan las **dos** que mueven el alto: la de la foto y
-                               la del ancho del celular, que arrastra su alto porque la
-                               pantalla es 1:2. Duran lo mismo pero el orden en que llegan
-                               no está garantizado, y con una sola el recentrado podía
-                               medir un alto que todavía no era el final. Correr dos veces
-                               no molesta: el cálculo es idempotente. */
-                            onTransitionEnd={e => {
-                                const t = e.target;
-                                const mueveElAlto =
-                                    (e.propertyName === 'height' && t.classList.contains('project-media'))
-                                    || (e.propertyName === 'width' && t.classList.contains('fono'));
-                                if (!mueveElAlto) return;
-
-                                const el = tarjetasRef.current.get(item.id);
-                                if (el?.classList.contains('expanded')) {
-                                    centrar(el);
-                                } else if (expandedId === null) {
-                                    // Acaba de cerrarse. Este es el corrector que faltaba: el
-                                    // primer centrado corrió al terminar la View Transition
-                                    // (~550ms), cuando la foto todavía se estaba encogiendo
-                                    // hasta los 850ms — o sea midiendo una sección más alta
-                                    // que la final, y por eso quedaba desencuadrada.
-                                    encuadrarSeccion();
-                                }
                             }}
                         >
                             {/* La ventana de larson: barra de título arriba, foto abajo, y la

@@ -1,27 +1,28 @@
-import { useLang } from '../../context/lang-context';
-import Gallery from '../ui/Gallery';
+import { getLogoApaisado } from '../../lib/media';
+import { journeyClientMeta } from '../../data/journey';
 
 /**
- * Acordeones por cliente dentro de una tarjeta del timeline (hoy, Lovelytics).
+ * Los puntos de la línea de tiempo interna de una tarjeta (hoy, Lovelytics).
+ *
+ * Cada punto muestra su logo apaisado si su subcarpeta tiene uno. Antes cada uno era
+ * un acordeón con un "Más Información" que desplegaba una galería: se fue el botón y
+ * con él el estado de qué punto estaba abierto, porque lo único que había detrás era
+ * el logo y no hace falta esconderlo.
  *
  * @param {object} props
- * @param {Array<{id: string, label: string, period?: string, desc: string}>} props.clients
- * @param {string} props.carpeta                    Carpeta de medios de la tarjeta
- *                                                  que los contiene; cada cliente
- *                                                  usa una subcarpeta suya.
- * @param {Record<string, boolean>} props.abiertos  Qué cliente está desplegado.
- * @param {(id: string) => void} props.onToggle
+ * @param {Array<{id: string, label: string, period?: string, desc: string, tags?: string[]}>} props.clients
+ * @param {string} props.carpeta  Carpeta de medios de la tarjeta que los contiene;
+ *                                cada punto usa una subcarpeta suya con su `id`.
  */
-export default function NestedClients({ clients, carpeta, abiertos, onToggle }) {
-    const { t } = useLang();
-
+export default function NestedClients({ clients, carpeta }) {
     return (
         <ul className="nested-timeline">
             {clients.map(c => {
-                const open = !!abiertos[c.id];
-                const galeriaId = `cliente-galeria-${c.id}`;
+                const logo = getLogoApaisado(`${carpeta}/${c.id}`);
+                const fondo = journeyClientMeta[c.id]?.bannerFondo;
+                const etiquetas = c.tags ?? [];
                 return (
-                    <li key={c.id} className={`nested-item ${open ? 'open' : ''}`}>
+                    <li key={c.id} className="nested-item">
                         <span className="nested-dot" />
                         <div className="nested-content">
                             <div className="nested-head">
@@ -29,26 +30,32 @@ export default function NestedClients({ clients, carpeta, abiertos, onToggle }) 
                                 {c.period && <span className="nested-period">{c.period}</span>}
                             </div>
                             <p className="nested-desc">{c.desc}</p>
-                            <button
-                                type="button"
-                                className="nested-more"
-                                onClick={(e) => { e.stopPropagation(); onToggle(c.id); }}
-                                aria-expanded={open}
-                                aria-controls={galeriaId}
-                            >
-                                <span>{open ? t('projects.showLess') : t('projects.viewMore')}</span>
-                                <svg className="nested-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-                            </button>
-                            {/* inert mientras está cerrada: sigue en el DOM para animarse,
-                                pero no recibe foco ni la leen los lectores de pantalla */}
-                            <Gallery
-                                className="nested-gallery"
-                                carpeta={`${carpeta}/${c.id}`}
-                                label={c.label}
-                                count={2}
-                                id={galeriaId}
-                                inert={!open}
-                            />
+                            {/* El logo y las etiquetas del punto, uno al lado del otro.
+                                Sin texto alternativo en la imagen: es el logo de quien el
+                                rótulo de arriba ya nombra. Los puntos sin logo no muestran
+                                recuadro —vacío se leería como que algo falló— y las
+                                etiquetas se corren solas a ocupar el lugar. */}
+                            {(logo || etiquetas.length > 0) && (
+                                <div className="nested-medios">
+                                    {logo && (
+                                        <img
+                                            className="nested-banner"
+                                            style={{ '--banner-fondo': fondo }}
+                                            src={logo}
+                                            alt=""
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                    )}
+                                    {etiquetas.length > 0 && (
+                                        <div className="nested-tags">
+                                            {etiquetas.map(tag => (
+                                                <span key={tag} className="tag">{tag}</span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </li>
                 );

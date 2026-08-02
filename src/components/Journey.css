@@ -39,6 +39,19 @@
     --eje-x: 6%;
 }
 
+/* ── El verde de la sección, en claro ─────────────────────────────────────
+   El acento del tema claro es un verde casi negro (#0a3d1f): se eligió para que
+   **texto** chico se leyera sobre la página verde, y ahí 5.96:1 tiene sentido. Pero
+   acá lo que lo usa son líneas y marcos, que no son texto y piden 3:1, y a ese tono
+   la línea de tiempo se leía como una raya negra —y con el brillo bajo, casi como
+   nada—. Sube a un verde medio: 3.39:1, holgado para lo que es, y por fin verde.
+
+   Va acotado a la sección y no al tema entero porque `--accent` gobierna también
+   textos en otras partes, donde el 4.5 sí aplica. */
+[data-theme="light"] .experience {
+    --accent: #166634;
+}
+
 /* Un solo eje vertical, en el medio: lo académico cae a su izquierda y lo laboral
    a su derecha. Antes eran dos ejes, uno pegado a cada margen. */
 .timeline-axis {
@@ -50,37 +63,22 @@
     --axis-color: var(--accent);
 }
 
-/* Riel apagado: el recorrido completo, tenue */
+/* ── La línea, encendida entera y siempre ────────────────────────────────
+   Antes esto eran dos capas: un riel tenue de fondo y, encima, una banda que
+   viajaba con el scroll encendiendo el tramo que estaba a la altura de la pantalla,
+   con los puntos apagándose y prendiéndose al pasar. Tenía sentido cuando la sección
+   medía tres pantallas y había que recorrerla; ahora entra entera en una, así que la
+   banda no tenía nada que recorrer —quedaba fija tapando el medio— y los puntos de
+   los extremos se veían apagados sin motivo.
+
+   Queda una sola capa. Los extremos siguen desvaneciéndose para que la línea no
+   arranque ni termine en un corte duro. */
 .timeline-axis::before {
     content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(to bottom, transparent, var(--axis-color), var(--axis-color), transparent);
-    opacity: 0.2;
-    transition: opacity 0.45s ease;
-}
-
-/* Tramo encendido: una banda que viaja con el scroll, centrada en la mitad
-   de la pantalla. Arriba y abajo de ella la línea queda apagada. El degradado
-   la desvanece en ambos extremos para que no se vean cortes duros. */
-.timeline-axis::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: var(--timeline-band, 30vh);
-    /* translateY y no `top`: `top` dispara layout, esto es composite puro.
-       El offset en px lo escribe Journey.jsx sobre cada eje (y no sobre
-       .timeline) para que la variable no se herede a las 6 tarjetas y su
-       contenido, invalidándoles el estilo en cada frame. El -50% del calc es
-       relativo al alto propio, así que centra la banda en el offset. */
-    transform: translateY(calc(var(--timeline-offset, 0px) - 50%));
-    background: linear-gradient(to bottom, transparent, var(--axis-color), transparent);
-    /* drop-shadow y no box-shadow: sigue el alfa del degradado en vez de
-       dibujar un halo rectangular con bordes duros */
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--axis-color) 50%, transparent));
-    transition: opacity 0.45s ease;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--axis-color) 40%, transparent));
 }
 
 .timeline-axis {
@@ -143,6 +141,13 @@
     /* Lo que respira el contenido contra el marco de la ventana. Es un token porque
        el logo apaisado lo sangra para llegar al borde. */
     --aire-ventana: 1rem;
+    /* La caja de los logos apaisados, la misma para el de la tarjeta y el de los puntos
+       de adentro. Todos entran con `contain` y ninguno se recorta; lo que cambia entre
+       uno y otro es el ancho, no la proporción.
+       Bajó de 935/125 a 935/100 cuando la ventana dejó de scrollear: son 25px por
+       tarjeta, y el logo más apaisado que hay (Pellegrini, 7.47) sigue entrando casi
+       justo. */
+    --caja-logo: 935 / 100;
 }
 
 .experience.has-decor .section-header {
@@ -224,20 +229,6 @@
 /* Antes, ocultar una rama apagaba su eje. Con la línea compartida eso no aplica:
    la línea es de las dos, así que se queda encendida y lo único que se colapsa son
    las tarjetas de ese lado. */
-
-/* Sin animación por preferencia del sistema: línea entera encendida y
-   fija, sin banda viajera. Lo marca Journey.jsx. */
-.timeline[data-static] .timeline-axis::before {
-    opacity: 1;
-}
-
-.timeline[data-static] .timeline-axis::after {
-    display: none;
-}
-
-.timeline[data-static] .timeline-dot {
-    opacity: 1;
-}
 
 .timeline-axis-label.is-collapsed {
     background: var(--accent);
@@ -362,8 +353,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Apagado hasta que la línea lo alcanza */
-    opacity: 0.4;
     transition: opacity 0.35s ease, box-shadow 0.3s ease, transform 0.3s ease,
         border-color 0.3s ease, left 0.45s ease;
 }
@@ -409,11 +398,8 @@
     --item-color: var(--work-color);
 }
 
-/* Punto alcanzado por la línea. `data-lit` es un atributo y no una clase
-   porque React reescribe className al re-renderizar y lo borraría
-   (mismo motivo por el que App.jsx usa data-revealed). */
-.timeline-item[data-lit] .timeline-dot {
-    opacity: 1;
+/* Todos los puntos encendidos: ya no hay una banda que los vaya alcanzando. */
+.timeline-dot {
     box-shadow: 0 0 14px color-mix(in srgb, var(--item-color) 50%, transparent);
 }
 
@@ -446,6 +432,14 @@
     min-height: var(--foto, 101px);
     /* El hueco entre el marco y el contenido sale de este fondo asomando por el
        relleno de abajo, como en Proyectos. */
+    /* El color de rama de **adentro**. La ventana es una superficie oscura en los dos
+       temas, y el oliva de afuera —elegido para leerse contra la página, que en claro
+       es verde pálido— acá desaparece: la línea de tiempo interna daba 1.07:1 y sus
+       etiquetas 1.14:1, o sea invisibles. Es el mismo problema que ya tenía el texto y
+       que resolvió `--work-texto`; esto lo extiende a lo que no es texto.
+       Un solo valor para los dos temas: sobre la ventana clara da 3.9:1 la línea y
+       4.9:1 las etiquetas, y sobre la oscura, más. */
+    --work-color: #c6e596;
     background: var(--bg-primary);
     border: var(--trazo) solid var(--proy-marco);
     /* Columna con el contenido en `flex: 1`: el hueco entre el marco y el contenido
@@ -646,6 +640,7 @@
     flex: 1;
     margin: var(--trazo);
     background: var(--bg-card);
+    font-family: var(--font-tarjeta);
     /* Con la barra de título arriba, el renglón de aire de adentro es redundante. */
     padding: clamp(0.3rem, 0.5vh, 0.45rem) var(--aire-ventana);
     text-align: left;
@@ -703,7 +698,7 @@
     font-size: 0.85rem;
     color: var(--text-secondary);
     line-height: 1.5;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.45rem;
 }
 
 .timeline-tags {
@@ -737,7 +732,20 @@
    frame de retraso; la fila es aritmética, así que es una cuenta de CSS. */
 .timeline-item.expanded .timeline-bloque {
     top: calc(-1 * var(--i, 0) * var(--fila-paso) - var(--rotulos-espacio));
-    bottom: calc(-1 * var(--j, 0) * var(--fila-paso));
+    /* El alto lo pone **el contenido**, no el timeline. Antes iba anclada arriba y
+       abajo a la vez, así que todas medían lo mismo y a las cortas les sobraba un vacío
+       debajo. El tope sigue siendo lo que hay hasta el pie del timeline, que es lo que
+       entra en pantalla: la cuenta es la misma de antes, pero como techo y no como alto
+       fijo. */
+    bottom: auto;
+    max-height: calc(var(--rotulos-espacio)
+            + (var(--i, 0) + var(--j, 0)) * var(--fila-paso)
+            + var(--foto)
+            /* Un aire de fila de más: la cuenta llega hasta el pie de la última fila,
+               pero abajo de eso todavía queda el relleno del timeline y el de la
+               sección. Con 922px de 953 hay lugar de sobra, y son los píxeles que le
+               faltaban a docencia —la única con tres puntos **y** galería—. */
+            + var(--fila-aire));
     /* Por encima de los puntos y de la línea, que quedan del otro lado del hueco. */
     z-index: 4;
 }
@@ -787,14 +795,17 @@
 .timeline-item.expanded .timeline-extra {
     max-height: 1400px;
     opacity: 1;
-    margin: 0.25rem 0 0.85rem;
+    /* Poco margen abajo, no cero: la ventana termina donde termina este bloque, así que
+       lo que se ponga acá es literalmente el aire contra el marco. En cero las etiquetas
+       del último punto cerraban al ras —9px contra los 7 de arriba de la barra—; con
+       esto quedan a 19, que es lo que necesita un elemento con relleno propio para no
+       leerse pegado. Más que esto ya vuelve a ser el "espacio vacío de abajo". */
+    margin: 0.1rem 0 0.6rem;
 }
 
 .timeline-fulldesc {
-    font-size: 0.85rem;
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.6rem;
 }
 
 .timeline-gallery {
@@ -804,7 +815,10 @@
 }
 
 .timeline-gallery-item {
-    aspect-ratio: 4 / 3;
+    /* Apaisada y no 4:3: la entrada de docencia lleva tres puntos **y** galería, y a
+       4:3 se pasaba 18px del marco. Son 40px por foto y ninguna de las que hay pierde
+       nada — todas son horizontales. */
+    aspect-ratio: 16 / 10;
     border-radius: 8px;
     border: 1px dashed var(--border);
     background: var(--bg-secondary);
@@ -820,8 +834,15 @@
 .nested-timeline {
     list-style: none;
     position: relative;
-    margin: 0.9rem 0 0.4rem;
+    margin: 0.5rem 0 0;
     padding-left: 1.5rem;
+}
+
+/* Cuando después de la lista viene la galería —hoy solo docencia—, las fotos
+   arrancaban pegadas al último renglón de texto. El margen va acá y no en la galería
+   para que no aparezca en las tarjetas donde la lista es lo último. */
+.nested-timeline:not(:last-child) {
+    margin-bottom: 0.65rem;
 }
 
 .nested-timeline::before {
@@ -832,12 +853,18 @@
     bottom: 6px;
     width: 2px;
     border-radius: 2px;
-    background: color-mix(in srgb, var(--work-color) 40%, transparent);
+    /* Del 40% al 70%: al 40 la línea daba 1.63:1 incluso en el tema oscuro, donde el
+       color sí era el correcto. Es una línea de 2px, no un fondo. */
+    background: color-mix(in srgb, var(--work-color) 70%, transparent);
 }
 
 .nested-item {
     position: relative;
-    padding-bottom: 0.9rem;
+    /* La separación entre un punto y el siguiente: el logo de uno contra el título del
+       de abajo. Estaba en 0.6rem —recortado cuando la tarjeta no entraba— y los puntos
+       se leían como un bloque continuo. Con las etiquetas en un renglón sobró alto y
+       vuelve a haber aire. */
+    padding-bottom: 1.15rem;
 }
 
 .nested-item:last-child {
@@ -852,7 +879,8 @@
     height: 12px;
     border-radius: 50%;
     background: var(--bg-card);
-    border: 2px solid color-mix(in srgb, var(--work-color) 65%, transparent);
+    /* Entero, no al 65%: era el otro que se perdía (2.27:1 en oscuro). */
+    border: 2px solid var(--work-color);
 }
 
 .nested-dot::after {
@@ -868,11 +896,13 @@
     flex-wrap: wrap;
     align-items: baseline;
     gap: 0.5rem;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
 }
 
 .nested-label {
-    font-size: 0.78rem;
+    /* Por encima de la explicación que tiene debajo (0.95rem): es su título, y a
+       0.78rem quedaba más chico que el texto que encabeza. */
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -891,55 +921,52 @@
     line-height: 1.6;
 }
 
-.nested-more {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin-top: 0.45rem;
-    padding: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: var(--font-sans);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--work-color);
-}
-
-.nested-chevron {
-    transition: transform 0.3s ease;
-}
-
-.nested-item.open .nested-chevron {
-    transform: rotate(180deg);
-}
-
-.nested-gallery {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease;
-}
-
-.nested-item.open .nested-gallery {
-    max-height: 360px;
-    opacity: 1;
-    margin-top: 0.6rem;
-}
-
-.nested-gallery-item {
-    aspect-ratio: 4 / 3;
-    border-radius: 8px;
-    border: 1px dashed var(--border);
-    background: var(--bg-secondary);
+/* El logo de cada punto de la línea interna. Misma caja que el de la tarjeta —el
+   token está una sola vez— para que los dos tamaños de logo se lean como el mismo
+   elemento a dos escalas. */
+/* El logo del punto y sus etiquetas, en un renglón. */
+.nested-medios {
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    font-size: 1.1rem;
+    gap: 0.8rem;
+    margin-top: 0.35rem;
+}
+
+/* Un solo renglón, sin envolver nunca: `nowrap` y listo. Iban en dos filas y eso le
+   sumaba ~20px de alto a cada punto —60 en la tarjeta de Lovelytics, que tiene tres— y
+   la sacaba de su marco. En una fila el alto del renglón lo pone el logo y las
+   etiquetas viajan gratis. */
+.nested-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    align-items: center;
+    min-width: 0;
+}
+
+/* No se achican para entrar: una etiqueta con el texto cortado no dice nada. */
+.nested-tags .tag {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.nested-banner {
+    display: block;
+    /* A ancho completo quedaba del mismo tamaño que el logo de la tarjeta, y estos son
+       los clientes: el logo del empleador tiene que seguir siendo el grande. Acá además
+       comparte el renglón con las etiquetas. */
+    flex: 0 0 34%;
+    /* Sin esto el 45% no manda: el mínimo automático de un ítem flex es su tamaño
+       intrínseco, y el de una imagen es su ancho real —el de Toyota mide 800px—, así
+       que el logo se plantaba en 804 y las etiquetas quedaban apretadas contra el
+       borde. Es el mismo caso que el `min-height: 0` del recuadro de la foto. */
+    min-width: 0;
+    aspect-ratio: var(--caja-logo);
+    object-fit: contain;
+    /* Blanco por defecto, como el de la tarjeta; el punto que necesite otra cosa lo
+       declara en `data/journey.js`. */
+    background: var(--banner-fondo, #fff);
+    border: var(--trazo) solid var(--proy-marco);
 }
 
 /* === Lado Experiencia (laboral): verde distinto al académico (oscuro) / negro (claro) === */
@@ -983,7 +1010,9 @@
 
 .timeline-item.cat-work .tag {
     color: var(--work-color);
-    background: color-mix(in srgb, var(--work-color) 14%, transparent);
+    /* 10% y no 14%, por lo mismo que en `ui.css`: el relleno propio de la etiqueta le
+       aclara el fondo y le come el contraste. */
+    background: color-mix(in srgb, var(--work-color) 10%, transparent);
     border-color: color-mix(in srgb, var(--work-color) 32%, transparent);
 }
 
@@ -1061,15 +1090,19 @@
     display: none;
 }
 
-.timeline-item.expanded .timeline-banner {
-    display: block;
+/* Los textos explicativos de la tarjeta abierta —la descripción de la entrada y la de
+   cada punto de la línea interna— son lo que se viene a leer: van un escalón más
+   grandes que el resto y en negrita. */
+.timeline-item.expanded .timeline-desc,
+.timeline-fulldesc,
+.nested-desc {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.55;
 }
 
-/* Abierta, la ventana tiene alto fijo —el del timeline— así que el contenido que no
-   entre scrollea adentro en vez de estirarla y sacar la sección de la pantalla. */
-.timeline-item.expanded .timeline-card-content {
-    overflow-y: auto;
-    min-height: 0;
+.timeline-item.expanded .timeline-banner {
+    display: block;
 }
 
 /* El logo apaisado va **solo y de lado a lado**: nada al costado y sin recorte, así
@@ -1098,7 +1131,7 @@
        y `contain` mete el logo entero adentro —recortar un logo lo arruina—, así que lo
        que sobra se rellena a los costados con el fondo. Es proporción y no alto en px
        para que siga valiendo si la ventana cambia de ancho. */
-    aspect-ratio: 935 / 125;
+    aspect-ratio: var(--caja-logo);
     object-fit: contain;
     /* Con qué se rellena lo que sobra a los costados. Blanco puro por defecto; el que
        tenga otro fondo lo declara en `data/journey.js`, medido de su archivo, para que

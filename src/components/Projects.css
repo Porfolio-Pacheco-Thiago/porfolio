@@ -8,6 +8,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
+    /* Referencia para la tarjeta abierta, que se posiciona sobre la grilla entera. */
+    position: relative;
 }
 
 /* La tarjeta **no es una superficie**: en la referencia no hay ninguna caja
@@ -24,6 +26,12 @@
 .project-card {
     /* 0 en reposo: el marco arranca en el borde de la columna. El estado expandido
        lo levanta, porque ahí sí hay una superficie que necesita respiro. */
+    /* La misma que adentro de las tarjetas de Trayectoria. Queda en la tarjeta y no en
+       un elemento suelto, así la toma todo lo que va adentro. Se salvan dos: el nombre
+       del proyecto, que tiene su propia display —es lo que más pesa de la pieza— y los
+       tiempos del reproductor, que van en mono porque son números que cambian y con
+       ancho variable bailan. */
+    font-family: var(--font-tarjeta);
     --marco: 0rem;
     /* Grosor del marco, alto de la barra de título, lado del recuadro y tamaño de
        su diagonal. Se achican juntos en modo compacto. */
@@ -77,21 +85,32 @@
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Con una tarjeta abierta, el resto se va: si siguieran ahí, la expandida las
-   empujaría hacia abajo y la sección pasaría de 950px a 1445px, o sea habría que
-   scrollear para ver lo que se acaba de abrir. Abierta, la tarjeta **es** la
-   sección; se cierra con el mismo título que la abrió. */
+/* Con una tarjeta abierta, el resto desaparece **pero sigue ocupando su lugar**:
+   `visibility` y no `display: none`. Es lo mismo que hace Trayectoria y por el mismo
+   motivo: si la grilla cambiara de alto, la sección cambiaría con ella y la página se
+   movería bajo el mouse. Así la grilla mide siempre lo mismo, la tarjeta abierta se
+   dibuja encima ocupándola entera, y no hace falta ningún scroll de reacomodo — la
+   tarjeta aparece exactamente donde ya estabas mirando.
+
+   `visibility` además las saca del foco y del lector de pantalla, que es lo que
+   `display: none` hacía bien y `opacity` sola no. */
 .projects-grid:has(.project-card.expanded) .project-card:not(.expanded) {
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
 }
 
-/* Expandida sí es una superficie: adentro hay descripción, celular y galería, y
-   sin un fondo que los contenga quedarían flotando sobre la página. */
+/* Expandida **tampoco tiene fondo**: lo que contiene su contenido es el marco, no una
+   superficie. Antes sí lo era —un verde oscuro— y eso obligaba a invertir la paleta de
+   todo lo de adentro, que es lo que se fue con el fondo: ahora el texto de la tarjeta
+   abierta se lee contra la página, igual que el de la cerrada, y usa sus mismos
+   tokens. Ver el bloque de `ui.css` que daba vuelta las superficies oscuras. */
 .project-card.expanded {
-    position: relative;
+    /* Fuera del flujo y sobre la grilla entera: ver la regla de arriba. */
+    position: absolute;
+    inset: 0;
     --marco: 0.9rem;
-    width: 100%;
-    background: var(--bg-card);
+    width: auto;
+    background: none;
     border: 1px solid var(--accent);
     border-radius: 16px;
 }
@@ -420,7 +439,10 @@
 }
 
 .project-fulldesc {
+    /* Como las explicaciones de Trayectoria: es lo que se viene a leer, así que va en
+       negrita. */
     font-size: 0.9rem;
+    font-weight: 600;
     color: var(--text-secondary);
     line-height: 1.65;
     /* ~65 caracteres: más ancho que esto y el ojo pierde el renglón al volver. */
@@ -482,7 +504,9 @@
    verdad exigirían `preserve-3d` y su re-rasterizado por frame. */
 .fono {
     position: relative;
-    width: min(205px, 60%);
+    /* Acotado también por el alto disponible: la tarjeta abierta ya no crece, así que
+       un celular más ancho es un celular que se sale por abajo. */
+    width: min(205px, 60%, 26vh);
     padding: 8px;
     background: linear-gradient(145deg, #3a3a41 0%, #16161a 38%, #0b0b0f 60%, #2c2c33 100%);
     border-radius: 30px;
@@ -622,7 +646,6 @@
     align-items: center;
     gap: 0.4rem;
     padding: 0.5rem 0.85rem;
-    font-family: var(--font-sans);
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-secondary);
@@ -663,6 +686,10 @@
    demo. */
 .fono-barra {
     position: relative;
+    /* Explícito y no heredado: la barra es una superficie oscura y `ui.css` le invierte
+       los tokens, pero lo que no pida `--text-primary` a mano heredaría el color de la
+       tarjeta, que desde que perdió el fondo es el oscuro de la página. */
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -989,12 +1016,12 @@
     width: 100%;
 }
 
-/* Bastante más alta que antes: recortada a 162px del mockup se veía una tirita.
-   El techo es que la tarjeta abierta entre **con aire arriba y abajo** en el
-   espacio útil: la ventana menos el navbar fijo (~74px) menos unos 40px de
-   respiro a cada lado. El encabezado de la sección no cuenta. */
+/* El techo cambió cuando la tarjeta abierta pasó a ocupar exactamente el hueco de la
+   grilla: ya no puede crecer y empujar la sección, así que lo que mida de más se lo
+   quita al celular y a la descripción, que van debajo. Con `28.5vh` el contenido se
+   pasaba 85px del borde y el celular quedaba cortado. */
 .projects.is-compact .project-card.expanded .project-media {
-    height: clamp(190px, 28.5vh, 285px);
+    height: clamp(150px, 19.4vh, 215px);
 }
 
 @media (max-width: 900px) {

@@ -301,7 +301,7 @@
     .section-title {
         background-image: linear-gradient(160deg,
                 var(--text-primary) 35%,
-                var(--accent-text) 115%);
+                var(--titulo-degrade-fin, var(--accent-text)) 115%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -622,32 +622,26 @@
    heredan a todo lo de adentro sin tener que tocar una sola regla de texto. */
 /* Los botones de idioma y de tema entran acá porque se pintan con el mismo
    `--bg-card`: son la misma superficie verde, en chico. */
-/* Ojo con Proyectos: va `.project-card.expanded` y no `.project-card` a secas.
-   Desde el rediseño de la Fase 5 la tarjeta cerrada **no es una superficie** —el
-   marco es la tarjeta, y el nombre queda sobre la página—, así que invertirle el
-   texto lo dejaba casi blanco sobre el verde claro: 1.91:1. Expandida sí vuelve a
-   tener fondo `--bg-card`, y ahí la inversión es correcta. */
+/* Proyectos ya no está acá, **en ningún estado**. La tarjeta cerrada nunca fue una
+   superficie —el marco es la tarjeta y el nombre queda sobre la página—, e invertirle
+   el texto lo dejaba en 1.91:1; la expandida lo era y dejó de serlo cuando se le sacó
+   el fondo. Ahora las dos se leen contra la página y les sirve la paleta de afuera. */
+/* La barra del reproductor entra acá aunque su tarjeta ya no: la tarjeta abierta perdió
+   el fondo, pero la barra conserva el suyo —es `--bg-card`, el verde oscuro— así que
+   sigue siendo una superficie oscura y su texto tiene que invertirse. Sin esto quedaba
+   con la paleta de la página: el título en 2.03:1 y los tiempos en 1.23:1. */
 [data-theme="light"] .timeline-card,
-[data-theme="light"] .project-card.expanded,
+[data-theme="light"] .fono-barra,
 [data-theme="light"] .skills-category,
 [data-theme="light"] .toggle-btn {
     --text-primary: #f2f7f4;
     --text-secondary: #b9d0c2;
-    --accent-text: #6fd89a;
-    --accent-glow: rgba(111, 216, 154, 0.14);
+    /* Subido de #6fd89a y el tinte bajado de 0.14: una etiqueta se lee sobre su
+       propio fondo, no sobre la tarjeta, y ese 14% de relleno aclaraba la superficie
+       lo justo para dejarla en 3.74. Con esto da 4.66. */
+    --accent-text: #8fe8b4;
+    --accent-glow: rgba(143, 232, 180, 0.10);
     --border: rgba(255, 255, 255, 0.16);
-}
-
-/* El marco y la barra de la ventana se dan vuelta **solo en la tarjeta de proyecto
-   expandida**, donde quedan rodeados por la superficie verde oscura y con el verde
-   de afuera desaparecerían (1.27:1). El menta de `--accent-text` da 5.6:1 ahí.
-
-   La entrada de Trayectoria queda afuera a propósito aunque comparta el bloque de
-   arriba: su marco no está adentro de la superficie oscura, está **contra la
-   página**, así que necesita el valor de afuera. Con el de adentro medía 1.11:1. */
-[data-theme="light"] .project-card.expanded {
-    --proy-marco: var(--accent-text);
-    --proy-barra: var(--accent-text);
 }
 
 /* El realce superior blanco pleno era para tarjetas claras; sobre verde
@@ -655,7 +649,6 @@
    36px y ahí la línea es la mitad del borde, además de que su `:hover`
    reemplaza el `box-shadow` y la haría parpadear. */
 [data-theme="light"] .timeline-card,
-[data-theme="light"] .project-card.expanded,
 [data-theme="light"] .skills-category {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
 }

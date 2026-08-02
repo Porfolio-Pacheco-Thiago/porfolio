@@ -46,6 +46,14 @@ Subí acá las fotos/videos de cada una (cualquier nombre: `1.jpg`, `2.png`, `de
     arriba de la galería cuando la tarjeta está abierta. Si no hay, no se muestra
     ninguno: el cuadrado estirado a todo el ancho queda como una mancha.
 
+  Sirve igual marcar el **cuadrado** en vez del apaisado, con `chico` o `cuadrado`
+  en el nombre (`logo-chico-toyota.png` contra `logo-toyota.png`): ahí el otro es el
+  apaisado por descarte. Lo que no se puede es no marcar ninguno de los dos —con un
+  solo `logo*` se asume que es el cuadrado—.
+
+  Los puntos de la línea de tiempo interna (los clientes de Lovelytics) usan lo
+  mismo, cada uno en su subcarpeta: `timeline/lovelytics/<id del punto>/`.
+
   Todo lo demás de la carpeta son las fotos del evento y van en la grilla.
 - **Portadas de video:** un archivo llamado `<video>-poster.webp` no se dibuja
   como un elemento más — se usa como `poster` del video con ese mismo nombre

@@ -16,11 +16,9 @@ import NestedNodes from './NestedNodes';
  * @param {boolean} props.esUltima     Es la última visible: no lleva aire debajo.
  * @param {boolean} props.isExpanded
  * @param {() => void} props.onToggle
- * @param {Record<string, boolean>} props.openClients
- * @param {(id: string) => void} props.onToggleClient
  */
 export default function TimelineItem({
-    item, isCollapsed, isExpanded, onToggle, openClients, onToggleClient,
+    item, isCollapsed, isExpanded, onToggle,
     fila = 0, filas = 1, esUltima = false,
 }) {
     const { t } = useLang();
@@ -30,15 +28,27 @@ export default function TimelineItem({
     const extraId = `journey-extra-${item.id}`;
     const carpeta = `timeline/${item.id}`;
     const apaisado = getLogoApaisado(carpeta);
+    const fotos = getFotos(carpeta);
 
-    // Se define una vez y se ubica según el modo: van **arriba de las fotos** cuando hay
-    // galería, y al final cuando el cuerpo es una lista anidada y no hay fotos.
+    // Se define una vez y se ubica según el modo, siempre **arriba de las fotos**.
     const etiquetas = tags.length > 0 && (
         <div className="timeline-tags">
             {tags.map(tag => (
                 <span key={tag} className="tag">{tag}</span>
             ))}
         </div>
+    );
+
+    // Las fotos de la carpeta, **solo si las hay**. No queda marcador de posición: la
+    // única entrada sin fotos es la Olimpiada, que no va a tener, y tres recuadros
+    // punteados ahí se leen como que algo falló y no como "todavía sin subir".
+    const galeria = fotos.length > 0 && (
+        <Gallery
+            className="timeline-gallery"
+            carpeta={carpeta}
+            medios={fotos}
+            label={item.title}
+        />
     );
 
     return (
@@ -131,29 +141,21 @@ export default function TimelineItem({
                     <div className="timeline-extra" id={extraId} inert={!isExpanded}>
                         {clients.length > 0 ? (
                             <>
-                                <NestedClients
-                                    clients={clients}
-                                    carpeta={carpeta}
-                                    abiertos={openClients}
-                                    onToggle={onToggleClient}
-                                />
+                                <NestedClients clients={clients} carpeta={carpeta} />
                                 {etiquetas}
+                                {galeria}
                             </>
                         ) : nodes.length > 0 ? (
                             <>
                                 <NestedNodes nodes={nodes} />
                                 {etiquetas}
+                                {galeria}
                             </>
                         ) : (
                             <>
                                 {item.body && <p className="timeline-fulldesc">{item.body}</p>}
                                 {etiquetas}
-                                <Gallery
-                                    className="timeline-gallery"
-                                    carpeta={carpeta}
-                                    medios={getFotos(carpeta)}
-                                    label={item.title}
-                                />
+                                {galeria}
                             </>
                         )}
                     </div>

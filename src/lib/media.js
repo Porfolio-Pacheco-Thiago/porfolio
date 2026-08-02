@@ -18,8 +18,13 @@ const POSTER = /-poster\.webp$/i;
 // El logo de la institución, frente a las fotos del evento. Se distingue por el
 // nombre porque es lo único que se sabe de un archivo sin cargarlo.
 const ES_LOGO = /^logo/i;
-// Y entre los logos, la versión apaisada: la que va sola, de lado a lado.
+// Y entre los logos, cuál es cuál. Hay dos formas de nombrarlos y las dos aparecen en
+// las carpetas: marcando el apaisado (`logo-grande`, `logo-fiuba-largo`) o marcando el
+// cuadrado (`logo-chico-toyota` contra `logo-toyota`). Se aceptan las dos porque el
+// nombre es la única señal que hay —las medidas no se conocen sin cargar el archivo— y
+// forzar una sola convención significaba renombrar archivos ya subidos.
 const ES_APAISADO = /(grande|largo)/i;
+const ES_CHICO = /(chico|cuadrado)/i;
 
 /**
  * Las rutas agrupadas por carpeta contenedora, para poder pedir una sola.
@@ -119,6 +124,9 @@ export function getLogo(carpeta) {
         m => m.tipo === 'imagen' && ES_LOGO.test(m.nombre) && !ES_APAISADO.test(m.nombre),
     );
     if (!logos.length) return getCover(carpeta);
+    // Si alguno se declara cuadrado, ese es y no hay nada que adivinar.
+    const chico = logos.find(m => ES_CHICO.test(m.nombre));
+    if (chico) return chico.src;
     // Descarta la versión apaisada explícitamente: en un cuadrado queda con dos franjas
     // vacías. Antes se elegía "el de nombre más corto", que funcionaba de casualidad;
     // al unificarse las carpetas en `logo-grande.*`, en Olimpiada ese nombre pasó a ser
@@ -142,9 +150,17 @@ export function getLogo(carpeta) {
  * @returns {string|undefined}
  */
 export function getLogoApaisado(carpeta) {
-    return getMedia(carpeta).find(
-        m => m.tipo === 'imagen' && ES_LOGO.test(m.nombre) && ES_APAISADO.test(m.nombre),
-    )?.src;
+    const logos = getMedia(carpeta).filter(
+        m => m.tipo === 'imagen' && ES_LOGO.test(m.nombre),
+    );
+    const apaisado = logos.find(m => ES_APAISADO.test(m.nombre));
+    if (apaisado) return apaisado.src;
+    // Nadie se declaró apaisado. Si en cambio alguno se declaró cuadrado, entonces el
+    // otro es el apaisado por descarte —así funciona `logo-toyota` contra
+    // `logo-chico-toyota`—. Sin ninguna de las dos marcas no se devuelve nada: un logo
+    // suelto es el cuadrado, y estirarlo a todo el ancho sería una mancha.
+    if (!logos.some(m => ES_CHICO.test(m.nombre))) return undefined;
+    return logos.find(m => !ES_CHICO.test(m.nombre))?.src;
 }
 
 /**

@@ -26,30 +26,43 @@
         "subtitle": "Ingeniero de Datos Junior",
         "period": "Diciembre 2025 — Presente",
         "location": "EE. UU. (Remoto)",
-        "desc": "Arquitectando pipelines de datos escalables e impulsando soluciones de ingeniería a nivel empresarial para clientes de primer nivel.",
-        "tags": [
-          "Ingeniería de Datos",
-          "Cloud",
-          "Analytics"
-        ],
+        "desc": "Lovelytics es una consultora líder en Estados Unidos especializada en datos e inteligencia artificial. Dentro de la compañía, me destaco como uno de los integrantes más jóvenes y el único ingeniero de mi edad, entregando resultados acelerados y demostrando un rendimiento que supera las expectativas estándar para mi nivel de experiencia.",
         "clients": [
           {
-            "id": "ypf",
-            "label": "Cliente: YPF",
+            "id": "toyota",
+            "label": "Cliente: Toyota",
             "period": "Julio 2026 — Presente",
-            "desc": "Desarrollo y mantenimiento de arquitecturas de datos robustas para el sector energético, con enfoque en procesamiento de alto rendimiento y soluciones analíticas escalables."
+            "desc": "Desarrollo y mantenimiento de arquitecturas de datos robustas para el sector automotriz. El proyecto se centra en la construcción de sistemas de procesamiento de alto rendimiento y el despliegue de soluciones analíticas escalables para impulsar la toma de decisiones.",
+            "tags": [
+              "Arquitectura de Datos",
+              "Alto Rendimiento",
+              "Analítica Escalable",
+              "Automotriz"
+            ]
           },
           {
             "id": "gp",
             "label": "Cliente: GP (Grupo Petersen)",
             "period": "Enero 2026 — Julio 2026",
-            "desc": "Diseño y optimización de pipelines de datos escalables para procesar datos financieros minoristas de alto volumen, mejorando la fiabilidad de los datos y la infraestructura en la nube."
+            "desc": "Diseño y optimización de pipelines de datos para procesar más de 250 TB de información financiera minorista. Formé parte del proceso de modernización tecnológica de la infraestructura del cliente, participando en la migración de repositorios de Atlas a GitLab y en la transición del procesamiento de datos de Apache Hue/Hive hacia entornos más eficientes con Apache Spark.",
+            "tags": [
+              "Pipelines de Datos",
+              "Cloud",
+              "Datos Financieros",
+              "Fiabilidad"
+            ]
           },
           {
             "id": "dataschool",
             "label": "Capacitación: data:school (Databricks)",
             "period": "Diciembre 2025",
-            "desc": "Completé el programa de capacitación intensivo 'data:school', enfocado en la arquitectura de Databricks, computación distribuida y prácticas avanzadas de ingeniería de datos."
+            "desc": "Completé el programa de capacitación intensivo 'data:school', enfocado en la arquitectura de Databricks, computación distribuida y prácticas avanzadas de ingeniería de datos.",
+            "tags": [
+              "Databricks",
+              "Computación Distribuida",
+              "Ingeniería de Datos",
+              "Capacitación"
+            ]
           }
         ]
       },
@@ -59,8 +72,7 @@
         "subtitle": "1er Puesto — Solución Ganadora",
         "period": "Octubre 2025",
         "location": "Hackathon Industrial",
-        "desc": "Campeón del principal hackathon de ingeniería de la facultad, desarrollando una solución tecnológica ganadora validada por ejecutivos de la industria y funcionarios gubernamentales.",
-        "body": "Ganador del primer puesto en el FIUBAtón 2025, la competencia de ingeniería más importante de la Facultad de Ingeniería (FIUBA). Liderando un equipo colaborativo, diseñamos una solución innovadora para un desafío de alto impacto del mundo real. Nuestro proyecto obtuvo el voto ganador de un distinguido panel compuesto por ejecutivos corporativos, inversores y altas autoridades nacionales.",
+        "desc": "Obtuve el primer puesto absoluto entre más de 450 competidores en el hackathon de ingeniería más importante de la facultad. Lideré un equipo para desarrollar una solución tecnológica innovadora en un lapso ininterrumpido de 36 horas, superando los desafíos industriales auspiciados por más de 5 empresas líderes del sector IT.",
         "tags": [
           "Competencia",
           "Innovación",
@@ -75,21 +87,21 @@
         "nodes": [
           {
             "id": "is2",
-            "label": "Ingeniería de Software 2 - Mentor",
+            "label": "Ingeniería de Software 2 - Mentor de Proyectos",
             "period": "Marzo 2026 — Presente",
-            "desc": "Ayudante de Cátedra y Mentor. Guiando a grupos de estudiantes a través del desarrollo integral de réplicas de plataformas full-stack. Responsable del seguimiento ágil semanal, mentoría arquitectónica y revisión de código."
+            "desc": "Me sumé al equipo docente para dar respuesta a la alta demanda de inscripciones de la materia. Hasta el momento, he guiado con éxito el desarrollo integral de 2 proyectos full-stack, simulando entornos ágiles de producción real para equipos de 6 estudiantes cada uno, brindando revisión de código y mentoría arquitectónica."
           },
           {
             "id": "algos-segundo",
             "label": "Teoría de Algoritmos - Ayudante Segundo",
             "period": "Marzo 2025 — Presente",
-            "desc": "Ascendido a Ayudante Segundo por excelencia académica. Responsable de impartir clases, evaluar proyectos complejos y gestionar la estructura organizativa de la cátedra."
+            "desc": "Tras un primer cuatrimestre donde los alumnos destacaron mi calidad de enseñanza, corrección y seguimiento, fui reconocido por el Jefe de Cátedra. Fui ascendido al cargo de Ayudante Segundo con tan solo un cuatrimestre de antigüedad y aún siendo estudiante de grado, un logro muy poco común dentro de la universidad."
           },
           {
             "id": "algos-adhonorem",
             "label": "Teoría de Algoritmos - Ayudante Ad-honorem",
             "period": "Agosto 2024 — Febrero 2025",
-            "desc": "Comencé como Ayudante Ad-honorem (Corrector). Encargado de la evaluación de parciales y trabajos prácticos, brindando feedback técnico detallado a los alumnos."
+            "desc": "Ingresé al equipo docente para hacer frente a la sobredemanda extrema de la materia, la cual contaba con más de 500 inscriptos para solo 100 vacantes. Me encargué de la corrección, evaluación y el seguimiento técnico detallado de los alumnos."
           }
         ],
         "location": "Buenos Aires"
@@ -99,7 +111,7 @@
         "title": "Universidad de Buenos Aires (UBA)",
         "subtitle": "Ingeniería Informática / de Software",
         "period": "2023 — 2026",
-        "desc": "Me convertí en la tercera persona en toda la historia de la institución en obtener el título de Ingeniero de Software en tiempo récord —un logro sin precedentes e inalcanzado desde 1938.",
+        "desc": "Completé el plan de estudios en tan solo 3.5 años, superando ampliamente el tiempo oficial de 6 años y el promedio histórico real de 8 años de la institución. Fui la tercera persona en toda la historia de la facultad en lograr esta graduación en tiempo récord, alcanzando un hito académico sin precedentes desde 1938.",
         "tags": [
           "Récord Académico Histórico"
         ],
@@ -110,7 +122,7 @@
         "title": "Olimpiada Nacional de Informática",
         "subtitle": "2do Puesto (Medalla de Plata)",
         "period": "2020",
-        "desc": "Obtuve el 2do puesto a nivel nacional en la Olimpiada Argentina de Informática, demostrando habilidades de élite en la resolución algorítmica de problemas con tan solo 16 años.",
+        "desc": "Obtuve el segundo puesto a nivel nacional compitiendo contra los 90 mejores participantes del país, demostrando habilidades de élite en la resolución algorítmica de problemas complejos con tan solo 16 años.",
         "tags": [
           "Medallista de Plata Nacional"
         ],
@@ -121,7 +133,7 @@
         "title": "Escuela Superior de Comercio Carlos Pellegrini",
         "subtitle": "Educación Secundaria (Perito Mercantil)",
         "period": "2017 — 2021",
-        "desc": "Exalumno de la Escuela Superior de Comercio Carlos Pellegrini, ampliamente reconocida como una de las instituciones académicas más rigurosas y prestigiosas de Argentina.",
+        "desc": "Graduado de una de las instituciones académicas más rigurosas y prestigiosas de Argentina. Ingresé en el puesto 23 por estricto orden de mérito, tras superar un exigente proceso de evaluación de un año entero en el que compiten en promedio 1.800 aspirantes para solo 450 vacantes.",
         "tags": [
           "Educación Secundaria de Élite"
         ],

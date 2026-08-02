@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Archivo:wdth,wght@112,400..700&family=Chakra+Petch:wght@600;700&family=Silkscreen:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Archivo:wdth,wght@112,400..700&family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap');
 
 /* Tailwind v4, para los componentes de shadcn/cult-ui. Todo lo de abajo es CSS
    propio sin capa, y en la cascada el CSS sin capa gana sobre el de @layer, así
@@ -90,6 +90,10 @@
   /* El cuerpo de los títulos de sección es un token porque hay que descontarlo
      desde fuera del título: ver el margen del encabezado en Journey.css. */
   --titulo-fs: clamp(2rem, 4vw, 3rem);
+  /* Para el texto de adentro de las tarjetas. Es una grotesca de caja alta y ojo
+     abierto: aguanta el cuerpo chico y la negrita de las descripciones sin
+     empastarse, que es justo lo que ahí hace falta. */
+  --font-tarjeta: 'Space Grotesk', var(--font-sans);
 
   /* Para el rol, debajo del nombre. Silkscreen es una tipografía de píxeles: su
      dibujo está hecho sobre una grilla de 8px, así que **el cuerpo tiene que ser
@@ -198,6 +202,12 @@
   --text-secondary: #324439;
   --border: rgba(13, 31, 20, 0.16);
   --accent-text: #0a3d1f;
+  /* El degradado del título terminaba en `--accent-text`, que en claro es el mismo
+     verde casi negro que `--text-primary`: dos tonos a 8.28 y 5.96 contra la página,
+     o sea el mismo negro con otro nombre. El degradado no se veía y el título se leía
+     como texto negro. Este verde medio da 3.39:1, de sobra para un título de 48px
+     —que pide 3:1—, y abre un rango que sí se nota. */
+  --titulo-degrade-fin: #166634;
   /* El acento ahora es oscuro, así que encima va blanco y no negro */
   --accent-on: #ffffff;
 
