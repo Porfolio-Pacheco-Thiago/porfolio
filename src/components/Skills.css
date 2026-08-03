@@ -12,12 +12,62 @@
     gap: clamp(0.75rem, 2vh, 2rem);
 }
 
+/* ── Cada categoría es una ventana ────────────────────────────────────────
+   La misma de Trayectoria y Proyectos. Antes era la tarjeta genérica —radio de
+   16px, borde translúcido de 1px y superficie `--bg-card`—, o sea el patrón que el
+   rediseño ya había sacado de todo el resto del sitio; era la última sección donde
+   seguía en pie.
+
+   Los tokens de grosor son locales y finos, como en Trayectoria: son cinco ventanas
+   a la vez y la sección tiene que entrar en una pantalla. */
 .skills-category {
+    --trazo: 2px;
+    --barra: 10px;
+    display: flex;
+    flex-direction: column;
+    /* El hueco entre el marco y el contenido sale de este fondo asomando por el
+       margen del cuerpo, igual que en las otras dos secciones. */
+    background: var(--bg-primary);
+    border: var(--trazo) solid var(--proy-marco);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Los tres cuadraditos son de contorno, no rellenos: rellenos se leerían como los
+   botones de verdad de una ventana. */
+.skills-barra {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: var(--barra);
+    padding-inline: 5px;
+    background: var(--proy-barra);
+    transition: background-color 0.3s ease;
+}
+
+.skills-barra span {
+    width: 5px;
+    height: 5px;
+    border: 1px solid color-mix(in srgb, var(--bg-primary) 50%, transparent);
+}
+
+.skills-cuerpo {
+    flex: 1;
+    margin: var(--trazo);
     background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: clamp(0.85rem, 1.8vh, 1.5rem);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    padding: clamp(0.7rem, 1.5vh, 1.1rem) clamp(0.8rem, 1.6vh, 1.15rem);
+}
+
+/* Igual que las tarjetas de Trayectoria: la pieza entera responde, no solo el
+   borde. Sin sombra de tarjeta —eso era del patrón viejo—, el marco encendido
+   alcanza. */
+.skills-category:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 26px rgb(var(--sombra-rgb) / 0.18), 0 0 18px var(--accent-glow-raw);
+}
+
+.skills-category:hover .skills-barra {
+    background: var(--accent);
 }
 
 /* Categoría con muchos items / nombres largos: ocupa 2 columnas
@@ -26,55 +76,53 @@
     grid-column: span 2;
 }
 
-.skills-category:hover {
-    border-color: var(--accent);
-    box-shadow: 0 4px 20px rgb(var(--sombra-rgb) / 0.15), 0 0 10px var(--accent-glow-raw);
-}
-
 .skills-category-title {
-    /* Título de categoría en mono */
+    /* Rótulo técnico en mono, como el período de las entradas de Trayectoria. */
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--accent-text);
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
     border-bottom: 1px solid var(--border);
 }
 
 .skills-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.skill-item {
-    display: flex;
-    align-items: center;
     gap: 0.4rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    font-size: 0.8rem;
-    color: var(--text-primary);
-    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
-.skill-item:hover {
-    border-color: var(--accent);
-    background: var(--accent-glow);
-    transform: translateY(-2px);
-}
-
-.skill-icon {
-    font-size: 1rem;
-}
-
-.skill-name {
+/* Cada tecnología se dibuja como una etiqueta, que es lo que ya usa el resto del
+   sitio para lo mismo. Antes eran píldoras con superficie propia —un patrón que no
+   se usa en ninguna otra parte— y encima con `translateY` al pasar el mouse, que a
+   nivel de un ítem suelto es ruido: acá lo que responde es la ventana entera. */
+.skill-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
     font-weight: 500;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    color: var(--accent-text);
+    background: var(--accent-glow);
+    border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.skills-category:hover .skill-item {
+    border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+}
+
+/* El ícono va del color del texto y un punto más grande que él: es lo que hace
+   reconocible la tecnología de un vistazo, antes de leer el nombre. */
+.skill-icon {
+    display: inline-flex;
+    font-size: 0.95rem;
 }
 
 @media (max-width: 900px) {
@@ -90,5 +138,13 @@
 
     .skills-category.is-wide {
         grid-column: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .skills-category,
+    .skill-item {
+        transition: none;
     }
 }

@@ -654,8 +654,11 @@
 }
 
 /* Y se vuelven a dar vuelta en las superficies blancas de adentro, que sí
-   necesitan texto oscuro. */
-[data-theme="light"] .skill-item,
+   necesitan texto oscuro.
+
+   Los ítems de Habilidades salieron de acá: eran una píldora con superficie blanca
+   propia y ahora son una etiqueta —tinte del acento sobre la ventana oscura— así que
+   volverles el texto a oscuro los dejaba en 2.5:1. Con el token de adentro dan 4.7. */
 [data-theme="light"] .timeline-gallery-item,
 [data-theme="light"] .project-gallery-item,
 [data-theme="light"] .nested-gallery-item {
