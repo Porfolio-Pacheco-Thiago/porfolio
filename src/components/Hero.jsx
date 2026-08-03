@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
 import Marcas from './ui/Marcas';
+import ReunionFiguras from './ui/ReunionFiguras';
+import PalabraFigura from './ui/PalabraFigura';
 import WireFigure from './ui/WireFigure';
 import AnimatedText from './ui/AnimatedText';
 import ContactButton from './ui/ContactButton';
@@ -10,6 +12,10 @@ import heroVideoVp9 from '../assets/hero-vp9-alpha.webm';
 import heroVideoVp8 from '../assets/hero-vp8-alpha.webm';
 import heroPoster from '../assets/hero-poster-alpha.webp';
 import './Hero.css';
+
+// Qué figura convoca cada frase de la bio, por orden. La última queda sin figura:
+// son tres figuras en el hero y cuatro frases.
+const FIGURAS = ['cube', 'tetrahedron', 'sphere'];
 
 export default function Hero({ loading, contactoAbierto, onContacto }) {
     const { t, getList } = useLang();
@@ -59,6 +65,8 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
             <WireFigure kind="cube" detail={2} spin="flat" className="hero-fig fig-a" size={150} line={3} seconds={70} tiltX={20} tiltZ={-10} />
             <WireFigure kind="tetrahedron" detail={2} spin="flat" className="hero-fig fig-b" size={120} line={3} seconds={95} tiltX={14} tiltZ={18} />
             <WireFigure kind="sphere" spin="flat" className="hero-fig fig-c" size={165} line={3} seconds={110} tiltX={24} tiltZ={-14} meridians={8} parallels={6} />
+            {/* Adonde viajan las tres cuando una palabra las convoca. */}
+            <ReunionFiguras />
             <div className="hero-content">
                 <div className="hero-text">
                     {/* La misma ventana que las tarjetas de Proyectos, con tres
@@ -107,8 +115,17 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
                         hito histórico…"—, que es donde el ojo pierde el hilo. Cada
                         idioma corta donde le corresponde a **sus** frases. */}
                     <p className="hero-bio reveal" style={{ transitionDelay: '240ms' }}>
-                        {getList('hero.bio').map(frase => (
-                            <span key={frase} className="hero-bio-frase">{frase}</span>
+                        {/* Cada frase convoca una figura distinta, como en la
+                            referencia: qué figura se forma depende de dónde esté el
+                            mouse. El orden es el de `FIGURAS`, así que agregar una
+                            frase al JSON no rompe nada — se queda sin figura y
+                            listo. */}
+                        {getList('hero.bio').map((frase, i) => (
+                            <span key={frase} className="hero-bio-frase">
+                                {FIGURAS[i]
+                                    ? <PalabraFigura figura={FIGURAS[i]}>{frase}</PalabraFigura>
+                                    : frase}
+                            </span>
                         ))}
                     </p>
                     <div className="hero-buttons reveal" style={{ transitionDelay: '320ms' }}>
