@@ -9,8 +9,13 @@ npm run dev          # Vite dev server (default http://localhost:5173)
 npm run build        # Production build to dist/
 npm run preview      # Serve the built dist/ locally
 npm run lint         # ESLint (flat config, JS/JSX only) — currently clean
-npm run deploy       # Builds, then publishes dist/ to gh-pages
 ```
+
+**Deployment is automatic.** `.github/workflows/deploy.yml` builds and publishes to
+GitHub Pages on every push to `main`; `ci.yml` runs lint and build on every branch.
+There is no `npm run deploy` — the old `gh-pages` script was removed because it
+publishes through a branch, which is the *other* Pages mode and fights with this one.
+The live site is <https://porfolio-pacheco-thiago.github.io/porfolio/>.
 
 Docker alternative for the dev server: `docker-compose up` (mounts the repo, hot-reload, same port 5173). Use the standalone `docker-compose` binary — the `docker compose` plugin subcommand is not installed on this machine.
 
@@ -94,6 +99,39 @@ One CSS file per component, imported by that component, **except** `src/styles/u
 ### Media galleries
 
 `GalleryPlaceholder` renders `FiImage` boxes and derives each child's class from its parent (`className` + `-item`), so the CSS for `.timeline-gallery-item` etc. still applies. `src/assets/media/` has a folder per card `id` (`projects/<id>/`, `timeline/<id>/`) documented in `src/assets/media/README.md`; the intended wiring is Vite's `import.meta.glob` over those folders.
+
+## Current stage: documenting the projects
+
+The redesign is finished — every section was rebuilt and `PLAN-REDISENO.md`, which
+tracked it, is gone from the repo (it is still in the history if a decision needs to be
+looked up). The work now is the **content** of the Projects section, which is what the
+site is still weakest at: six of its seven cards have no screenshot, and their copy and
+tags were written from memory rather than from the code.
+
+The loop is one project at a time, and its output goes to **`resum-projects.md`**:
+
+1. **Containerise it** — a `Dockerfile` and a `docker-compose.yml` so the project runs
+   without installing its toolchain on the host.
+2. **Look at the front end** and note whether it is worth improving, and how.
+3. **Write the summary** of what the project does.
+4. **List the technologies** it actually uses, read off the manifests and the code — not
+   from memory.
+5. **Run it and take screenshots**, which become the card's media.
+
+Only when a project is done there does the portfolio get updated: its description, its
+tags and its images. That order matters — the card is a rendering of the file, not the
+other way round.
+
+**Where the projects live.** They are not in this repo. Three are on this machine under
+`~/Escritorio/proyectos/` (`cassandra-flight-app`, `monopoly`, `vibe-trip`) plus
+`~/Escritorio/distribuidos-tp-money-laundering`; the rest — Melodía, SpecForge, the
+predictive models and Zorro y Ocas — are not, so they need their source before their
+turn. Several already carry Docker files (`vibe-trip` has one per side,
+`cassandra-flight-app` has five), so check before writing one.
+
+The ids that tie everything together are the ones in `src/data/projects.js`:
+`melodia`, `vibetrip`, `cassandra-engine`, `specforge`, `predictive-models`,
+`monopoly`, `zorro-ocas`. Media goes in `src/assets/media/projects/<id>/`.
 
 ## Notes
 
