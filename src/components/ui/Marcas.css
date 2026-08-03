@@ -1,0 +1,139 @@
+/* ── Fila de respaldo del hero ────────────────────────────────────────────
+   Como en tamalsen: un rótulo chico en mayúsculas y muy interletrado, y debajo los
+   logos monocromos, atenuados, avanzando de a uno. Es una nota al pie, no un
+   bloque: tiene que leerse si se la busca y desaparecer si no. */
+.marcas {
+    /* Pegada a los botones de arriba: es su respaldo, no una sección aparte. */
+    margin-top: clamp(0.9rem, 1.8vh, 1.5rem);
+}
+
+.marcas-titulo {
+    /* Mayúsculas chicas y separadas: a este cuerpo, sin interletrado, se empastan. */
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-secondary);
+    opacity: 0.75;
+    margin-bottom: 0.7rem;
+}
+
+/* Las flechas a los costados y la ventana en el medio, como en la referencia. */
+.marcas-carrusel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* La ventana recorta; la pista se corre por debajo. */
+.marcas-ventana {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Chevrones al ras, sin caja: en la referencia son dos flechas sueltas y nada más.
+   Atenuadas como los logos, y se encienden igual al pasar el mouse. */
+.marcas-flecha {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+    opacity: 0.55;
+    transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.marcas-flecha:hover {
+    opacity: 1;
+    color: var(--accent-text);
+}
+
+.marcas-flecha:active {
+    transform: scale(0.9);
+}
+
+/* El chevron se dibuja una vez, mirando a la izquierda, y la otra flecha lo espeja:
+   así las dos son la misma forma y no pueden quedar desparejas. */
+.marcas-flecha.es-next svg {
+    transform: scaleX(-1);
+}
+
+.marcas-pista {
+    --hueco: 1.4rem;
+    /* Cada lugar es una fracción del ancho visible, descontando los huecos que se
+       ven. Así entran exactamente `--visibles` y el paso es un lugar entero. */
+    --lugar: calc((100% - (var(--visibles) - 1) * var(--hueco)) / var(--visibles));
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: var(--hueco);
+    margin: 0;
+    padding: 0;
+    transform: translateX(calc(var(--paso) * -1 * (var(--lugar) + var(--hueco))));
+    transition: transform var(--transicion, 550ms) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Para volver al principio sin que se vea el rebobinado. Ver el componente. */
+.marcas-pista.sin-transicion {
+    transition: none;
+}
+
+.marcas-item {
+    flex: 0 0 var(--lugar);
+    display: flex;
+    justify-content: center;
+}
+
+/* El logo es una **máscara**, no una imagen: el color lo pone la caja. Por eso los
+   seis salen del mismo token y siguen al tema sin tener dos juegos de archivos.
+   `contain` para que cada uno conserve su proporción dentro del alto común, que es
+   lo que hace que la fila se lea pareja. */
+.marcas-logo {
+    display: block;
+    width: 100%;
+    height: 2.4rem;
+    background-color: var(--text-secondary);
+    -webkit-mask-image: var(--marca);
+    mask-image: var(--marca);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.62;
+    transition: opacity 0.25s ease, background-color 0.25s ease;
+}
+
+/* Al pasar el mouse se encienden **los tres**, no el que está debajo del cursor: la
+   fila es una sola afirmación —quiénes te respaldan— y no seis elementos que se
+   eligen de a uno. Encender uno solo invitaba a clickearlo, y no llevan a ningún
+   lado; por eso tampoco cambian el cursor. */
+.marcas-carrusel:hover .marcas-logo {
+    opacity: 1;
+    background-color: var(--accent-text);
+}
+
+@media (max-width: 768px) {
+    .marcas-logo {
+        height: 1.9rem;
+    }
+}
+
+/* Sin movimiento: el intervalo no arranca —lo decide el componente— así que la
+   pista se queda en los tres primeros. */
+@media (prefers-reduced-motion: reduce) {
+
+    .marcas-pista,
+    .marcas-logo,
+    .marcas-flecha {
+        transition: none;
+    }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLang } from '../context/lang-context';
 import { scrollToSection } from '../lib/scroll';
+import Marcas from './ui/Marcas';
 import WireFigure from './ui/WireFigure';
 import AnimatedText from './ui/AnimatedText';
 import ContactButton from './ui/ContactButton';
@@ -11,7 +12,7 @@ import heroPoster from '../assets/hero-poster-alpha.webp';
 import './Hero.css';
 
 export default function Hero({ loading, contactoAbierto, onContacto }) {
-    const { t } = useLang();
+    const { t, getList } = useLang();
     const videoRef = useRef(null);
     const flechaRef = useRef(null);
     // La flecha se dibuja con `stroke-dashoffset`, que no se compone en GPU:
@@ -100,7 +101,16 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
                         </div>
                     </div>
 
-                    <p className="hero-bio reveal" style={{ transitionDelay: '240ms' }}>{t('hero.bio')}</p>
+                    {/* Una frase por renglón: `bio` es una lista y no un texto suelto
+                        justamente para eso. Antes era un párrafo corrido y el ajuste de
+                        línea partía las oraciones por la mitad —"…a los 21 años — un /
+                        hito histórico…"—, que es donde el ojo pierde el hilo. Cada
+                        idioma corta donde le corresponde a **sus** frases. */}
+                    <p className="hero-bio reveal" style={{ transitionDelay: '240ms' }}>
+                        {getList('hero.bio').map(frase => (
+                            <span key={frase} className="hero-bio-frase">{frase}</span>
+                        ))}
+                    </p>
                     <div className="hero-buttons reveal" style={{ transitionDelay: '320ms' }}>
                         <button className="btn btn-primary" onClick={() => scrollToSection('projects')}>
                             {t('hero.cta')}
@@ -108,6 +118,12 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
                         {/* Abre y cierra el riel de la izquierda, donde ahora
                             viven los enlaces de contacto, en lugar de bajar al pie */}
                         <ContactButton abierto={contactoAbierto} onCambio={onContacto} />
+                    </div>
+                    {/* Debajo de los botones, en la misma columna: es el respaldo de lo
+                        que dice el hero, así que se lee junto con él. Entran tres a la
+                        vez y van rotando, como en la referencia. */}
+                    <div className="reveal" style={{ transitionDelay: '400ms' }}>
+                        <Marcas />
                     </div>
                 </div>
                 <div className="hero-visual">

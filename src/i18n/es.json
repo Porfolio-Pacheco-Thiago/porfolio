@@ -144,7 +144,15 @@
   "hero": {
     "name": "Thiago Pacheco",
     "role": "Ingeniero de Software",
-    "bio": "A mis 21 años, soy Ingeniero de Software graduado de la Universidad de Buenos Aires, con la distinción de ser una de las únicas tres personas en la historia de la institución en completar la carrera en tiempo récord —un hito inalcanzado desde 1938—. Como Data Engineer Junior en Lovelytics, canalizo mi pasión hacia la arquitectura de soluciones de software robustas, destacándome en la intersección entre los sistemas distribuidos complejos y las tecnologías de inteligencia artificial de vanguardia.",
+    "marcas": "Con la confianza y el respaldo de",
+    "marcasPrev": "Marcas anteriores",
+    "marcasNext": "Marcas siguientes",
+    "bio": [
+      "Ingeniero de Software (UBA).",
+      "Graduado en tiempo récord a los 21 años — un hito histórico desde 1938.",
+      "Actualmente Data Engineer en Lovelytics.",
+      "Especializado en arquitecturas robustas, sistemas distribuidos complejos e integraciones de inteligencia artificial."
+    ],
     "cta": "Ver Mi Trabajo",
     "scroll": "Ir a Trayectoria",
     "contact": "Contactame"

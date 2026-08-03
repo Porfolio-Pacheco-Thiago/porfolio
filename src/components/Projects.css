@@ -1,5 +1,5 @@
 .projects {
-    padding: 6rem 2rem;
+    padding: clamp(1rem, 2.2vh, 2rem) 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -34,14 +34,15 @@
     font-family: var(--font-tarjeta);
     --marco: 0rem;
     /* Grosor del marco, alto de la barra de título, lado del recuadro y tamaño de
-       su diagonal. Se achican juntos en modo compacto. */
-    --trazo: 3px;
-    --barra: 20px;
-    --notch: 3.6rem;
-    --corte: 0.85rem;
-    /* Aire entre el pie del marco y el nombre. En la referencia hay ~20px ahí, con
-       el recuadro cruzando ese hueco. */
-    --aire: 0.95rem;
+       su diagonal. Son los valores de la grilla de tres columnas: la ventana de larson
+       entera —barra, diagonal y recuadro— pero a escala, porque siete tarjetas en tres
+       filas dentro de una pantalla no toleran el tamaño grande. */
+    --trazo: 2px;
+    --barra: 15px;
+    --notch: 2.6rem;
+    --corte: 0.6rem;
+    /* Aire entre el pie del marco y el nombre. */
+    --aire: 0.7rem;
     /* Duración y curva de la coreografía de poner o sacar una demo: la foto que se
        contrae, la barra, el marco que se desvanece y el celular que crece. Van
        todas de la misma variable para que no se desfasen — y porque el recentrado
@@ -65,7 +66,7 @@
             color-mix(in srgb, var(--accent) 25%, var(--degrade-luz)) 52%,
             var(--accent) 78%,
             var(--degrade-sombra) 100%);
-    width: calc(50% - 0.75rem);
+    width: calc(33.333% - 1rem);
     flex-shrink: 0;
     cursor: pointer;
 }
@@ -108,15 +109,27 @@
     /* Fuera del flujo y sobre la grilla entera: ver la regla de arriba. */
     position: absolute;
     inset: 0;
-    --marco: 0.9rem;
+    --marco: 0.7rem;
     width: auto;
     background: none;
     border: 1px solid var(--accent);
     border-radius: 16px;
 }
 
+/* El techo cambió cuando la tarjeta abierta pasó a ocupar exactamente el hueco de la
+   grilla: ya no puede crecer y empujar la sección, así que lo que mida de más se lo
+   quita al celular y a la descripción, que van debajo. Con `28.5vh` el contenido se
+   pasaba 85px del borde y el celular quedaba cortado. */
 .project-card.expanded .project-media {
-    height: 300px;
+    height: clamp(150px, 19.4vh, 215px);
+}
+
+/* Los que **no** tienen demo en el celular tienen lugar de sobra —el celular es lo que
+   llena la mitad de abajo— así que su foto puede ser bastante más alta. Le viene bien
+   sobre todo a la que va con `contain`: cuanto más alto el hueco, menos relleno a los
+   costados. */
+.project-card.expanded:not(:has(.fono-bloque)) .project-media {
+    height: clamp(200px, 30.5vh, 300px);
 }
 
 /* ── Hover: la tarjeta se inclina y el marco se pone brilloso ──────────────
@@ -193,9 +206,12 @@
     border: 1px solid color-mix(in srgb, var(--bg-primary) 50%, transparent);
 }
 
+/* Alta y no una franja: con la ventana de larson la foto tiene que leerse como foto.
+   El tope lo pone la pantalla —tres filas más el encabezado de la sección— y el aire
+   lo liberaron los tags, que en reposo no se muestran. */
 .project-media {
     position: relative;
-    height: 200px;
+    height: clamp(112px, 15.3vh, 156px);
     /* El hueco a los tres lados restantes; abajo lo pone el padding del marco. */
     margin: var(--trazo) var(--trazo) 0;
     overflow: hidden;
@@ -208,10 +224,10 @@
 
    Se animan los altos de la foto y de la barra, que son valores concretos, y no un
    `max-height` sobre el marco: desde `none` no interpola y el colapso saltaría. */
-/* La especificidad tiene que ganarle a `.projects.is-compact .project-card.expanded
+/* La especificidad tiene que ganarle a `.project-card.expanded
    .project-media`, que fija el alto de la foto abierta. Con un selector más corto
    la foto no colapsaba: la regla de arriba seguía mandando. */
-.projects.is-compact .project-card.expanded.is-reproduciendo .project-media,
+.project-card.expanded.is-reproduciendo .project-media,
 .project-card.is-reproduciendo .project-barra {
     height: 0;
 }
@@ -277,6 +293,62 @@
     object-position: center;
 }
 
+/* ── Tapa en tres versiones: quieta por tema, y animada al abrir ──────────
+   Las tres están en el DOM y acá se elige cuál se ve. Es CSS y no un cambio de `src`
+   en JS porque así la animada ya está decodificada cuando la tarjeta se abre: si se
+   cargara en ese momento, se vería el hueco vacío mientras baja.
+
+   Van una encima de otra, en absoluto, para que el hueco mida siempre lo mismo. */
+.project-cover.es-oscuro,
+.project-cover.es-claro,
+.project-cover.es-animada {
+    position: absolute;
+    inset: 0;
+    /* Entera y no recortada: el dibujo es cuadrado y el hueco apaisado, así que con
+       `cover` se perdían las columnas de los costados —justo las que hacen que se lea
+       como una red—. Lo que sobra a los lados lo rellena el fondo, que es el mismo
+       sobre el que se generó cada versión. */
+    object-fit: contain;
+}
+
+.project-cover.es-oscuro,
+.project-cover.es-animada {
+    background: #000;
+}
+
+.project-cover.es-claro,
+[data-theme="light"] .project-cover.es-animada {
+    background: #fff;
+}
+
+/* Cerrada: la quieta del tema que corresponda. */
+.project-cover.es-claro,
+[data-theme="light"] .project-cover.es-oscuro {
+    opacity: 0;
+}
+
+[data-theme="light"] .project-cover.es-claro {
+    opacity: 1;
+}
+
+/* Abierta: la animación tapa a las dos quietas. Va con transición para que el cambio
+   no sea un corte seco al terminar de expandirse. */
+.project-cover.es-animada {
+    opacity: 0;
+    transition: opacity 0.35s ease 0.25s;
+}
+
+.project-card.expanded .project-cover.es-animada {
+    opacity: 1;
+}
+
+/* La animación es un dibujo con transparencia: sin esto se vería lo quieto por
+   detrás, con su fondo, en vez del fondo de la página. */
+.project-card.expanded .project-cover.es-oscuro,
+.project-card.expanded .project-cover.es-claro {
+    opacity: 0;
+}
+
 /* ── La tapa ampliada al pasar el mouse (solo en la tarjeta abierta) ───────
    La tapa está muy recortada: el mockup es 1600×1132 y el hueco, apaisado y bajo.
    Al pasar el mouse se ve completa y más grande.
@@ -303,6 +375,21 @@
     width: 100%;
     transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         object-fit 0s 0.4s;
+}
+
+/* La ampliación al pasar el mouse es para las capturas, que están muy recortadas y
+   no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
+   entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
+.project-card.expanded .project-media:hover:has(.es-animada) {
+    overflow: hidden;
+}
+
+.project-card.expanded .project-media:hover .project-cover.es-oscuro,
+.project-card.expanded .project-media:hover .project-cover.es-claro,
+.project-card.expanded .project-media:hover .project-cover.es-animada {
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
 }
 
 .project-card.expanded .project-media:hover {
@@ -340,7 +427,7 @@
 }
 
 .project-icon {
-    font-size: 3rem;
+    font-size: 1.8rem;
     z-index: 1;
 }
 
@@ -348,7 +435,7 @@
    arranquen en la misma vertical que el marco y el nombre. En reposo eso es 0
    —no hay caja de la que despegarse—; expandida, el mismo aire que el marco. */
 .project-info {
-    padding: 0.9rem var(--marco) var(--marco);
+    padding: clamp(0.35rem, 0.6vh, 0.55rem) var(--marco) var(--marco);
 }
 
 /* La tipografía del nombre, que en larson es lo que más pesa de la tarjeta:
@@ -356,7 +443,10 @@
    referencia las letras están holgadas, no comprimidas. */
 .project-title {
     font-family: var(--font-display);
-    font-size: clamp(1.35rem, 1.1rem + 0.9vw, 2rem);
+    /* Más chico que el de la referencia, pero no tanto: le da mucho peso al nombre.
+       El techo lo puso la pantalla — con más que esto, los nombres que envuelven a dos
+       líneas desbordan las tres filas. */
+    font-size: clamp(1.1rem, 0.95rem + 0.45vw, 1.35rem);
     font-weight: 700;
     /* Ancho e interletrado copiados de la referencia: las letras son anchas y
        **separadas**, no comprimidas. Yo había puesto interletrado negativo, que es
@@ -368,6 +458,7 @@
     /* Reparte las líneas para que no quede una palabra sola abajo. Con nombres
        como "Modelos Predictivos y Análisis con IA" pasaba siempre. */
     text-wrap: balance;
+    margin-bottom: 0.35rem;
 }
 
 /* El título **es** el botón que abre la tarjeta. Hereda todo del `h3` para que
@@ -395,6 +486,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
+}
+
+/* En la referencia la tarjeta chica es **solo** marco y nombre. Los tags y el link al
+   repo no van; el link ya vive dentro del bloque expandible. */
+.project-card:not(.expanded) .project-tags {
+    display: none;
 }
 
 .project-link {
@@ -949,83 +1046,8 @@
         height: 160px;
     }
 }
-/* ── Modo compacto ──────────────────────────────────────────────────────
-   Tres columnas en vez de dos, sin tarjeta destacada a ancho completo, y la
-   media reducida a una franja. Siete tarjetas entran en tres filas. */
-.projects.is-compact {
-    padding: clamp(1rem, 2.2vh, 2rem) 2rem;
-}
-
-.projects.is-compact .project-card {
-    width: calc(33.333% - 1rem);
-}
-
-/* Más alta que la franja de antes: con la ventana de larson la foto tiene que
-   leerse como foto. El tope lo pone la pantalla — tres filas más el encabezado de
-   la sección—, y el aire lo liberaron los tags, que acá no se muestran. */
-.projects.is-compact .project-media {
-    height: clamp(112px, 15.3vh, 156px);
-}
-
-/* La ventana de larson **también acá**, que es el estado por defecto: barra,
-   diagonal y recuadro, todo a escala. Lo único que se sacrifica es el tamaño del
-   nombre, porque siete tarjetas en tres filas dentro de una pantalla no toleran
-   el cuerpo grande. */
-.projects.is-compact .project-card {
-    --trazo: 2px;
-    --barra: 15px;
-    --notch: 2.6rem;
-    --corte: 0.6rem;
-    --aire: 0.7rem;
-}
-
-.projects.is-compact .project-card.expanded {
-    --marco: 0.7rem;
-}
-
-/* En la referencia la tarjeta chica es **solo** marco y nombre. Los tags y el
-   link al repo no van; el link ya vive dentro del bloque expandible. */
-.projects.is-compact .project-card:not(.expanded) .project-tags {
-    display: none;
-}
-
-.projects.is-compact .project-icon {
-    font-size: 1.8rem;
-}
-
-/* Más chico que en la vista grande, pero no tanto como antes: la referencia le da
-   mucho peso al nombre. El techo lo puso la pantalla — con más de esto, los
-   nombres que envuelven a dos líneas desbordan las tres filas. */
-.projects.is-compact .project-title {
-    font-size: clamp(1.1rem, 0.95rem + 0.45vw, 1.35rem);
-}
-
-.projects.is-compact .project-info {
-    padding: clamp(0.35rem, 0.6vh, 0.55rem) var(--marco) var(--marco);
-}
-
-/* El tamaño lo fija la regla de más arriba; acá solo el espacio de abajo. Antes
-   este bloque repetía `font-size` y, por venir después, pisaba al otro. */
-.projects.is-compact .project-title {
-    margin-bottom: 0.35rem;
-}
-
-/* Abierta ocupa la fila entera. Pisa al `calc(33.333% ...)` de la grilla, que es
-   más específico por venir del contenedor. */
-.projects.is-compact .project-card.expanded {
-    width: 100%;
-}
-
-/* El techo cambió cuando la tarjeta abierta pasó a ocupar exactamente el hueco de la
-   grilla: ya no puede crecer y empujar la sección, así que lo que mida de más se lo
-   quita al celular y a la descripción, que van debajo. Con `28.5vh` el contenido se
-   pasaba 85px del borde y el celular quedaba cortado. */
-.projects.is-compact .project-card.expanded .project-media {
-    height: clamp(150px, 19.4vh, 215px);
-}
-
 @media (max-width: 900px) {
-    .projects.is-compact .project-card {
+    .project-card {
         width: 100%;
     }
 }

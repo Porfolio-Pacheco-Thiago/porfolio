@@ -25,6 +25,9 @@ const ES_LOGO = /^logo/i;
 // forzar una sola convención significaba renombrar archivos ya subidos.
 const ES_APAISADO = /(grande|largo)/i;
 const ES_CHICO = /(chico|cuadrado)/i;
+// La tapa de un proyecto puede venir en tres versiones —una por tema y una animada—
+// y ninguna de las tres es un elemento más de la galería.
+const ES_PORTADA = /^portada/i;
 
 /**
  * Las rutas agrupadas por carpeta contenedora, para poder pedir una sola.
@@ -91,7 +94,11 @@ export function getVideos(carpeta) {
  *                           ve arriba de la tarjeta y repetirla no aporta.
  */
 export function getImagenes(carpeta, excluir) {
-    return getMedia(carpeta).filter(m => m.tipo === 'imagen' && m.src !== excluir);
+    // Las portadas quedan afuera: ya se ven arriba de la tarjeta y las tres son la
+    // misma imagen, así que en la galería serían tres repeticiones.
+    return getMedia(carpeta).filter(
+        m => m.tipo === 'imagen' && m.src !== excluir && !ES_PORTADA.test(m.nombre),
+    );
 }
 
 /**
@@ -173,6 +180,34 @@ export function getLogoApaisado(carpeta) {
  */
 export function getFotos(carpeta) {
     return getMedia(carpeta).filter(m => !ES_LOGO.test(m.nombre));
+}
+
+/**
+ * La tapa de un proyecto, en sus tres versiones, cuando las hay.
+ *
+ * Existe porque una sola imagen no alcanza para este caso: la tarjeta cerrada tiene
+ * que mostrar un cuadro quieto —y el fondo del dibujo depende del tema— mientras que
+ * la abierta muestra la animación corriendo. Se distinguen por el nombre, como el
+ * resto de las convenciones de esta carpeta:
+ *
+ *  - `portada.webp`          el cuadro quieto sobre fondo oscuro
+ *  - `portada-claro.webp`    el mismo, sobre fondo claro
+ *  - `portada-animada.webp`  la animación, con transparencia para servir a los dos
+ *
+ * @param {string} carpeta
+ * @returns {{oscuro?: string, claro?: string, animada?: string}}
+ */
+export function getPortada(carpeta) {
+    const busca = (re) => getMedia(carpeta).find(
+        m => m.tipo === 'imagen' && ES_PORTADA.test(m.nombre) && re.test(m.nombre),
+    )?.src;
+    return {
+        oscuro: getMedia(carpeta).find(
+            m => m.tipo === 'imagen' && /^portada\.[a-z]+$/i.test(m.nombre),
+        )?.src,
+        claro: busca(/claro/i),
+        animada: busca(/animada/i),
+    };
 }
 
 export function getCover(carpeta) {

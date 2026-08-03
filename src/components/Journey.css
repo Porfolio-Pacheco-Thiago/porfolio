@@ -77,7 +77,14 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent, var(--axis-color), var(--axis-color), transparent);
+    /* El desvanecido de las puntas era larguísimo —los cuatro topes por defecto caen
+       en 0/33/66/100, o sea que la línea solo estaba entera en el tercio del medio— y
+       el conector de una tarjeta abierta llegaba a una zona donde el eje ya casi no
+       existía: se veía la flecha sin línea a la que llegar. Ahora se apaga en la
+       primera y la última décima parte, que alcanza para que no arranque de golpe. */
+    background: linear-gradient(to bottom,
+            transparent 0%, var(--axis-color) 9%,
+            var(--axis-color) 91%, transparent 100%);
     filter: drop-shadow(0 0 6px color-mix(in srgb, var(--axis-color) 40%, transparent));
 }
 
@@ -721,6 +728,24 @@
     background: var(--proy-barra);
 }
 
+/* Abierta, el conector deja de salir de la fila y sale de la **ventana**. La fila
+   sigue donde estaba —su punto también— pero la ventana ya no la cubre: desde que el
+   alto lo pone el contenido, una tarjeta corta de las últimas filas termina bastante
+   más arriba que su propio punto, y el conector quedaba colgado en el aire a 123px de
+   la ventana. Acá se lo lleva contra el borde de arriba de la ventana, que es una
+   posición **conocida** —lo que la tarjeta sube es el mismo cálculo del `top`— sin
+   necesitar el alto del contenido, que el CSS no puede saber. De ahí para abajo el
+   recorrido lo hace el eje, que va de punta a punta. */
+.timeline-item.expanded::before {
+    /* Medido desde el tope del **timeline**, no desde el de la ventana: la ventana
+       abierta arranca más arriba que el timeline —se come el renglón de los rótulos—
+       así que anclarlo a su borde lo dejaba por encima del eje, que ni siquiera
+       empieza ahí. Restando la fila queda a 4.5rem del tope del eje para cualquiera
+       de las seis, que es donde el degradado ya está entero y bien adentro de la
+       ventana más corta. */
+    top: calc(4.5rem - var(--i, 0) * var(--fila-paso));
+}
+
 /* ── Abierta: la tarjeta ocupa el timeline entero ─────────────────────────
    Se estira desde su fila hasta los dos extremos. Cuánto hay que subir y bajar sale
    de la posición de la fila, que se sabe sin medir nada: las seis miden lo mismo, así
@@ -812,6 +837,8 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
+    /* Para que `cqw` mida el ancho de la galería: ver la nota de la foto ampliada. */
+    container-type: inline-size;
 }
 
 .timeline-gallery-item {
@@ -827,6 +854,104 @@
     justify-content: center;
     color: var(--text-secondary);
     font-size: 1.2rem;
+}
+
+/* ── La foto ampliada al pasar el mouse ───────────────────────────────────
+   Lo mismo que hace la tapa de un proyecto en Melodía. La foto está muy recortada
+   —el hueco es apaisado y bajo, y `cover` se come lo que sobra— así que al pasar el
+   mouse se ve entera y más grande.
+
+   **Crece como capa, no en el flujo**: posicionada en absoluto no mueve nada de lo
+   que tiene alrededor, que acá importa el doble porque la ventana abierta ya está
+   ajustada al píxel contra su tope.
+
+   Crece **hacia la ventana**: se agranda a lo ancho hasta casi tocarla, dejando
+   márgenes parejos a los costados, y hacia arriba, que es donde hay lugar —la galería
+   es lo último de la ventana—. Así queda contenida adentro en vez de desbordarla.
+
+   Lo horizontal necesita saber cuánto hay que correrla para que quede centrada en la
+   ventana y no en su propio hueco, y eso depende de en qué columna esté. La galería se
+   declara **contenedor de consulta** y ahí `cqw` mide su ancho, así que el corrimiento
+   es exactamente un lugar de la grilla, sin números a mano y sin dejar de ser
+   responsivo.
+
+   El puntero no la pierde al agrandarse aunque se salga de su hueco: `:hover` sigue
+   valiendo mientras esté sobre **un descendiente**, y la imagen lo es. Sin eso
+   parpadearía al entrar en la parte que sobresale.
+
+   La imagen está en absoluto **siempre**, no solo en hover: `position` no se puede
+   animar y el salto se vería. Lo único que cambia es el tamaño, que sí interpola. */
+.timeline-gallery-item.is-media {
+    position: relative;
+}
+
+.timeline-gallery-item.is-media img {
+    position: absolute;
+    /* Anclada abajo: hacia abajo no hay lugar —el marco termina 18px más allá— así
+       que el crecimiento va hacia arriba, sobre el texto, que es lo que uno deja de
+       mirar mientras mira la foto. */
+    bottom: 0;
+    left: 50%;
+    translate: calc(-50% + var(--desvio, 0px)) 0;
+    width: 100%;
+    height: 100%;
+    /* `object-fit` sin retardo al agrandar y con él al volver: si cambiara junto con
+       el tamaño, la imagen saltaría de recortada a entera a mitad de camino. */
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s 0.4s;
+}
+
+/* Un lugar de la grilla de corrimiento: la de la izquierda va hacia la derecha, la de
+   la derecha hacia la izquierda, y la del medio ya está centrada. Un lugar es un
+   tercio del ancho de la galería más su parte del hueco. */
+.timeline-gallery-item.is-media:nth-child(1):hover img {
+    --desvio: calc(33.333cqw + 0.1667rem);
+}
+
+.timeline-gallery-item.is-media:nth-child(3):hover img {
+    --desvio: calc(-33.333cqw - 0.1667rem);
+}
+
+/* Deja salir la imagen del hueco; el marco de la ventana sigue recortando. */
+.timeline-gallery-item.is-media:hover {
+    overflow: visible;
+    z-index: 3;
+}
+
+.timeline-gallery-item.is-media:hover img {
+    /* Casi el ancho de la ventana —que mide ~1000— dejando márgenes anchos a los dos
+       costados. Acotada en `vw`/`vh` para que en una pantalla chica no se pase de la
+       ventana del navegador. */
+    width: min(58vw, 780px);
+    height: min(46vh, 430px);
+    /* El `img { max-width: 100% }` global la volvía a dejar del ancho de su hueco:
+       crecía a lo alto y nada a lo ancho. Es el mismo caso del logo apaisado. */
+    max-width: none;
+    /* Entera, sin recortar. El fondo opaco tapa lo que queda atrás en las bandas
+       que deja `contain`. */
+    object-fit: contain;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    box-shadow: 0 20px 48px rgb(var(--sombra-rgb) / 0.55);
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
+}
+
+/* La galería vive dentro del bloque que se despliega, que recorta para poder animar
+   su alto. Una vez abierto ya no hay nada que recortar, y si siguiera recortando se
+   comería la foto ampliada. El retardo espera a que termine de abrirse: sin él, el
+   contenido asomaría entero desde el primer fotograma. */
+.timeline-item.expanded .timeline-extra {
+    overflow: visible;
+    transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease,
+        overflow 0s 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .timeline-gallery-item.is-media img {
+        transition: none;
+    }
 }
 
 /* Línea de tiempo anidada (Lovelytics → clientes) */

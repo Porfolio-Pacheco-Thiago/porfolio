@@ -262,10 +262,25 @@
 }
 
 .hero-bio {
+    /* La misma que adentro de las tarjetas: es el texto de lectura de la página y
+       conviene que sea una sola voz. El nombre de arriba tiene la suya —Chakra Petch—
+       y el rol la de píxeles, que son las dos que hacen de marca. */
+    font-family: var(--font-tarjeta);
     font-size: 1rem;
     color: var(--text-secondary);
     line-height: 1.7;
     margin-bottom: 2rem;
+}
+
+/* Cada frase arranca en su propio renglón. Sigue siendo un párrafo —es una sola
+   idea— así que son `span` en bloque y no párrafos sueltos: no hay que separarlos
+   entre sí, solo evitar que compartan renglón.
+
+   `balance` reparte las líneas de la frase que sí necesita más de una, para que no
+   quede una palabra sola abajo. */
+.hero-bio-frase {
+    display: block;
+    text-wrap: balance;
 }
 
 .hero-buttons {

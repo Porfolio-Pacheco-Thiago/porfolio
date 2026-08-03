@@ -5,7 +5,7 @@ import { useLang } from '../context/lang-context';
 import { projectMeta } from '../data/projects';
 import Gallery from './ui/Gallery';
 import PhoneDemo from './ui/PhoneDemo';
-import { getCover, getVideos, getImagenes } from '../lib/media';
+import { getCover, getPortada, getVideos, getImagenes } from '../lib/media';
 import WireFigure from './ui/WireFigure';
 import './Projects.css';
 
@@ -67,10 +67,7 @@ export default function Projects() {
     };
 
     return (
-        // `is-compact` fija y sin botón de vista: esta sección tiene una sola
-        // densidad. La clase queda porque es la que gobierna todo el CSS de la
-        // grilla —Journey sigue usándola con su toggle—, pero acá ya no alterna.
-        <section id="projects" className="projects has-decor is-compact">
+        <section id="projects" className="projects has-decor">
             <WireFigure kind="tetrahedron" detail={3} spin="flat" className="wire-decor at-right" size={720} line={7} seconds={115} tiltX={14} tiltZ={16} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('projects.title')}</h2>
@@ -82,7 +79,10 @@ export default function Projects() {
                     const { Icon, repo } = projectMeta[item.id] ?? {};
                     const isExpanded = expandedId === item.id;
                     const carpeta = `projects/${item.id}`;
-                    const cover = getCover(carpeta);
+                    // Un proyecto puede traer una tapa en tres versiones —quieta por
+                    // tema y animada— o una imagen común. Ver `getPortada`.
+                    const portada = getPortada(carpeta);
+                    const cover = portada.oscuro ?? getCover(carpeta);
                     // Los videos se van al celular y la galería se queda con las
                     // imágenes, sin repetir la que ya se ve como tapa.
                     const videos = getVideos(carpeta);
@@ -155,7 +155,19 @@ export default function Projects() {
                                     `alt` vacío a propósito: el título está al lado, así que
                                     nombrarla otra vez solo repite. */}
                                 <div className="project-media">
-                                    {cover ? (
+                                    {portada.animada || portada.claro ? (
+                                        // Las tres conviven en el DOM y el CSS elige: la
+                                        // quieta que corresponda al tema mientras la
+                                        // tarjeta está cerrada, la animada al abrirla.
+                                        // Cambiar el `src` por JS al expandir haría que
+                                        // la animación empiece recién ahí, con un
+                                        // parpadeo mientras baja.
+                                        <>
+                                            <img className="project-cover es-oscuro" src={portada.oscuro} alt="" loading="lazy" decoding="async" />
+                                            <img className="project-cover es-claro" src={portada.claro} alt="" loading="lazy" decoding="async" />
+                                            <img className="project-cover es-animada" src={portada.animada} alt="" loading="lazy" decoding="async" />
+                                        </>
+                                    ) : cover ? (
                                         <img
                                             className="project-cover"
                                             src={cover}
@@ -236,6 +248,7 @@ export default function Projects() {
                                         <Gallery
                                             className="project-gallery"
                                             carpeta={carpeta}
+                                            medios={imagenes}
                                             label={item.title}
                                         />
                                     ) : imagenes.length > 0 && (

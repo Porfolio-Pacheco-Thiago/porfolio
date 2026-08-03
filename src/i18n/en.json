@@ -144,7 +144,15 @@
   "hero": {
     "name": "Thiago Pacheco",
     "role": "Software Engineer",
-    "bio": "At 21, I am a Software Engineering graduate from the University of Buenos Aires, holding the distinction of being one of only three individuals in the institution's history to complete the degree in record time—a milestone untouched since 1938. As a Junior Data Engineer at Lovelytics, I channel my passion into architecting robust software solutions, thriving at the intersection of complex distributed systems and cutting-edge AI technologies.",
+    "marcas": "Trusted and recognized by",
+    "marcasPrev": "Previous logos",
+    "marcasNext": "Next logos",
+    "bio": [
+      "Software Engineer (UBA).",
+      "Graduated in record time at age 21 — a historical milestone since 1938.",
+      "Currently a Data Engineer at Lovelytics.",
+      "Specializing in robust architectures, complex distributed systems, and artificial intelligence integrations."
+    ],
     "cta": "View My Work",
     "scroll": "Go to Journey",
     "contact": "Get in Touch"
