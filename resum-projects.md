@@ -46,19 +46,23 @@ se trata como un caso aparte, con su propio criterio.
 | `vibetrip` | VibeTrip | ✅ `vibe-trip` | 🟡 uno por lado, sin compose raíz | ✅ ya tiene, no se toca | — solo tecnologías | ✅ | — solo tecnologías |
 | `cassandra-engine` | Motor de Cassandra | ✅ `cassandra-flight-app` | ✅ compose + 5 Dockerfile + script | ✅ rediseñado | ✅ | ✅ | 🟡 cuatro, faltan copiar |
 | `specforge` | SpecForge | — caso aparte | — | — | — | — | — |
-| `predictive-models` | Modelos Predictivos y Análisis con IA | ✅ `machine-learning` | 🔴 ninguno | 🔲 | 🔲 | 🔲 | ✅ portada animada |
+| `predictive-models` | Modelos Predictivos y Análisis con IA | ✅ `machine-learning` | 🔴 ninguno, a decidir | — no aplica, son notebooks | ✅ | ✅ | ✅ portada animada |
 | `monopoly` | Motor de Monopoly | ✅ `monopoly` | 🔴 ninguno | 🔲 | 🔲 | 🔲 | 🔲 |
 | `zorro-ocas` | Zorro y Ocas (Assembly) | ✅ `assembly-game` | ✅ compose + Dockerfile 3 etapas | ✅ emojis + modo ascii | ✅ | ✅ | ✅ cuatro, sin commitear |
 | — | Money Laundering Analysis | ✅ `distributed-systems` | ✅ ~25 Dockerfile + Makefile | ✅ tablero nuevo | ✅ | ✅ | 🟡 una, faltan 3 |
 
 **El primero terminado es el TP de distribuidos**, que además era el único sin front. Las
 fichas van al final de este archivo, en el orden en que se fueron cerrando: distribuidos,
-VibeTrip, Zorro y Ocas, y el motor de Cassandra.
+VibeTrip, Zorro y Ocas, el motor de Cassandra y los modelos predictivos.
 
 **De VibeTrip se documentan solo las tecnologías**, por decisión de Thiago: es un trabajo
 de equipo de seis y el resto no se publica.
 
-Quedan dos sin empezar: `machine-learning` y `monopoly`.
+**De `machine-learning` se documentan el resumen y las tecnologías**, y no lleva front: son
+seis *notebooks* de Jupyter y lo que hay para mostrar ya está adentro, en sus gráficos y
+matrices de confusión.
+
+Queda uno sin empezar: `monopoly`.
 
 **Dos de los cerrados no compilaban ni corrían cuando se los abrió**, y por motivos
 distintos que vale la pena separar. Zorro y Ocas nunca había funcionado: el último commit
@@ -89,9 +93,11 @@ de arranque que siempre estuvieron ahí empezaron a perderse.
   imagen y las IPs fijas chocaban con las dinámicas; está contado en su ficha.
 - **Tienen a medias:** `vibe-trip`, con un `Dockerfile` y un `docker-compose.yaml` en
   cada mitad pero **ninguno que levante las dos juntas**. Eso es lo que falta escribir.
-- **No tienen nada:** `machine-learning` (notebooks: alcanza una imagen de Jupyter con el
-  `requirements.txt` que ya está en `tp2/`) y `monopoly` (JavaFX de escritorio: es el caso
-  incómodo, porque una app con ventana necesita exponer X11 al contenedor).
+- **No tienen nada:** `machine-learning` (notebooks: alcanza una imagen de Jupyter, pero el
+  `requirements.txt` de `tp2/` está incompleto y hay 273 MB de datasets versionados que no
+  conviene copiar adentro de la imagen — está en su ficha) y `monopoly` (JavaFX de
+  escritorio: es el caso incómodo, porque una app con ventana necesita exponer X11 al
+  contenedor).
 - **Se le escribió:** `assembly-game`, con un `Dockerfile` de tres etapas (build, pruebas,
   juego) y un compose.
 
@@ -616,3 +622,123 @@ avanzando.
   desde la cuenta de Mapbox, que es la de Iván.
 - La `private_key.pem` del certificado autofirmado está versionada en los cuatro *crates*.
   Para un certificado de demo no es grave, pero queda raro en un portfolio.
+
+---
+
+## Modelos Predictivos y Análisis con IA (`predictive-models`)
+
+**Dónde está.** `~/Escritorio/project-porfolio/proyectos/machine-learning` ·
+<https://github.com/Porfolio-Pacheco-Thiago/machine-learning> · commit `8e22b44`
+(26 de junio de 2025).
+
+**De este proyecto se documentan el resumen y las tecnologías.** No tiene front ni tiene
+sentido escribirle uno: son seis *notebooks* de Jupyter, y lo que hay para mostrar son los
+gráficos y las matrices de confusión que ya están adentro. Forzar una interfaz encima sería
+inventarle una capa que el proyecto no tiene.
+
+### Resumen
+
+Los dos trabajos prácticos de **Ciencia de Datos (TA047R, FIUBA, 1°C 2025)**, hechos en
+grupo de cuatro. Entre los dos recorren el ciclo completo de un problema de datos —de la
+exploración cruda a un modelo entregado a una competencia— sobre cinco datasets que no se
+parecen entre sí.
+
+El **TP1** son cuatro ejercicios, uno por familia de problema:
+
+| | Problema | Dataset | Qué se hizo |
+|---|---|---|---|
+| EJ1 | Análisis exploratorio | 10,7 M de viajes en taxi de Nueva York (abril–junio 2024) + el *shapefile* de las zonas | Limpieza, variables derivadas (duración, hora pico, zona de subida y bajada) y análisis geográfico con mapas |
+| EJ2 | Clasificación binaria | 145 460 días de observaciones meteorológicas en Australia | Predecir si llueve al día siguiente |
+| EJ3 | Regresión | 35 172 alojamientos de Airbnb en Buenos Aires, 79 columnas | Predecir el precio |
+| EJ4 | Clustering | 750 canciones de Spotify con sus atributos de audio | Agrupar por *energy*, *valence*, *danceability* e *instrumentalness* |
+
+Lo que más se trabajó no fueron los modelos sino lo de antes: imputación de faltantes,
+detección de *outliers* multivariados con **Isolation Forest** —en el ejercicio de Airbnb
+se corre por subgrupos (capacidad, disponibilidad, ingresos) y se marca como atípico global
+solo lo que dos de tres subgrupos coinciden en marcar—, agrupamiento de categorías de alta
+cardinalidad por precio promedio, y selección de variables cruzando tres métodos de
+importancia sobre particiones disjuntas para que no se contaminen entre sí.
+
+Resultados del TP1: en la predicción de lluvia gana **XGBoost** (accuracy 0,855 y AUC 0,803
+en test) sobre Random Forest, que consigue más *recall* de la clase minoritaria pero a costa
+de precisión y de mucho más cómputo. En el precio de Airbnb, XGBoost otra vez (R² 0,79 y
+13 % de error relativo) contra 0,67 de Random Forest y 0,58 de la regresión lineal, aunque
+la regresión entrena en 2 segundos y Random Forest tarda 240. En el clustering quedan tres
+grupos estables, separados sobre todo por *instrumentalness* y por el eje energía/valencia.
+
+El **TP2** es una competencia de **Kaggle**: clasificar el sentimiento de 50 000 críticas de
+cine **en español**, con 8 599 reseñas de test a predecir. Acá el trabajo grueso es el
+preprocesamiento de texto, que es una cadena de diez pasos —normalizar puntuación, sacar
+etiquetas HTML, convertir emojis a palabras, colapsar letras repetidas, quitar *stopwords*,
+**manejar la negación** (que en análisis de sentimiento es justamente lo que no se puede
+tirar), pasar números escritos a cifras, *stemming* y lematización con spaCy—. Sobre esa
+base se entrenan cinco modelos y tres formas de ensamblarlos:
+
+| Modelo | Accuracy en el hold-out |
+|---|---|
+| Stacking (los cuatro + meta-modelo de regresión logística) | **0,91** |
+| Regresión logística sobre TF-IDF | 0,90 (F1 macro en validación cruzada) |
+| Naive Bayes multinomial | 0,88 |
+| Red neuronal en Keras (Embedding + LSTM bidireccional) | 0,85 |
+| XGBoost | 0,80 |
+| Random Forest | 0,75 |
+
+El resultado que más llama la atención es que **el modelo más simple queda segundo**: una
+regresión logística sobre TF-IDF con bigramas empata prácticamente con el ensamble por
+*stacking* de cuatro modelos y le saca cinco puntos a la red neuronal, que tarda órdenes de
+magnitud más en entrenar. Es la clase de conclusión que justifica haber probado las seis.
+
+> **Cuidado con un número del notebook.** El ensamble por promedio de probabilidades reporta
+> 0,97 de accuracy, pero ese número está inflado: tres de los cuatro modelos que promedia se
+> reentrenaron sobre el 100 % del set antes de evaluarlos, así que ya habían visto las filas
+> del *hold-out*. Los válidos son los de la tabla —el *stacking* sí se entrena solo con
+> `X_train`—. **No conviene publicar el 0,97 en la tarjeta.**
+
+Los informes escritos de los dos trabajos están en el repositorio
+(`TA047R_TP1_GRUPO06_REPORTE.pdf` y `TA047R_TP2_GRUPO06_REPORTE.pdf`), y los modelos
+entrenados quedaron serializados en `.joblib`.
+
+### Tecnologías
+
+Leídas de los `import` de los seis notebooks y del `requirements.txt` de `tp2/`.
+
+**Base** — **Python** en **Jupyter Notebook**, con **pandas** y **NumPy** para los datos,
+**Matplotlib** y **seaborn** para los gráficos, y **joblib** para serializar los modelos y
+paralelizar búsquedas.
+
+**Modelado clásico** — **scikit-learn** es el esqueleto de todo: `DecisionTreeClassifier`,
+`RandomForestClassifier` y `RandomForestRegressor`, `LinearRegression`,
+`LogisticRegression`, `MultinomialNB`, `KMeans`, `IsolationForest`, `KNNImputer`,
+`NearestNeighbors` y `PCA`. **XGBoost** para clasificación y regresión. Búsqueda de
+hiperparámetros con `RandomizedSearchCV` sobre `StratifiedKFold`, y ensambles con
+`VotingClassifier` y `StackingClassifier`. Preprocesamiento con `OneHotEncoder`,
+`LabelEncoder`, `MultiLabelBinarizer`, `StandardScaler`, `MinMaxScaler` y `RobustScaler`;
+selección de variables con `RFE`. Desbalanceo de clases con **SMOTE** de
+**imbalanced-learn**. Métricas: `classification_report`, `confusion_matrix`, `roc_auc`,
+`r2_score`, `silhouette_score`.
+
+**Texto y PNL** — **NLTK** (tokenizador, *stopwords* en español, `SnowballStemmer`) y
+**spaCy** con el modelo `es_core_news_md` para lematización. Vectorización con
+`TfidfVectorizer` y `CountVectorizer`. **emoji** para convertir emojis a texto.
+
+**Redes neuronales** — **TensorFlow / Keras**: `Embedding`, `LSTM` bidireccional, `Dense`,
+`Dropout`, `Attention` y `GlobalMaxPool1D`, con regularización `l2`, optimizador `Adam` y
+*callbacks* `EarlyStopping`, `ReduceLROnPlateau` y `ModelCheckpoint`. La búsqueda de
+arquitectura se hizo a mano, con validación cruzada propia sobre una grilla aleatoria.
+
+**Datos geográficos y estadística** — **GeoPandas** para el *shapefile* de las zonas de taxi
+de Nueva York, **pyarrow** para leer los viajes en Parquet, **statsmodels** y **networkx**
+en el análisis exploratorio.
+
+> El `requirements.txt` está solo en `tp2/` y **le faltan dependencias**: no incluye
+> `tensorflow`, `geopandas`, `pyarrow`, `imbalanced-learn`, `statsmodels`, `networkx` ni el
+> modelo `es_core_news_md` de spaCy. Con ese archivo tal como está, los notebooks no corren
+> completos.
+
+### Docker
+
+**No tiene, y queda pendiente decidirlo.** Es el caso más fácil de todos: una imagen de
+`jupyter/scipy-notebook` con el `requirements.txt` completo y el repositorio montado como
+volumen alcanza. Lo que hay que resolver antes es el peso: `tp1/data/` son **273 MB** de
+datasets versionados (175 MB solo los Parquet de los taxis), así que la imagen no los tiene
+que copiar adentro.
