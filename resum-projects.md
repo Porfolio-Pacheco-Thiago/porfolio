@@ -47,13 +47,13 @@ se trata como un caso aparte, con su propio criterio.
 | `cassandra-engine` | Motor de Cassandra | ✅ `cassandra-flight-app` | ✅ compose + 5 Dockerfile + script | ✅ rediseñado | ✅ | ✅ | 🟡 cuatro, faltan copiar |
 | `specforge` | SpecForge | — caso aparte | — | — | — | — | — |
 | `predictive-models` | Modelos Predictivos y Análisis con IA | ✅ `machine-learning` | 🔴 ninguno, a decidir | — no aplica, son notebooks | ✅ | ✅ | ✅ portada animada |
-| `monopoly` | Motor de Monopoly | ✅ `monopoly` | 🔴 ninguno | 🔲 | 🔲 | 🔲 | 🔲 |
+| `monopoly` | Motor de Monopoly | ✅ `monopoly` | ✅ compose + Dockerfile 2 etapas (jlink + X11) | ✅ rehecho sobre una hoja de estilos | ✅ | ✅ | 🔴 ninguna todavía |
 | `zorro-ocas` | Zorro y Ocas (Assembly) | ✅ `assembly-game` | ✅ compose + Dockerfile 3 etapas | ✅ emojis + modo ascii | ✅ | ✅ | ✅ cuatro, sin commitear |
 | — | Money Laundering Analysis | ✅ `distributed-systems` | ✅ ~25 Dockerfile + Makefile | ✅ tablero nuevo | ✅ | ✅ | 🟡 una, faltan 3 |
 
 **El primero terminado es el TP de distribuidos**, que además era el único sin front. Las
 fichas van al final de este archivo, en el orden en que se fueron cerrando: distribuidos,
-VibeTrip, Zorro y Ocas, el motor de Cassandra y los modelos predictivos.
+VibeTrip, Zorro y Ocas, el motor de Cassandra, los modelos predictivos y Monopoly.
 
 **De VibeTrip se documentan solo las tecnologías**, por decisión de Thiago: es un trabajo
 de equipo de seis y el resto no se publica.
@@ -62,7 +62,8 @@ de equipo de seis y el resto no se publica.
 seis *notebooks* de Jupyter y lo que hay para mostrar ya está adentro, en sus gráficos y
 matrices de confusión.
 
-Queda uno sin empezar: `monopoly`.
+**Ya no queda ninguno sin empezar.** Lo que falta de acá en adelante son capturas y el
+texto de las tarjetas del sitio, no fichas.
 
 **Dos de los cerrados no compilaban ni corrían cuando se los abrió**, y por motivos
 distintos que vale la pena separar. Zorro y Ocas nunca había funcionado: el último commit
@@ -93,17 +94,18 @@ de arranque que siempre estuvieron ahí empezaron a perderse.
   imagen y las IPs fijas chocaban con las dinámicas; está contado en su ficha.
 - **Tienen a medias:** `vibe-trip`, con un `Dockerfile` y un `docker-compose.yaml` en
   cada mitad pero **ninguno que levante las dos juntas**. Eso es lo que falta escribir.
-- **No tienen nada:** `machine-learning` (notebooks: alcanza una imagen de Jupyter, pero el
+- **No tiene nada:** `machine-learning` (notebooks: alcanza una imagen de Jupyter, pero el
   `requirements.txt` de `tp2/` está incompleto y hay 273 MB de datasets versionados que no
-  conviene copiar adentro de la imagen — está en su ficha) y `monopoly` (JavaFX de
-  escritorio: es el caso incómodo, porque una app con ventana necesita exponer X11 al
-  contenedor).
-- **Se le escribió:** `assembly-game`, con un `Dockerfile` de tres etapas (build, pruebas,
-  juego) y un compose.
+  conviene copiar adentro de la imagen — está en su ficha).
+- **Se les escribió:** `assembly-game`, con un `Dockerfile` de tres etapas (build, pruebas,
+  juego) y un compose; y `monopoly`, con uno de dos etapas que arma el runtime con `jlink` y
+  saca la ventana por X11.
 
-Sobre las apps con ventana: el caso ya apareció con `flight_app` y se resolvió dejándola
-fuera de Docker, porque además de X11 necesita la placa de video y salida a internet. Para
-`monopoly` conviene el mismo criterio antes de pelearse con el contenedor.
+Sobre las apps con ventana, los dos casos terminaron distinto y por buenos motivos.
+`flight_app` quedó **fuera** de Docker: además de la ventana necesita la placa de video y
+salida a internet para bajar los *tiles* del mapa. `monopoly` quedó **adentro**, porque no
+necesita ninguna de las dos cosas — le alcanza con montar el socket de X11 en solo lectura y
+un `xhost +local:docker`.
 
 ---
 
@@ -742,3 +744,180 @@ en el análisis exploratorio.
 volumen alcanza. Lo que hay que resolver antes es el peso: `tp1/data/` son **273 MB** de
 datasets versionados (175 MB solo los Parquet de los taxis), así que la imagen no los tiene
 que copiar adentro.
+
+---
+
+## Motor de Monopoly (`monopoly`)
+
+**Dónde está.** `~/Escritorio/project-porfolio/proyectos/monopoly` ·
+<https://github.com/Porfolio-Pacheco-Thiago/monopoly> · commit `4e54887`. El trabajo
+original es de marzo–abril de 2024; el Docker y el rediseño del front son de agosto
+de 2025.
+
+**Andaba desde el principio.** A diferencia de Zorro y Ocas y del motor de Cassandra, este
+compiló y corrió a la primera. No hubo nada que arreglar: lo que se hizo fue meterlo en un
+contenedor y rehacerle la interfaz.
+
+### Docker
+
+**No tenía nada, y era el caso incómodo:** una aplicación de escritorio con ventana. El
+criterio que había quedado de `flight_app` era dejarla afuera del contenedor, pero acá se
+resolvió al revés, porque Monopoly necesita bastante menos que la app de vuelos — no pide
+placa de video ni salida a internet, solo una ventana.
+
+La ventana la dibuja el servidor X del anfitrión; el contenedor se cuelga de él por el
+socket de `/tmp/.X11-unix`, que se monta en solo lectura.
+
+```bash
+xhost +local:docker            # una vez por sesión
+docker-compose run --rm monopoly
+xhost -local:docker            # opcional, para dejar todo como estaba
+```
+
+Va con `run` y no con `up` porque es una ventana sola: al cerrarla el proceso termina.
+
+El `Dockerfile` tiene dos etapas y **la imagen final no lleva ni Maven ni el JDK**:
+`mvn javafx:jlink` —que ya estaba configurado en el `pom.xml` y nadie usaba— arma en
+`target/app` un runtime autocontenido con solo los módulos que el programa necesita y su
+propio lanzador. La segunda etapa es un Ubuntu 22.04 pelado con GTK y una fuente, y le
+copia ese runtime. La base es Ubuntu y no Debian a propósito: es la misma que usa la imagen
+de Maven, y el runtime que arma jlink queda enlazado contra su glibc.
+
+Pesa **451 MB**. Se probó una variante sin Mesa que baja a 297 MB y también funciona
+—JavaFX se cae al pipeline por software y el tablero se ve igual—, pero escupe un *stack
+trace* de Java entero en cada arranque. Se eligió la grande: arranca con cinco líneas de
+aviso de `libGL` en vez de una traza, y deja la puerta abierta a usar la placa de video
+descomentando el `devices: /dev/dri` que quedó documentado en el compose.
+
+Sin Docker sigue siendo `mvn javafx:run`, que para desarrollar es más rápido porque
+recompila solo lo que cambió.
+
+### El front
+
+Es JavaFX, y el informe del trabajo lo dice sin vueltas: *"la implementacion de la
+visualización del juego resulta trivial para la evaluación del presente trabajo práctico"*,
+así que se omitió del análisis. Se notaba.
+
+**No había ninguna hoja de estilos.** Cada color y cada borde estaba escrito a mano dentro
+de un `setStyle()` en Java o en un atributo `style=` del FXML, repetido decenas de veces. Lo
+más caro de eso no era el desorden sino una consecuencia concreta: **el hover de un botón
+tenía que escribirse como una segunda cadena de estilo completa** e intercambiarse a mano
+con dos listeners de mouse. Por eso `BotonView.crearBoton` recibía dos strings de estilo.
+Ahora eso son dos reglas de CSS y `BotonView` quedó en once líneas.
+
+Se agregó `estilos.css` y un `Estilos.java` que lo engancha. El detalle que obliga a tener
+ese punto único es que el juego abre **cinco ventanas** por su cuenta (inicio, partida,
+tarjeta de casilla, listado de propiedades, final) y cada una crea su propia `Scene`; una
+`Scene` no hereda los estilos de ninguna otra, así que olvidarse en una sola se nota
+enseguida.
+
+La paleta pasó a tener **un solo acento** (naranja desaturado), todos los grises tirados al
+verde, crema en lugar de blanco puro y sombras tintadas de verde en vez de negro.
+
+Aparte del aspecto, cambiaron cuatro cosas que se usan:
+
+- **Se ve de quién es el turno.** Antes eso se sabía solamente mirando el muñeco de la
+  cabecera. Ahora la tarjeta del jugador en turno se levanta del resto.
+- **Se nota que las casillas se clickean**, con cursor de mano y realce al pasar por encima.
+  El cartel de *"click en una casilla para ver su información"* existía justamente porque no
+  se notaba.
+- **Los botones responden a `setOnAction`** en lugar de `setOnMouseClicked`, así que se
+  activan con Enter o barra espaciadora, y el foco se ve. El juego se puede recorrer con el
+  teclado.
+- **Las fichas del inicio tienen tooltip y texto accesible.** Son botones sin una sola
+  palabra: la imagen era la única pista de qué personaje se estaba eligiendo.
+
+Además el saldo pasó a ser el número grande de la tarjeta, en monoespaciada para que no
+baile de ancho cuando 1500 pasa a 980; el estado dejó de ser una línea de texto y es una
+etiqueta; la tarjeta de una casilla quedó como un título de propiedad con los importes
+alineados en columna; y el listado de propiedades vacío dice algo en lugar de abrirse en
+blanco.
+
+**El modelo no se tocó.** Los cambios son de `resources/`, de `view/` y de las dos clases de
+`controller/` que arman pantalla.
+
+> **Trampa para el que venga después.** `TableroView`, `CasillaView` y `PropiedadesView`
+> agarran nodos **por posición** (`getChildren().get(1)`), no por `fx:id`. Se pueden cambiar
+> estilos y medidas, pero agregar un hijo en el medio de esos FXML rompe el tablero sin que
+> el compilador diga nada. Quedó advertido en un comentario dentro de cada uno.
+
+### Resumen
+
+Monopoly de escritorio para dos a cuatro jugadores, en **Java 17 con JavaFX**, hecho de cero
+para Paradigmas de Programación (FIUBA) y entregado en abril de 2024. Son unas 2.900 líneas
+repartidas en 52 clases con separación estricta de modelo, vista y controlador: **el modelo
+no sabe que la vista existe**, y esa es la decisión que sostiene todo lo demás.
+
+Lo que lo hace más que una copia del juego de mesa es que **el tablero es configuración, no
+código**. `Config.java` describe la partida entera —las 36 casillas, los precios, los
+alquileres, los barrios, cuánto sale construir, el dinero inicial, los turnos de cárcel, la
+fianza— y el resto del programa la lee. La lista por defecto son 22 propiedades, 4
+estaciones, 4 multas, 2 loterías y las cuatro esquinas, y está armada de modo que **SALIDA,
+CÁRCEL, PASO e IR A CÁRCEL caen justo en las esquinas** cuando la vista reparte las casillas
+de a ocho por lado. Se puede cambiar la cantidad de casillas y el tablero se redibuja solo,
+con las esquinas donde toque; hasta los personajes son configuración, porque cada
+`ColorJugador` es el nombre de un `.png` de `resources/images/`.
+
+Las reglas propias que el grupo decidió y documentó en el informe:
+
+- Para salir de prisión sin pagar la fianza hay que sacar **los dos dados iguales**.
+- Vender una construcción devuelve **la mitad** de lo que costó, y lo mismo vale para
+  hipotecar y deshipotecar.
+- **Las estaciones también se pueden hipotecar**, no solo las propiedades.
+- Se agregó un estado **CRISIS**: el jugador cayó en una casilla que lo obliga a pagar más
+  de lo que tiene. Mientras esté en crisis solo puede hipotecar o vender hasta juntar el
+  monto; si no llega, lo único que le queda es declararse en quiebra.
+
+Del lado del diseño, lo que se aprovecha del enunciado son dos abstracciones. `Casilla` es
+una interfaz con una sola operación, `accionar`, de manera que **agregar un tipo de casilla
+nuevo no obliga a tocar nada del motor**: el jugador cae, la casilla sabe qué hacerle. Y las
+acciones del turno están divididas en tres etapas (inicio, casilla, fin), cada una con su
+*calculadora* que lee el estado del juego y devuelve qué puede hacer el jugador ahora — el
+controlador arma un botón por cada acción que le devuelven, sin saber cuáles son. Es un
+*abstract factory* que produce objetos `Accion`, y es lo que hace que la botonera cambie
+sola según el momento del turno.
+
+### Tecnologías
+
+Leídas del `pom.xml`, del `module-info.java` y de los imports:
+
+- **Java 17** con **módulos de JPMS**: hay un `module-info.java` de verdad, que exporta
+  `org.monopoly` y abre `org.monopoly.controller` a `javafx.fxml` para que la inyección de
+  `@FXML` funcione bajo el sistema de módulos.
+- **JavaFX 17.0.6**, `javafx.controls` y `javafx.fxml`.
+- **FXML** para cinco vistas (`escena-inicio`, `vistaMonopoly`, `tablero`, `casilla`,
+  `propiedades`), cargadas con `FXMLLoader`.
+- **CSS de JavaFX** (`estilos.css`), agregado en el rediseño: colores como *looked-up
+  colors*, y `:hover` / `:pressed` / `:focused` para los estados.
+- **Maven** con `maven-compiler-plugin` y **`javafx-maven-plugin`**, del que se usan
+  `javafx:run` para desarrollo y **`javafx:jlink`** para armar el runtime del contenedor.
+- **Docker** multietapa y **X11** para sacar la ventana afuera del contenedor.
+- 27 imágenes PNG (628 KB) en `resources/images/`: los quince personajes, las caras de los
+  dados, las esquinas y el centro del tablero.
+
+> Dos dependencias declaradas que **no se usan**: `controlsfx` y `formsfx-core` están en el
+> `pom.xml` y el `module-info.java` no las requiere ni aparecen en ningún import. Se pueden
+> sacar.
+>
+> Y **no hay ni un test**: el `pom.xml` declara `junit-jupiter-api` y `junit-jupiter-engine`,
+> pero `src/test/` no existe. Es la diferencia más grande contra Zorro y Ocas, donde las 55
+> verificaciones son media ficha.
+
+### Capturas
+
+**Todavía no hay ninguna en el portfolio.** Durante el rediseño se sacaron seis de trabajo
+—inicio antes y después, selección de fichas, el botón con el hover puesto, el tablero en
+juego y el arranque dentro del contenedor— pero están en un directorio temporal y ninguna
+sirve tal cual: la del tablero es una partida de dos jugadores recién empezada, sin
+propiedades compradas ni dados tirados.
+
+Lo que conviene fotografiar, de una partida ya avanzada:
+
+- El tablero con cuatro jugadores, propiedades compradas y los dados con un resultado.
+- La tarjeta de una casilla, que es donde mejor se ve el rediseño.
+- El listado de propiedades de un jugador con varias filas.
+- La pantalla de ganador.
+
+El *antes* para comparar no hace falta sacarlo: está en la página 1 de
+`InformeMonopoly.pdf`, que tiene una captura de una partida de cuatro jugadores con la
+interfaz original.
