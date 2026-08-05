@@ -7,23 +7,50 @@ proyecto y con qué está hecho.
 
 ## Money Laundering Analysis
 
-**Resumen.** Sistema de análisis de transacciones bancarias orientado a detectar lavado de
-dinero. Toma extractos con millones de operaciones y responde cinco preguntas analíticas
-sobre ellos: filtra, agrupa, compara períodos, busca patrones de dinero moviéndose entre
-cuentas encadenadas y convierte montos a una moneda común.
+**Resumen.** Pipeline distribuido y tolerante a fallos que ingiere extractos de
+transacciones bancarias y calcula cinco consultas analíticas en paralelo sobre un clúster
+escalable conectado por RabbitMQ. Está construido para seguir dando resultados **correctos
+y exactamente una vez** aunque se le caigan nodos a mitad de corrida: los detecta por
+latido, los reinicia solos y cada uno retoma desde su último checkpoint en vez de
+reprocesar todo.
 
-Es un **sistema distribuido**: en vez de una sola máquina procesando todo, el trabajo se
-reparte entre decenas de nodos que corren a la vez, y crece agregando más. Lo que lo
-define es que está pensado para **seguir funcionando aunque se le caigan nodos en plena
-corrida** — los detecta, los levanta solos y retoma desde donde estaban, sin repetir ni
-perder resultados. Corriendo sobre cinco millones de transacciones, resuelve las cinco
-consultas en poco más de un minuto.
+Las cinco consultas cubren filtrado, agregación por clave, estadística entre períodos,
+matching de patrones sobre un grafo (*scatter-gather* con al menos cinco intermediarios) y
+enriquecimiento con tipos de cambio históricos.
 
-**Tecnologías.** Python, con RabbitMQ como sistema de mensajería entre los nodos. Docker y
-Docker Compose para desplegar el clúster, y Docker-in-Docker para que el sistema pueda
-reiniciar sus propios contenedores. Tablero de monitoreo en vivo hecho con Server-Sent
-Events y SVG, sin frameworks. API de Frankfurter para los tipos de cambio históricos.
-Suites de test end-to-end, de distribución, de despliegue y de caos.
+*Cómo es tolerante a fallos.* Asume caídas limpias —un nodo muere de golpe— y las sobrevive
+en cuatro pasos encadenados: cada nodo late a un fanout y un Medic lo da por muerto si deja
+de latir (detección a nivel aplicación, nunca preguntándole a Docker); los Medics están
+replicados y eligen líder por **Bully**, así solo uno repara y no hay tres reinicios del
+mismo nodo; los workers hacen **checkpoint atómico** de su estado, así volver no es
+reprocesar desde cero; y como se confirma cada mensaje recién después de hacer durable su
+efecto, un crash siempre redeliverea y el destinatario descarta lo repetido por número de
+secuencia — entrega *al menos una vez*, resultado *exactamente una vez*.
+
+*Cómo escala.* Cada etapa es un grupo de N instancias declarado en `config.json`, así que
+escalar es cambiar un número. El reparto no es por turnos sino **por hash de una clave de
+negocio**, con lo que cada worker es dueño de un pedazo disjunto del problema y acumula sus
+parciales sin coordinarse. Y nada espera al archivo completo: el cliente sube por pedazos y
+cada etapa emite mientras consume.
+
+Las dos propiedades salen del mismo diseño: **el particionado por clave es lo que hace
+barata la tolerancia a fallos**, porque el estado de cada worker es chico y solo suyo, y el
+que muere necesita su propio checkpoint y nada más.
+
+**Tecnologías.**
+
+- **Python** — todo el sistema; única dependencia externa **pika** (cliente de AMQP).
+- **RabbitMQ** como middleware orientado a mensajes: fanout para latidos y elección, colas
+  con partición por hash para los datos, y el **plugin de management**, del que el tablero
+  lee el caudal por cola.
+- **Docker** y **Docker Compose**, con el compose generado por `generate_compose.py`.
+- **Docker-in-Docker** para que el Medic reinicie contenedores caídos y para el plano de
+  control del tablero.
+- **Algoritmo Bully** para elegir el líder entre los medics replicados.
+- **Server-Sent Events**, `http.server` y **SVG** de la biblioteca estándar y del navegador,
+  para el tablero. Sin framework y sin dependencias nuevas.
+- **API de Frankfurter** para los tipos de cambio históricos, con caché en disco.
+- Suites de test *end to end*, de distribución, de despliegue y de caos.
 
 ---
 
@@ -72,25 +99,56 @@ emojis y un modo de respaldo en ASCII. Docker multietapa.
 
 ## Motor de Cassandra
 
-**Resumen.** Dos cosas que van juntas: una **base de datos distribuida escrita desde cero**,
-que replica el funcionamiento de Apache Cassandra, y una **aplicación de seguimiento de
-vuelos en vivo** que la usa como si fuera la base real.
+**Resumen.** Una **base de datos distribuida al estilo Cassandra escrita en Rust desde
+cero**, y una aplicación de seguimiento de vuelos que la usa como si fuera Cassandra de
+verdad.
 
-La base guarda la información repartida entre varios nodos y copiada en más de uno, de modo
-que ninguno tenga todo y ninguno sea imprescindible: se le pueden agregar nodos, se le
-pueden apagar, y sigue respondiendo. No se apoya en ninguna biblioteca de Cassandra — el
-lenguaje de consultas, el protocolo de comunicación y todo el mecanismo de reparto y copia
-están hechos a mano.
+No usa ninguna librería de Cassandra. Están implementados a mano el protocolo binario CQL
+—`STARTUP`, `AUTHENTICATE`, `QUERY`, `PREPARE`, `EXECUTE`, `BATCH`, `REGISTER`—, el lexer y
+el parser de CQL, el motor de queries, el particionado por token, la replicación, el
+gossip, el hinted handoff y el read repair. Son **18.400 líneas solo en el nodo**,
+repartidas en 150 archivos.
 
-La aplicación es la que le da sentido: muestra un mapa mundial con los aviones moviéndose
-en tiempo real, se hace clic en un aeropuerto para ver sus vuelos y en un vuelo para
-seguirlo con su posición, altitud, velocidad y combustible.
+*Cómo se arma el clúster.* Un nodo entra conectándose al *seed listener* del primer seed,
+que le manda la lista de nodos y le asigna una posición y un rango de tokens. De ahí en
+adelante cada nodo hace **gossip** una vez por segundo con otro nodo al azar, así que todos
+convergen a la misma vista sin que nadie coordine. Cada nodo usa siete puertos consecutivos:
+clientes, delegación de queries, data access, metadata, gossip, seed listener y hinted
+handoff.
 
-**Tecnologías.** Rust, en un proyecto de cinco módulos que suman más de 24.000 líneas.
-Comunicación cifrada con TLS y contraseñas hasheadas con argon2. Interfaz gráfica con
-egui/eframe y mapas de Mapbox, con respaldo en OpenStreetMap. Monitor del clúster en
-terminal con termion. Docker y Docker Compose para levantar los nodos. GitHub Actions con
-build, tests y linter.
+*Qué pasa cuando un nodo se cae.* Las queries que le tocaban se guardan como **hints** y se
+le entregan cuando vuelve; los rangos se recalculan y los datos se redistribuyen fila por
+fila entre los que quedan. Salir del clúster con `exit` no es lo mismo que matar el
+contenedor: el nodo reparte sus datos antes de irse. Y cuando una lectura con consistencia
+fuerte devuelve réplicas que no coinciden, el **read repair** las compara y arregla la que
+quedó vieja.
+
+*Para qué sirve todo eso.* La aplicación de vuelos es el caso de uso que lo justifica: el
+estado del vuelo se lee con **consistencia fuerte** (QUORUM) y el seguimiento —posición,
+altitud, velocidad, combustible— con **consistencia débil** (ONE), que son dos caminos
+distintos por dentro de la base. El simulador mueve los aviones por fases —despegue,
+crucero, descenso— calculando la distancia restante con la fórmula de Haversine, y escribe
+las posiciones desde varias conexiones en paralelo contra nodos distintos.
+
+Toda la comunicación cliente–nodo va por **TLS**, con validación de la IP contra el
+certificado. Las contraseñas se guardan hasheadas con argon2.
+
+**Tecnologías.**
+
+- **Rust**, en un workspace de cinco *crates*: `node` (18.400 líneas), `flight_app` (3.300),
+  `simulator` (2.100), `test-client` (800) y `node_handler` (130).
+- **rustls** para el TLS de las dos puntas, con certificado autofirmado y validación por IP;
+  **openssl** para cifrar el tráfico entre nodos; **argon2** para las contraseñas.
+- **murmur3** para el hash del particionado por token, que es lo que decide qué nodo es
+  dueño de cada fila.
+- **serde** con `serde_json`, `serde_yaml` y `rmp-serde` para la metadata, la configuración y
+  los mensajes entre nodos.
+- **egui / eframe** y **walkers** para la aplicación gráfica, con tiles de **Mapbox** (estilo
+  `NavigationNight`) y respaldo en **OpenStreetMap** cuando no hay token.
+- **termion** para el monitor del clúster, que pinta los nodos por estado.
+- **Docker** y Docker Compose, con red de subred fija y rangos separados para las IPs
+  estáticas y las dinámicas.
+- **GitHub Actions** con build, tests y `clippy` bajo `-Dwarnings`.
 
 ---
 
