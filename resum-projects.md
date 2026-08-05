@@ -44,7 +44,7 @@ se trata como un caso aparte, con su propio criterio.
 |----|----------|--------|--------|-------|---------|-------------|----------|
 | `melodia` | Melodía | — no se hace | — | — | — | — | — |
 | `vibetrip` | VibeTrip | ✅ `vibe-trip` | 🟡 uno por lado, sin compose raíz | ✅ ya tiene, no se toca | — solo tecnologías | ✅ | — solo tecnologías |
-| `cassandra-engine` | Motor de Cassandra | ✅ `cassandra-flight-app` | ✅ compose + 5 Dockerfile + script | ✅ rediseñado | ✅ | ✅ | 🟡 cuatro, faltan copiar |
+| `cassandra-engine` | Motor de Cassandra | ✅ `cassandra-flight-app` | ✅ compose + 5 Dockerfile + script | ✅ rediseñado | ✅ | ✅ | ✅ tres, copiadas |
 | `specforge` | SpecForge | — caso aparte | — | — | — | — | — |
 | `predictive-models` | Modelos Predictivos y Análisis con IA | ✅ `machine-learning` | 🔴 ninguno, a decidir | — no aplica, son notebooks | ✅ | ✅ | ✅ portada animada |
 | `monopoly` | Motor de Monopoly | ✅ `monopoly` | ✅ compose + Dockerfile 2 etapas (jlink + X11) | ✅ rehecho sobre una hoja de estilos | ✅ | ✅ | 🔴 ninguna todavía |
@@ -592,13 +592,19 @@ Leídas de los `Cargo.toml` y del código:
 
 ### Capturas
 
-Cuatro, en `capturas/` del propio repositorio. **Faltan copiar** a
+Cuatro en `capturas/` del propio repositorio; **tres copiadas** a
 `src/assets/media/projects/cassandra-engine/`.
 
-- `0-antes.png` — cómo se veía antes del rediseño, útil como comparación.
-- `1-aeropuertos.png` — la lista de aeropuertos con el buscador y el mapa mundial.
+- `1-aeropuertos.png` — la lista de aeropuertos con el buscador y el mapa mundial. Es la
+  **tapa de la tarjeta**, porque `getCover` toma la primera imagen en orden alfabético.
 - `2-vuelos.png` — los vuelos de Ezeiza, con los aviones coloreados por estado en vuelo.
 - `3-detalle-vuelo.png` — la ficha de un vuelo, con el progreso del recorrido.
+
+**`0-antes.png` queda solo en el repositorio del proyecto, fuera del sitio.** La galería no
+muestra epígrafes —solo un `alt` genérico—, así que ahí un visitante vería una captura que
+se ve peor que las otras tres sin ninguna forma de saber que es el *antes* del rediseño.
+Sirve como comparación en esta ficha, no como cuarta imagen de la tarjeta. Además, con su
+nombre original habría ganado el orden alfabético y habría terminado siendo la tapa.
 
 Falta una del **monitor del clúster** (`docker-compose logs -f monitor`), que es la que
 muestra que abajo hay cuatro nodos y no una base y ya.
