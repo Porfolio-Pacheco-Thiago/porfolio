@@ -43,16 +43,29 @@ se trata como un caso aparte, con su propio criterio.
 | id | Proyecto | Código | Docker | Front | Resumen | Tecnologías | Capturas |
 |----|----------|--------|--------|-------|---------|-------------|----------|
 | `melodia` | Melodía | — no se hace | — | — | — | — | — |
-| `vibetrip` | VibeTrip | ✅ `vibe-trip` | 🟡 uno por lado, sin compose raíz | 🔲 | 🔲 | 🔲 | 🔲 |
-| `cassandra-engine` | Motor de Cassandra | ✅ `cassandra-flight-app` | ✅ compose + 5 Dockerfile | 🔲 | 🔲 | 🔲 | 🔲 |
+| `vibetrip` | VibeTrip | ✅ `vibe-trip` | 🟡 uno por lado, sin compose raíz | ✅ ya tiene, no se toca | — solo tecnologías | ✅ | — solo tecnologías |
+| `cassandra-engine` | Motor de Cassandra | ✅ `cassandra-flight-app` | ✅ compose + 5 Dockerfile + script | ✅ rediseñado | ✅ | ✅ | 🟡 cuatro, faltan copiar |
 | `specforge` | SpecForge | — caso aparte | — | — | — | — | — |
 | `predictive-models` | Modelos Predictivos y Análisis con IA | ✅ `machine-learning` | 🔴 ninguno | 🔲 | 🔲 | 🔲 | ✅ portada animada |
 | `monopoly` | Motor de Monopoly | ✅ `monopoly` | 🔴 ninguno | 🔲 | 🔲 | 🔲 | 🔲 |
-| `zorro-ocas` | Zorro y Ocas (Assembly) | ✅ `assembly-game` | 🔴 ninguno | 🔲 | 🔲 | 🔲 | 🔲 |
+| `zorro-ocas` | Zorro y Ocas (Assembly) | ✅ `assembly-game` | ✅ compose + Dockerfile 3 etapas | ✅ emojis + modo ascii | ✅ | ✅ | ✅ cuatro, sin commitear |
 | — | Money Laundering Analysis | ✅ `distributed-systems` | ✅ ~25 Dockerfile + Makefile | ✅ tablero nuevo | ✅ | ✅ | 🟡 una, faltan 3 |
 
-**El primero terminado es el TP de distribuidos**, que además era el único sin front. Su
-ficha completa está al final de este archivo.
+**El primero terminado es el TP de distribuidos**, que además era el único sin front. Las
+fichas van al final de este archivo, en el orden en que se fueron cerrando: distribuidos,
+VibeTrip, Zorro y Ocas, y el motor de Cassandra.
+
+**De VibeTrip se documentan solo las tecnologías**, por decisión de Thiago: es un trabajo
+de equipo de seis y el resto no se publica.
+
+Quedan dos sin empezar: `machine-learning` y `monopoly`.
+
+**Dos de los cerrados no compilaban ni corrían cuando se los abrió**, y por motivos
+distintos que vale la pena separar. Zorro y Ocas nunca había funcionado: el último commit
+del original admite el error en su propio título. El motor de Cassandra sí había
+funcionado, y se rompió solo con el paso del tiempo — se venció el certificado, las
+dependencias transitivas se actualizaron más allá del toolchain instalado, y dos carreras
+de arranque que siempre estuvieron ahí empezaron a perderse.
 
 ### Los dos que no son lo que parecen
 
@@ -68,16 +81,23 @@ ficha completa está al final de este archivo.
 
 ### Docker, de un vistazo
 
-- **Ya tienen y funciona:** `cassandra-flight-app` (un `docker-compose.yml` en la raíz y
-  un `Dockerfile` por *crate*) y `distributed-systems` (un `Dockerfile` por servicio, un
+- **Ya tenía y funcionaba:** `distributed-systems` (un `Dockerfile` por servicio, un
   `generate_compose.py` que arma el `docker-compose.yaml` según `config.json`, y un
   `Makefile` con `up` / `down` / `logs`).
+- **Ya tenía y no arrancaba:** `cassandra-flight-app` (un `docker-compose.yml` en la raíz y
+  un `Dockerfile` por *crate*). El *healthcheck* usaba un comando que no existe en la
+  imagen y las IPs fijas chocaban con las dinámicas; está contado en su ficha.
 - **Tienen a medias:** `vibe-trip`, con un `Dockerfile` y un `docker-compose.yaml` en
   cada mitad pero **ninguno que levante las dos juntas**. Eso es lo que falta escribir.
 - **No tienen nada:** `machine-learning` (notebooks: alcanza una imagen de Jupyter con el
-  `requirements.txt` que ya está en `tp2/`), `assembly-game` (NASM de 64 bits: hace falta
-  una imagen con el ensamblador y el enlazador) y `monopoly` (JavaFX de escritorio: es el
-  caso incómodo, porque una app con ventana necesita exponer X11 al contenedor).
+  `requirements.txt` que ya está en `tp2/`) y `monopoly` (JavaFX de escritorio: es el caso
+  incómodo, porque una app con ventana necesita exponer X11 al contenedor).
+- **Se le escribió:** `assembly-game`, con un `Dockerfile` de tres etapas (build, pruebas,
+  juego) y un compose.
+
+Sobre las apps con ventana: el caso ya apareció con `flight_app` y se resolvió dejándola
+fuera de Docker, porque además de X11 necesita la placa de video y salida a internet. Para
+`monopoly` conviene el mismo criterio antes de pelearse con el contenedor.
 
 ---
 
@@ -271,3 +291,328 @@ Dos cosas que conviene saber antes de la demo: **construir las ~25 imágenes des
 lleva varios minutos**, así que hay que levantarlo con tiempo; y con el clúster cargado el
 *healthcheck* de RabbitMQ puede fallar por falta de CPU aunque el broker esté sano, lo que
 bloquea cualquier `up` que dependa de `service_healthy` — se sortea con `--no-deps`.
+
+---
+
+## VibeTrip (`vibetrip`)
+
+**Dónde está.** `~/Escritorio/project-porfolio/proyectos/vibe-trip` ·
+<https://github.com/Porfolio-Pacheco-Thiago/vibe-trip>
+
+**De este proyecto se documentan solo las tecnologías.** No se toca el código —las
+capturas ya están sacadas— y el resto de la ficha queda afuera por decisión de Thiago.
+
+### Tecnologías
+
+Leídas de `pyproject.toml`, `package.json` y el código.
+
+**Backend** — Python 3.11 con **FastAPI**, **SQLAlchemy 2.0 asíncrono** (`asyncpg` para
+Postgres, `aiosqlite` para desarrollo) y **Alembic** para las migraciones. Autenticación con
+**JWT** (`pyjwt`) y hash de contraseñas con **passlib** sobre argon2/bcrypt. Validación con
+**Pydantic v2** y configuración con `pydantic-settings`. Mails de verificación con
+**fastapi-mail**. Subida de archivos con `python-multipart`, guardada en disco con límites
+propios: 5 MB por imagen, 100 MB y 2 minutos por video, tope por entidad.
+
+**Frontend** — **Next.js 15** con App Router y Turbopack, **React 19** y **TypeScript**.
+**Tailwind CSS v4** con **shadcn/ui** sobre casi treinta primitivas de **Radix**, más `cva`,
+`clsx` y `tailwind-merge`. Formularios con **react-hook-form**, fechas con **date-fns** y
+**react-day-picker**, carrusel con **Embla**. Mapas con **Leaflet** / **react-leaflet**.
+Gráficos con **ECharts** (y **Recharts** convive en las dependencias). Avisos con **sonner**
+y **react-hot-toast**, tema con **next-themes**, iconos de **Lucide**, métricas con
+**Vercel Analytics**.
+
+**Infra y proceso** — **Docker** y Docker Compose por mitad, desplegado con **Dokploy** en
+un VPS contra **PostgreSQL**. **GitHub Actions** con tres *workflows*: tests de backend con
+pytest y cobertura a Codecov, build y lint del front, y una validación específica de
+migraciones que corre sola cuando el PR toca `alembic/versions/`. **50 archivos de test**
+con pytest y `pytest-asyncio`; linting con **ruff** y **mypy** de un lado, **ESLint** y
+**Prettier** del otro. Trabajo por *pull request* contra `develop` con historias de usuario
+numeradas.
+
+---
+
+## Zorro y Ocas (`zorro-ocas`)
+
+**Dónde está.** `~/Escritorio/project-porfolio/proyectos/assembly-game` ·
+<https://github.com/Porfolio-Pacheco-Thiago/assembly-game> · commit `cdf74bf`.
+
+**No compilaba.** El commit anterior se llama, textualmente, *"Arreglo actualizar tablero,
+falta un erro por tamaño de registros"* — y ese error estaba efectivamente ahí, en
+`tablero.asm`, moviendo un registro de 8 bits a uno de 32. Detrás había más: rutinas sin
+`ret` que caían en la siguiente, macros nunca definidos que NASM leía como etiquetas,
+saltos que hacían inalcanzable el cierre del bucle, y `moverOca` que calculaba el
+movimiento y no lo escribía. **El juego nunca había funcionado.** Se reescribió entero,
+manteniendo la notación de coordenadas y el esquema de teclas del planteo original.
+
+### Docker
+
+**No tenía nada.** Ahora hay un `Dockerfile` de tres etapas y un `docker-compose.yaml`:
+
+- `build` — Debian con `nasm` y `gcc`, ensambla los ocho módulos y enlaza con `-no-pie`.
+- `pruebas` — compila el driver en C contra los mismos `.o` que usa el juego.
+- `juego` — Debian slim, sin compilador y sin fuentes tipográficas: los emojis los dibuja
+  la terminal del anfitrión, acá dentro solo se escriben bytes UTF-8.
+
+```bash
+docker-compose run --rm juego            # jugar
+docker-compose run --rm juego --ascii    # si la terminal no mide bien los emojis
+docker-compose run --rm pruebas          # las 55 verificaciones
+```
+
+Va con `run` y no con `up` porque el juego es interactivo y necesita una terminal propia.
+
+### El front
+
+Es una terminal, y ahí estaba casi todo por hacer.
+
+**Emojis.** El tablero guarda un código por casilla (vacío, oca, zorro, pared), no el
+carácter: el glifo se resuelve recién al imprimir, con una tabla de punteros. Esa
+indirección es lo que los hace posibles, porque un emoji ocupa cuatro bytes en UTF-8 y no
+entra en el byte de la casilla.
+
+**El problema interesante fue el ancho.** Todos los glifos tienen que medir lo mismo o las
+filas no alinean, y el ancho no lo decide el programa sino la tabla que tenga la terminal.
+La regla práctica resultó ser la antigüedad del emoji: el ganso 🪿 es de Unicode 15.0
+(2022) y en la terminal de VS Code sale a una columna, mientras que el zorro 🦊 (Unicode
+9.0, 2016) sale a dos — el tablero quedaba escalonado. Se cambió por el pato 🦆, del mismo
+Unicode 9.0 que el zorro. Queda documentado en `prints.asm` para que nadie lo rompa
+después.
+
+Además hay un **modo `--ascii`** de respaldo: un carácter más un espacio miden dos columnas
+en cualquier terminal, y el color ANSI no ocupa ninguna.
+
+**El texto se acomodó al tablero.** Las reglas ocupaban 78 columnas debajo de un tablero de
+17, que quedaba desbalanceado; se movieron al costado, una línea por fila. Alinean solas,
+porque cada fila imprime siempre siete glifos.
+
+```
+   🦊  El Zorro y las Ocas  🦆
+
+   A B C D E F G
+1      🦆🦆🦆         q w e    Zorro: los ocho lados.
+2      🦆🦆🦆         a . d    Come saltando una oca,
+3  🦆🦆🦆🦆🦆🦆🦆     z x c    como en las damas.
+4  🦆⬜⬜⬜⬜⬜🦆
+5  🦆⬜⬜🦊⬜⬜🦆              Ocas: solo a, d o x.
+6      ⬜⬜⬜                  No retroceden ni comen.
+7      ⬜⬜⬜                  'f' termina la partida.
+```
+
+### Resumen
+
+Juego de mesa para dos jugadores en la terminal, escrito **en assembly x86-64** (NASM,
+sintaxis Intel) y enlazado contra libc. Un jugador lleva al zorro y el otro las 17 ocas,
+sobre un tablero de 7×7 con las cuatro esquinas de 2×2 recortadas: una cruz de 33 casillas.
+El zorro se mueve en las ocho direcciones y come saltando por encima de una oca, como en
+las damas; las ocas solo van a los costados o para adelante, no retroceden y no comen — su
+única arma es el número. Ganan las ocas si lo dejan sin movidas, y gana el zorro si se come
+tantas que ya no pueden encerrarlo.
+
+Lo que lo hace más que un ejercicio de sintaxis es que **las funciones respetan la
+convención de llamada de System V AMD64**, y eso es lo que permite que un driver escrito en
+C llame directamente a las rutinas de assembly y las verifique una por una. Las 55
+verificaciones de `prueba.c` enlazan contra exactamente los mismos objetos que el juego —
+no contra una copia— y cubren posición inicial, traducción de coordenadas, parsing de
+direcciones, bordes del tablero, movimientos del zorro, captura, restricciones de las ocas
+y detección de final de partida. Encontraron dos cosas: un error mío en un caso de prueba y
+un bug real, `inicializarTablero` armaba el tablero pero no reseteaba los contadores ni el
+turno.
+
+Conviven dos sistemas de coordenadas, y es una decisión y no un descuido: la **notación del
+jugador** es `columna*10 + fila`, que es lo que se tipea (`D5`), y el **índice de tablero**
+es `fila*7 + columna`, que deja recorrer el tablero en un solo bucle.
+
+### Tecnologías
+
+Leídas del código y de `Comandos.txt`:
+
+- **NASM** con sintaxis Intel, formato `elf64`; ocho módulos que se ensamblan por separado.
+- **GCC** como enlazador, con `-no-pie`, contra **libc** — de ahí salen `printf`, `fgets`,
+  `strcmp` y `fflush`.
+- **Convención de llamada System V AMD64**: argumentos en `edi`/`esi`, retorno en `eax`,
+  alineación de 16 bytes en los `call`. Es lo que hace posible el driver en C.
+- **Reubicación por copia** para leer símbolos de datos de libc (`extern stdin`) bajo
+  `-no-pie`.
+- `%include` de un header de solo `%define` (`juego.inc`) para compartir constantes sin
+  emitir símbolos duplicados — el original mezclaba includes con ensamblado por separado y
+  terminaba duplicando código entre objetos.
+- **Secuencias de escape ANSI** para limpiar la pantalla y colorear, en lugar de llamar a
+  `system("clear")`.
+- `section .note.GNU-stack` para que el enlazador no marque la pila como ejecutable.
+- **C** para el driver de pruebas, y **Docker** multietapa.
+
+### Capturas
+
+**Ya están**, cuatro, en `src/assets/media/projects/zorro-ocas/` (las sacó Thiago; falta
+commitearlas). Son una partida seguida, que es la mejor forma de contar el juego sin
+explicarlo:
+
+- `1.jpeg` — la posición inicial: las 17 ocas arriba, el zorro en D5, `Ocas 17 · Comidas 0`.
+- `2.jpeg` y `3.jpeg` — las ocas empiezan a bajar y se abre un hueco en C3.
+- `4.jpeg` — **el zorro comió**: está en C3 y el marcador pasó a `Ocas 16 · Comidas 1`.
+
+Se ve bien lo que importa: los emojis alineados, las reglas al costado en vez de debajo, y
+el contador cambiando.
+
+Si alguna vez hacen falta dos más: el mismo tablero en `--ascii`, para mostrar el respaldo
+cuando la terminal no mide bien los emojis, y la salida de
+`docker-compose run --rm pruebas` con las 55 líneas en verde.
+
+---
+
+## Motor de Cassandra (`cassandra-engine`)
+
+**Dónde está.** `~/Escritorio/project-porfolio/proyectos/cassandra-flight-app` ·
+<https://github.com/Porfolio-Pacheco-Thiago/cassandra-flight-app> · commits `24a4143` y
+`f68e26f`. Repositorio heredado del grupo (con Matías Bartellone e Iván Maximoff).
+
+**Estaba roto por el paso del tiempo, no por el código.** El clúster no arrancaba, ningún
+cliente podía conectarse y el proyecto no compilaba. Nada de eso era una regresión: el
+certificado se venció, las dependencias transitivas se actualizaron más allá del toolchain,
+y dos carreras de arranque que siempre habían estado ahí empezaron a perderse.
+
+### Docker
+
+**Ya tenía**: un `docker-compose.yml` en la raíz y un `Dockerfile` por *crate*. Levantaba
+un clúster multi-nodo escalable con `--scale node=N`. Pero no arrancaba, por dos cosas:
+
+- El *healthcheck* del primer seed usaba `nc`, **que no viene en la imagen de rust**.
+  Fallaba siempre, el contenedor quedaba `unhealthy` y `docker-compose up` moría con
+  *"dependency failed to start"*. Ahora la sonda va por bash contra `/dev/tcp` y apunta al
+  9090, que el nodo abre último — es la señal correcta de que terminó de arrancar.
+- Docker reparte las IPs dinámicas desde el principio de la subred, así que un nodo
+  escalado **se quedaba con la `.3`** antes de que arrancara el segundo seed, que la tiene
+  fija, y el `up` moría con *"Address already in use"*. Se separó con
+  `ip_range: 192.168.100.16/28`.
+
+Se le agregaron los clientes como servicios detrás de un *profile*, para que `up` levante
+solo el clúster, y un script que hace todo el recorrido solo:
+
+```bash
+./scripts/simulacion.sh
+```
+
+Levanta el clúster, **espera a que los nodos entren de verdad** —cuenta los que están
+`Active` en el metadata, no un `sleep` a ojo—, carga la base si no lo está, pone los
+aviones a volar y abre la aplicación. Al cerrar la ventana corta el simulador.
+
+### El front
+
+Es una aplicación de escritorio: un mapa mundial con los aviones moviéndose en vivo, hecha
+con **egui** y **walkers** sobre tiles de Mapbox. Va por fuera de Docker porque necesita
+ventana, placa de video y salida a internet.
+
+**Cuatro cosas estaban mal, y una salía cara:**
+
+- Cada avión **releía el PNG del disco y creaba una textura nueva en cada cuadro**. Con
+  veinte vuelos en pantalla eran veinte lecturas de archivo sesenta veces por segundo. Y la
+  ruta era relativa al directorio de ejecución, así que desde otro lado no había aviones.
+  Ahora se dibujan con polígonos, coloreados por estado y apuntando al destino.
+- El marcador de aeropuerto era **el emoji de una escuela pintado de negro sobre un mapa
+  oscuro**. Ahora se dibuja, y no depende de la fuente del sistema.
+- Los cartelitos del mapa pintaban el texto de negro sobre una caja negra.
+- Los recuadros flotantes se anclan contra la pantalla y no contra el mapa, así que
+  **quedaban encima del panel lateral**.
+
+**El rediseño.** La aplicación arrancaba con el tema claro por defecto de egui pegado a un
+mapa oscuro, y la pantalla se partía al medio. Ahora la paleta es de la misma familia fría
+que los tiles, con un acento ámbar que es el complementario del azul del mapa: un avión o
+una fila seleccionada se despegan del fondo sin subir la saturación.
+
+El panel pasó a tres vistas con jerarquía: **aeropuertos** con buscador y filas clickeables
+—antes solo se podía elegir acertándole al ícono en el mapa—, **vuelos** con código,
+destino y pastilla de estado, y **ficha del vuelo** con barra de progreso del recorrido y de
+combustible, que cambia de color cuando baja. Más referencia de colores, estados vacíos, y
+el vuelo seleccionado con halo y su curva al destino.
+
+La aplicación acepta nodo, usuario, contraseña y aeropuerto por línea de comandos; sin
+argumentos pregunta como antes.
+
+### Resumen
+
+Una **base de datos distribuida al estilo Cassandra escrita en Rust desde cero**, y una
+aplicación de seguimiento de vuelos que la usa como si fuera Cassandra de verdad.
+
+No usa ninguna librería de Cassandra. Están implementados a mano el protocolo binario CQL
+—`STARTUP`, `AUTHENTICATE`, `QUERY`, `PREPARE`, `EXECUTE`, `BATCH`, `REGISTER`—, el lexer y
+el parser de CQL, el motor de queries, el particionado por token, la replicación, el
+gossip, el hinted handoff y el read repair. Son **18.400 líneas solo en el nodo**, repartidas
+en 150 archivos.
+
+**Cómo se arma el clúster.** Un nodo entra conectándose al *seed listener* del primer seed,
+que le manda la lista de nodos y le asigna una posición y un rango de tokens. De ahí en
+adelante cada nodo hace gossip una vez por segundo con otro nodo al azar, así que todos
+convergen a la misma vista sin que nadie coordine. Cada nodo usa siete puertos consecutivos:
+clientes, delegación de queries, data access, metadata, gossip, seed listener y hinted
+handoff.
+
+**Qué pasa cuando un nodo se cae.** Las queries que le tocaban se guardan como *hints* y se
+le entregan cuando vuelve; los rangos se recalculan y los datos se redistribuyen fila por
+fila entre los que quedan. Salir del clúster con `exit` no es lo mismo que matar el
+contenedor: el nodo reparte sus datos antes de irse. Y cuando una lectura con consistencia
+fuerte devuelve réplicas que no coinciden, el **read repair** las compara y arregla la que
+quedó vieja.
+
+**Para qué sirve todo eso.** La aplicación de vuelos es el caso de uso que lo justifica: el
+estado del vuelo se lee con **consistencia fuerte** (QUORUM) y el seguimiento —posición,
+altitud, velocidad, combustible— con **consistencia débil** (ONE), que son dos caminos
+distintos por dentro de la base. El simulador mueve los aviones por fases —despegue,
+crucero, descenso— calculando la distancia restante con la fórmula de Haversine, y escribe
+las posiciones desde varias conexiones en paralelo contra nodos distintos.
+
+Toda la comunicación cliente–nodo va por **TLS**, con validación de la IP contra el
+certificado. Las contraseñas se guardan hasheadas con argon2.
+
+### Tecnologías
+
+Leídas de los `Cargo.toml` y del código:
+
+- **Rust**, en un workspace de cinco *crates*: `node` (18.400 líneas), `flight_app`
+  (3.300), `simulator` (2.100), `test-client` (800) y `node_handler` (130).
+- **rustls** para el TLS de las dos puntas, con certificado autofirmado y validación por
+  IP; **openssl** para cifrar el tráfico entre nodos; **argon2** para las contraseñas.
+- **murmur3** para el hash del particionado por token, que es lo que decide qué nodo es
+  dueño de cada fila.
+- **serde** con `serde_json`, `serde_yaml` y `rmp-serde` para la metadata, la configuración
+  y los mensajes entre nodos.
+- **egui / eframe** y **walkers** para la aplicación gráfica, con tiles de **Mapbox**
+  (estilo `NavigationNight`) y respaldo en **OpenStreetMap** cuando no hay token.
+- **termion** para el monitor del clúster, que pinta los nodos por estado.
+- **Docker** y Docker Compose, con red de subred fija y rangos separados para las IPs
+  estáticas y las dinámicas.
+- **GitHub Actions** con build, tests y `clippy` bajo `-Dwarnings`.
+
+### Capturas
+
+Cuatro, en `capturas/` del propio repositorio. **Faltan copiar** a
+`src/assets/media/projects/cassandra-engine/`.
+
+- `0-antes.png` — cómo se veía antes del rediseño, útil como comparación.
+- `1-aeropuertos.png` — la lista de aeropuertos con el buscador y el mapa mundial.
+- `2-vuelos.png` — los vuelos de Ezeiza, con los aviones coloreados por estado en vuelo.
+- `3-detalle-vuelo.png` — la ficha de un vuelo, con el progreso del recorrido.
+
+Falta una del **monitor del clúster** (`docker-compose logs -f monitor`), que es la que
+muestra que abajo hay cuatro nodos y no una base y ya.
+
+### Para la demo
+
+`./scripts/simulacion.sh` y listo. El paso por defecto está calibrado para que **la tanda
+entera dure alrededor de un minuto** —medido: 63 y 64 segundos, de los cuales unos 59 son
+de vuelo—, que es lo que entra en una grabación. Con `-p 0.2` son dos minutos y medio, y con
+`-p 0.05` casi diez.
+
+Entre tomas, `--recargar` resetea los vuelos a Ezeiza.
+
+Lo que más rinde mostrar, en orden: el monitor con los cuatro nodos activos, la aplicación
+con los aviones saliendo, y un vuelo seleccionado con su curva al destino y el progreso
+avanzando.
+
+### Dos cosas pendientes que no son de código
+
+- **El token de Mapbox estaba escrito dentro de `flight_app.rs`**, en un repositorio
+  público. GitHub bloqueó el push por eso. Se sacó del código —ahora sale de `MAPBOX_TOKEN`
+  o de un archivo que no se versiona—, pero **sigue en el historial**: conviene revocarlo
+  desde la cuenta de Mapbox, que es la de Iván.
+- La `private_key.pem` del certificado autofirmado está versionada en los cuatro *crates*.
+  Para un certificado de demo no es grave, pero queda raro en un portfolio.
