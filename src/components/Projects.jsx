@@ -189,6 +189,14 @@ export default function Projects() {
                                     ) : marca.imagen && (
                                         <img className="project-marca" src={marca.imagen} alt="" loading="lazy" decoding="async" />
                                     )}
+                                    {/* El logo apaisado, para la franja de la tarjeta
+                                        abierta. Es un archivo aparte del chico porque los
+                                        dos huecos tienen proporciones muy distintas —2.3:1
+                                        cerrada contra más de 5:1 abierta— y una sola pieza
+                                        no sirve para los dos. */}
+                                    {marca.grande && (
+                                        <img className="project-marca-grande" src={marca.grande} alt="" loading="lazy" decoding="async" />
+                                    )}
                                     {portada.animada || portada.claro ? (
                                         // Las tres conviven en el DOM y el CSS elige: la
                                         // quieta que corresponda al tema mientras la

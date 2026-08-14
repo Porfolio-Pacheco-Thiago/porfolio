@@ -104,12 +104,21 @@ export function getVideos(carpeta) {
  *    quieta no alcanzaba para contar que son tres cosas distintas coordinándose.
  *
  * @param {string} carpeta
- * @returns {{imagen?: string, videos: Array<{src: string, poster?: string}>}}
+ * @returns {{imagen?: string, grande?: string, videos: Array<{src: string, poster?: string}>}}
  */
 export function getMarca(carpeta) {
     const logos = getMedia(carpeta).filter(m => ES_LOGO.test(m.nombre));
+    const imagenes = logos.filter(m => m.tipo === 'imagen');
+    // Un proyecto puede traer dos logos, marcados por el nombre igual que en la línea
+    // de tiempo: `logo-grande.png` es el apaisado y `logo.jpeg` el chico. Van a huecos
+    // distintos —el chico a la tarjeta cerrada, el grande a la franja de arriba de la
+    // abierta— porque los huecos tienen proporciones muy distintas: 2.3:1 el de la
+    // cerrada y más de 5:1 el de la abierta.
+    const grande = imagenes.find(m => ES_APAISADO.test(m.nombre));
     return {
-        imagen: logos.find(m => m.tipo === 'imagen')?.src,
+        // Con un solo logo, ese sirve para los dos huecos.
+        imagen: imagenes.find(m => !ES_APAISADO.test(m.nombre))?.src ?? grande?.src,
+        grande: grande?.src,
         // Ya vienen ordenados por nombre desde `getMedia`, que es de dónde sale el
         // orden del bucle: el número del archivo es el turno. Se lleva también la
         // portada —`getMedia` la empareja por nombre— porque un video que no llega a

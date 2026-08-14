@@ -322,8 +322,11 @@
     --marca-zoom: 1.45;
 }
 
+/* Dos placas porque son dos archivos con fondos distintos: el logo chico es una
+   captura de la terminal, con su marco gris; el grande viene sobre blanco. */
 [data-proyecto="zorro-ocas"] .project-media.con-marca {
     --marca-placa: #3f3f3f;
+    --marca-placa-grande: #fff;
     --marca-zoom: 1;
 }
 
@@ -380,6 +383,29 @@
        tocan los bordes del hueco, y pasarse les come las letras. */
     transform: scale(var(--marca-zoom, 1));
     transition: opacity 0.3s ease;
+}
+
+/* El logo apaisado ocupa la franja de arriba de la tarjeta abierta, en lugar de la
+   captura. Va por encima de las dos capas de abajo —la marca chica y la tapa— porque
+   mientras está no tienen nada que aportar. Su placa puede ser distinta de la de la
+   marca chica: son archivos distintos y cada uno trae su propio fondo. */
+.project-marca-grande {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 0.15rem 0.4rem;
+    background: var(--marca-placa-grande, var(--marca-placa));
+    opacity: 0;
+    /* Entra con el mismo retardo con el que se va la marca chica, así el cambio ocurre
+       una vez que la ventana terminó de crecer y no se cruza con el cambio de alto. */
+    transition: opacity 0.35s ease 0.2s;
+}
+
+.project-card.expanded .project-marca-grande {
+    opacity: 1;
 }
 
 /* Abierta: la marca se corre y deja ver la captura que tiene detrás. El retardo la
@@ -698,11 +724,28 @@
    maquetado, más los 5px del `translateY` de los fotogramas. Con los 12px que había,
    la escena medía 418 y `.project-extra` —que lleva `overflow: hidden` para poder
    animar su despliegue— recortaba las puntas de arriba y abajo. */
+/* Con monitor la columna del aparato pesa más que la del texto, porque lo que limita
+   a un monitor es el ancho y no la altura. Va acotado a `:has(.es-monitor)` y no puesto
+   en `.fono-bloque` a secas: aplicado a todos, le angostaba la columna de texto a
+   Melodía, cuya descripción es la más larga de las ocho, y las líneas de más la
+   hacían pasarse del borde de abajo de la tarjeta. */
+.fono-bloque:has(.fono.es-monitor) {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+}
+
 .fono-escena {
     perspective: 1100px;
     display: grid;
     place-items: center;
-    padding: 1.6rem 0;
+    padding: 2.1rem 0;
+}
+
+/* El monitor necesita más que el celular: es más ancho, así que al girar su caja
+   crece más en términos absolutos aunque el ángulo sea menor. Medido: 535x310
+   quieto pasa a 548x360 girado, o sea 25px por lado, y el `translateY` de los
+   fotogramas se lleva 4 más para arriba. */
+.fono-escena:has(.fono.es-monitor) {
+    padding: 2.8rem 0;
 }
 
 /* El cuerpo del iPhone. El grosor **no** son caras 3D: es un `box-shadow` sólido
@@ -823,7 +866,10 @@
         var(--aparato-medio) 38%,
         var(--aparato-hondo) 60%,
         var(--aparato-brillo) 100%);
-    width: min(330px, 92%, 44vh);
+    /* Lo que manda es el 96% de la columna; el literal y el `vh` están para que en
+       pantallas muy anchas o muy bajas no se desborde. Antes el tope eran 330px, que
+       dejaba 185px de columna sin usar. */
+    width: min(485px, 90%, 58vh);
     padding: 4px 4px 5px;
     border-radius: 7px;
     /* Menos canto que el celular: un monitor es un panel fino, no un ladrillo. */
@@ -866,7 +912,7 @@
 }
 
 .project-card.is-reproduciendo .fono.es-monitor {
-    width: min(430px, 96%);
+    width: min(620px, 96%);
 }
 
 /* La proporción la fija la pantalla y el celular la envuelve: así el bisel no
