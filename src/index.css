@@ -167,12 +167,27 @@
      para el grosor —que es un `box-shadow` y no caras 3D— y uno para los detalles
      (los botones del costado, el pie del monitor).
 
-     **En oscuro es plateada y en claro es negra**, que es al revés de lo que se
+     **En oscuro son claras y en claro son negras**, que es al revés de lo que se
      esperaría de un aparato. La razón es el fondo: en oscuro el aparato se apoya
      sobre `#1a1a1a` y una carcasa negra desaparecía contra la página; en claro se
      apoya sobre el verde de `--bg-primary`, donde la negra recorta perfecto. El
      material sigue al contraste, no al objeto real. La pantalla queda negra en los
-     dos temas: una pantalla apagada es negra y punto. */
+     dos temas: una pantalla apagada es negra y punto.
+
+     Y son dos metales distintos, uno por aparato: el celular va en el dorado de los
+     iPhone y el monitor en aluminio. En claro los dos vuelven al mismo negro, así que
+     esa distinción solo existe en oscuro — que es donde hay carcasa que mirar. */
+  /* El dorado es `#f6e0c9`. Las otras seis paradas salen de ahí: dos más claras para
+     el reflejo de la chapa y tres más oscuras para el canto y los detalles, que es lo
+     que le da volumen a una pieza dibujada plana. */
+  --fono-luz: #fbf0e4;
+  --fono-medio: #f6e0c9;
+  --fono-hondo: #e0c3a4;
+  --fono-brillo: #f9e9d8;
+  --fono-canto: #cfae8b;
+  --fono-canto-claro: #ead3b7;
+  --fono-detalle: #ddc0a0;
+
   --aparato-luz: #f2f2f5;
   --aparato-medio: #d2d2da;
   --aparato-hondo: #babac4;
@@ -248,7 +263,17 @@
   --proy-barra: color-mix(in srgb, var(--accent) 62%, var(--bg-card));
 
   /* La carcasa negra, que es la original: en claro el aparato se apoya sobre el
-     verde de la página y recorta sin ayuda. Ver la nota del tema oscuro. */
+     verde de la página y recorta sin ayuda, así que los dos metales del tema oscuro
+     —el dorado del celular y el aluminio del monitor— vuelven acá al mismo negro.
+     Ver la nota del tema oscuro. */
+  --fono-luz: #3a3a41;
+  --fono-medio: #16161a;
+  --fono-hondo: #0b0b0f;
+  --fono-brillo: #2c2c33;
+  --fono-canto: #1b1b20;
+  --fono-canto-claro: #2f2f36;
+  --fono-detalle: #3d3d45;
+
   --aparato-luz: #3a3a41;
   --aparato-medio: #16161a;
   --aparato-hondo: #0b0b0f;

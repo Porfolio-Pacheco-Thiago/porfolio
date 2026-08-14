@@ -317,10 +317,27 @@
 
 [data-proyecto="specforge"] .project-media.con-marca {
     --marca-placa: #0c0c0c;
+    --marca-zoom: 1.3;
 }
 
 [data-proyecto="zorro-ocas"] .project-media.con-marca {
     --marca-placa: #3f3f3f;
+    --marca-zoom: 1.1;
+}
+
+/* Los tres videos son iconos chicos en un lienzo cuadrado de 1500px: casi todo lo que
+   se recorta al acercar es lienzo vacío, de ahí que aguanten el acercamiento más
+   grande de los cinco. */
+[data-proyecto="distributed-systems"] .project-media.con-marca {
+    --marca-zoom: 1.36;
+}
+
+[data-proyecto="cassandra-engine"] .project-media.con-marca {
+    --marca-zoom: 1.15;
+}
+
+[data-proyecto="monopoly"] .project-media.con-marca {
+    --marca-zoom: 1.0;
 }
 
 .project-marca {
@@ -335,9 +352,20 @@
     object-fit: contain;
     /* El aire que separa al logo del marco. Va como padding y no como un contenedor
        aparte porque `object-fit` se calcula dentro de la caja de contenido, así que
-       el padding lo achica sin deformarlo. */
-    padding: 0.55rem 1.1rem;
+       el padding lo achica sin deformarlo. Es poco a propósito: `contain` ya deja
+       márgenes propios —el hueco es 2.4:1 y ningún logo tiene esa proporción— y
+       sumarle padding encima los dejaba diminutos. */
+    padding: 0.15rem 0.4rem;
     background: var(--marca-placa);
+    /* El acercamiento final. `contain` mete la pieza entera y ahí se planta, aunque
+       le sobre lugar a los costados; esto la agranda por encima de ese tope y lo que
+       se pasa lo recorta `.project-media`. Se puede porque lo que se recorta es el
+       propio margen del archivo, no dibujo: los tres videos de sistemas distribuidos
+       son iconos chicos centrados en un lienzo cuadrado de 1500px, y el logo de
+       Cassandra y el de Zorro tienen aire de sobra alrededor.
+       Los dos wordmarks —Monopoly y SpecForge— van casi sin acercar: son anchos, ya
+       tocan los bordes del hueco, y pasarse les come las letras. */
+    transform: scale(var(--marca-zoom, 1));
     transition: opacity 0.3s ease;
 }
 
@@ -349,10 +377,9 @@
     transition: opacity 0.35s ease 0.2s;
 }
 
-/* Sin captura debajo, abrir descubriría el ícono de respaldo. Le pasa a SpecForge, que
-   no tiene ninguna imagen más que su logo: ahí la marca se queda, porque el logo dice
-   más que el microscopio genérico. */
-.project-media.con-marca:has(.project-img-placeholder) .project-marca {
+/* Sin captura debajo no hay nada que descubrir, así que la marca se queda también con
+   la tarjeta abierta. Le pasa a SpecForge, cuyo único archivo es su propio logo. */
+.project-media.con-marca:not(:has(.project-cover)) .project-marca {
     opacity: 1;
 }
 
@@ -652,11 +679,17 @@
     align-items: center;
 }
 
+/* El aire de arriba y abajo no es decorativo: al girar, la caja del aparato crece.
+   Con el celular medido —205×394 quieto— el peor caso del giro (rotateY pasando por
+   0, con el rotateZ de -11°) es 276×426, o sea 32px más alto de lo que ocupa
+   maquetado, más los 5px del `translateY` de los fotogramas. Con los 12px que había,
+   la escena medía 418 y `.project-extra` —que lleva `overflow: hidden` para poder
+   animar su despliegue— recortaba las puntas de arriba y abajo. */
 .fono-escena {
     perspective: 1100px;
     display: grid;
     place-items: center;
-    padding: 0.75rem 0;
+    padding: 1.6rem 0;
 }
 
 /* El cuerpo del iPhone. El grosor **no** son caras 3D: es un `box-shadow` sólido
@@ -667,17 +700,21 @@
     /* Acotado también por el alto disponible: la tarjeta abierta ya no crece, así que
        un celular más ancho es un celular que se sale por abajo. */
     width: min(205px, 60%, 26vh);
-    padding: 8px;
+    /* El bisel. Fino a propósito: los marcos gordos son de un teléfono viejo, y acá
+       además le comen lugar a la pantalla, que es lo que se vino a ver. El radio de
+       la pantalla es este valor menos el del cuerpo, para que las dos curvas sean
+       concéntricas. */
+    padding: 4px;
     background: linear-gradient(145deg,
-        var(--aparato-luz) 0%,
-        var(--aparato-medio) 38%,
-        var(--aparato-hondo) 60%,
-        var(--aparato-brillo) 100%);
+        var(--fono-luz) 0%,
+        var(--fono-medio) 38%,
+        var(--fono-hondo) 60%,
+        var(--fono-brillo) 100%);
     border-radius: 30px;
     box-shadow:
         /* el canto */
-        7px 5px 0 -2px var(--aparato-canto),
-        11px 8px 0 -4px var(--aparato-canto-claro),
+        7px 5px 0 -2px var(--fono-canto),
+        11px 8px 0 -4px var(--fono-canto-claro),
         /* la sombra en el piso */
         0 28px 60px rgb(var(--sombra-rgb) / 0.5);
     animation: fono-girar 16s ease-in-out infinite;
@@ -695,7 +732,7 @@
     position: absolute;
     width: 2px;
     border-radius: 2px;
-    background: var(--aparato-detalle);
+    background: var(--fono-detalle);
 }
 
 .fono-lateral-izq {
@@ -766,9 +803,16 @@
    Y un plano ancho se escorza mucho más que uno angosto: la mitad de la pantalla se
    volvía ilegible. De ahí su propio juego de fotogramas, con la mitad de amplitud. */
 .fono.es-monitor {
+    /* Aluminio, contra el dorado del celular: son dos aparatos distintos y conviene
+       que se lean como tales. Los tokens salen de index.css, uno por tema. */
+    background: linear-gradient(145deg,
+        var(--aparato-luz) 0%,
+        var(--aparato-medio) 38%,
+        var(--aparato-hondo) 60%,
+        var(--aparato-brillo) 100%);
     width: min(330px, 92%, 44vh);
-    padding: 7px 7px 8px;
-    border-radius: 9px;
+    padding: 4px 4px 5px;
+    border-radius: 7px;
     /* Menos canto que el celular: un monitor es un panel fino, no un ladrillo. */
     box-shadow:
         5px 4px 0 -2px var(--aparato-canto),
@@ -817,7 +861,7 @@
 .fono-pantalla {
     aspect-ratio: 1 / 2;
     width: 100%;
-    border-radius: 23px;
+    border-radius: 26px;
     overflow: hidden;
     background: #000;
 }

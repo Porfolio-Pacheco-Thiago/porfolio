@@ -15,7 +15,7 @@ export const projectMeta = {
     // la org y no a un fork nuestro, para no romper la atribución de los commits.
     melodia: { Icon: FiMusic, repo: 'https://github.com/Melodia-ID2' },
     vibetrip: { Icon: FaPlane, repo: 'https://github.com/Porfolio-Pacheco-Thiago/vibe-trip', pantalla: 'monitor' },
-    'cassandra-engine': { Icon: SiApachecassandra, repo: 'https://github.com/Porfolio-Pacheco-Thiago/cassandra-flight-app' },
+    'cassandra-engine': { Icon: SiApachecassandra, repo: 'https://github.com/Porfolio-Pacheco-Thiago/cassandra-flight-app', pantalla: 'monitor' },
     // RabbitMQ y no un ícono genérico de red: el middleware es lo que define al
     // proyecto —los latidos, la elección de líder y el reparto por hash van todos
     // por ahí—, igual que Cassandra define al de al lado.

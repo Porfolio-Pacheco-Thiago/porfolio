@@ -209,7 +209,12 @@ export default function Projects() {
                                             loading="lazy"
                                             decoding="async"
                                         />
-                                    ) : (
+                                    ) : hayMarca ? null : (
+                                        // El ícono es el último recurso, para cuando no hay
+                                        // ni captura ni logo. Antes se dibujaba igual detrás
+                                        // de la marca y se le colaba encima: le pasaba a
+                                        // SpecForge, cuyo único archivo es su logo, así que
+                                        // `getCover` no devuelve nada y este bloque entraba.
                                         <div className="project-img-placeholder">
                                             <span className="project-icon">{Icon && <Icon />}</span>
                                         </div>
