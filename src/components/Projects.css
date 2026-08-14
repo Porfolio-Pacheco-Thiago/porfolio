@@ -293,6 +293,69 @@
     object-position: center;
 }
 
+/* ── La marca: lo que llena la ventana con la tarjeta cerrada ─────────────
+   Cerrada, la tarjeta muestra el logo del proyecto; al abrirse el logo se va y
+   aparece la captura, que es la que tiene algo para contar cuando hay lugar. Es el
+   mismo mecanismo que las tres versiones de `portada` de más abajo: las dos piezas
+   conviven en el DOM y acá se elige cuál se ve.
+
+   La placa que rellena lo que sobra **no** es blanco puro, y no es la misma para todos:
+   cada logo trae su propio fondo y la placa lo copia, así el relleno no se ve como una
+   caja alrededor del logo sino como parte de él. Los valores salen de muestrear la
+   esquina de cada archivo, no de elegirlos a ojo:
+
+     - SpecForge  `#0c0c0c`, el negro sobre el que está dibujado su ASCII
+     - Zorro      `#3f3f3f`, el marco de la ventana de terminal de su captura
+     - el resto   el gris claro del tema claro del sitio, porque sus logos son
+                  transparentes y no tienen fondo que copiar. Los tres videos de
+                  sistemas distribuidos vienen sobre `#fdfdfd`, a seis puntos de ese
+                  gris, así que apoyan sin junta visible. */
+.project-media.con-marca {
+    --marca-placa: #f7faf8;
+    background: var(--marca-placa);
+}
+
+[data-proyecto="specforge"] .project-media.con-marca {
+    --marca-placa: #0c0c0c;
+}
+
+[data-proyecto="zorro-ocas"] .project-media.con-marca {
+    --marca-placa: #3f3f3f;
+}
+
+.project-marca {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    /* `contain` y no `cover`: son logos, y un logo recortado es un logo roto. Los
+       wordmarks son mucho más apaisados que la ventana y los videos son cuadrados,
+       así que en los dos casos sobra lugar; lo que sobra lo rellena la placa. */
+    object-fit: contain;
+    /* El aire que separa al logo del marco. Va como padding y no como un contenedor
+       aparte porque `object-fit` se calcula dentro de la caja de contenido, así que
+       el padding lo achica sin deformarlo. */
+    padding: 0.55rem 1.1rem;
+    background: var(--marca-placa);
+    transition: opacity 0.3s ease;
+}
+
+/* Abierta: la marca se corre y deja ver la captura que tiene detrás. El retardo la
+   deja irse recién cuando la ventana terminó de crecer, para que no se cruce el
+   cambio de imagen con el cambio de alto. */
+.project-card.expanded .project-marca {
+    opacity: 0;
+    transition: opacity 0.35s ease 0.2s;
+}
+
+/* Sin captura debajo, abrir descubriría el ícono de respaldo. Le pasa a SpecForge, que
+   no tiene ninguna imagen más que su logo: ahí la marca se queda, porque el logo dice
+   más que el microscopio genérico. */
+.project-media.con-marca:has(.project-img-placeholder) .project-marca {
+    opacity: 1;
+}
+
 /* ── Tapa en tres versiones: quieta por tema, y animada al abrir ──────────
    Las tres están en el DOM y acá se elige cuál se ve. Es CSS y no un cambio de `src`
    en JS porque así la animada ya está decodificada cuando la tarjeta se abre: si se

@@ -5,7 +5,8 @@ import { useLang } from '../context/lang-context';
 import { projectMeta } from '../data/projects';
 import Gallery from './ui/Gallery';
 import PhoneDemo from './ui/PhoneDemo';
-import { getCover, getPortada, getVideos, getImagenes } from '../lib/media';
+import LogoBucle from './ui/LogoBucle';
+import { getCover, getPortada, getVideos, getImagenes, getMarca } from '../lib/media';
 import WireFigure from './ui/WireFigure';
 import './Projects.css';
 
@@ -83,6 +84,10 @@ export default function Projects() {
                     // tema y animada— o una imagen común. Ver `getPortada`.
                     const portada = getPortada(carpeta);
                     const cover = portada.oscuro ?? getCover(carpeta);
+                    // La marca —el logo, o los videítos que se turnan— se ve con la
+                    // tarjeta cerrada y le deja el lugar a la captura al abrirla.
+                    const marca = getMarca(carpeta);
+                    const hayMarca = Boolean(marca.imagen || marca.videos.length);
                     // Los videos se van al celular y la galería se queda con las
                     // imágenes, sin repetir la que ya se ve como tapa.
                     const videos = getVideos(carpeta);
@@ -119,6 +124,9 @@ export default function Projects() {
                         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                         <div
                             key={item.id}
+                            // La placa sobre la que se apoya la marca depende del logo, y
+                            // el logo del proyecto: ver `--marca-placa` en Projects.css.
+                            data-proyecto={item.id}
                             className={`project-card reveal-fade ${isExpanded ? 'expanded' : ''} ${reproduciendoId === item.id ? 'is-reproduciendo' : ''}`}
                             style={{
                                 // Escalonado acotado: cada tarjeta se revela por su cuenta al
@@ -154,7 +162,17 @@ export default function Projects() {
                                     ícono queda como respaldo para los que todavía no tienen.
                                     `alt` vacío a propósito: el título está al lado, así que
                                     nombrarla otra vez solo repite. */}
-                                <div className="project-media">
+                                <div className={`project-media ${hayMarca ? 'con-marca' : ''}`}>
+                                    {/* La marca va primero y en absoluto, encima de la
+                                        tapa. Las dos conviven en el DOM y el CSS decide
+                                        cuál se ve según la tarjeta esté abierta o
+                                        cerrada — el mismo mecanismo que ya usaban las
+                                        tres versiones de `portada`. */}
+                                    {marca.videos.length > 0 ? (
+                                        <LogoBucle className="project-marca" videos={marca.videos} />
+                                    ) : marca.imagen && (
+                                        <img className="project-marca" src={marca.imagen} alt="" loading="lazy" decoding="async" />
+                                    )}
                                     {portada.animada || portada.claro ? (
                                         // Las tres conviven en el DOM y el CSS elige: la
                                         // quieta que corresponda al tema mientras la

@@ -80,10 +80,44 @@ export function getMedia(carpeta) {
 
 /**
  * Solo los videos de una carpeta, en el mismo orden que `getMedia`.
+ *
+ * Los logos quedan afuera aunque sean videos: tienen su lugar propio —el recuadro de
+ * la tarjeta cerrada, ver `getMarca`— y colarlos acá los mandaba a la pantalla del
+ * celular, mezclados con las demos y con un botón cada uno en la botonera.
+ *
  * @param {string} carpeta
  */
 export function getVideos(carpeta) {
-    return getMedia(carpeta).filter(m => m.tipo === 'video');
+    return getMedia(carpeta).filter(m => m.tipo === 'video' && !ES_LOGO.test(m.nombre));
+}
+
+/**
+ * La marca de un proyecto: lo que se ve en la ventana **con la tarjeta cerrada**, en
+ * lugar de la captura. Sale de los archivos que empiezan con `logo`, la misma
+ * convención que ya usaba la línea de tiempo.
+ *
+ * Puede venir en dos formas y son excluyentes:
+ *
+ *  - una imagen suelta (`logo.png`, `logo.svg`), que es el caso normal;
+ *  - varios videos numerados (`logo-1-nube.mp4`, `logo-2-base.mp4`, …), que se turnan
+ *    en bucle. Los usa el proyecto de sistemas distribuidos, donde una sola pieza
+ *    quieta no alcanzaba para contar que son tres cosas distintas coordinándose.
+ *
+ * @param {string} carpeta
+ * @returns {{imagen?: string, videos: Array<{src: string, poster?: string}>}}
+ */
+export function getMarca(carpeta) {
+    const logos = getMedia(carpeta).filter(m => ES_LOGO.test(m.nombre));
+    return {
+        imagen: logos.find(m => m.tipo === 'imagen')?.src,
+        // Ya vienen ordenados por nombre desde `getMedia`, que es de dónde sale el
+        // orden del bucle: el número del archivo es el turno. Se lleva también la
+        // portada —`getMedia` la empareja por nombre— porque un video que no llega a
+        // arrancar sin portada no dibuja nada.
+        videos: logos
+            .filter(m => m.tipo === 'video')
+            .map(({ src, poster }) => ({ src, poster })),
+    };
 }
 
 /**
@@ -95,9 +129,14 @@ export function getVideos(carpeta) {
  */
 export function getImagenes(carpeta, excluir) {
     // Las portadas quedan afuera: ya se ven arriba de la tarjeta y las tres son la
-    // misma imagen, así que en la galería serían tres repeticiones.
+    // misma imagen, así que en la galería serían tres repeticiones. Los logos también:
+    // se ven en la ventana con la tarjeta cerrada, y de paso un wordmark apaisado
+    // metido entre capturas cuadradas descuadraba la grilla de la galería.
     return getMedia(carpeta).filter(
-        m => m.tipo === 'imagen' && m.src !== excluir && !ES_PORTADA.test(m.nombre),
+        m => m.tipo === 'imagen'
+            && m.src !== excluir
+            && !ES_PORTADA.test(m.nombre)
+            && !ES_LOGO.test(m.nombre),
     );
 }
 
@@ -218,7 +257,10 @@ export function getCover(carpeta) {
     const elegida = medios.find(m => m.tipo === 'imagen' && /^cover\./i.test(m.nombre));
     if (elegida) return elegida.src;
 
-    const imagen = medios.find(m => m.tipo === 'imagen');
+    // El logo queda afuera: es la marca de la tarjeta cerrada, no una captura. Sin esto,
+    // un proyecto cuyo único archivo es su logo —SpecForge— lo mostraba dos veces, y la
+    // segunda recortada por el `cover` de la tapa.
+    const imagen = medios.find(m => m.tipo === 'imagen' && !ES_LOGO.test(m.nombre));
     if (imagen) return imagen.src;
     return medios.find(m => m.tipo === 'video' && m.poster)?.poster;
 }
