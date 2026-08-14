@@ -329,8 +329,15 @@
 
 /* Los tres videos son iconos chicos en un lienzo cuadrado de 1500px: casi todo lo que
    se recorta al acercar es lienzo vacío, de ahí que aguanten el acercamiento más
-   grande de los cinco. */
+   grande de los cinco.
+
+   Y su lienzo es blanco puro, así que la placa también. El gris claro que usan los
+   demás dejaba una junta visible alrededor del video: seis puntos de diferencia
+   alcanzan para que se vea el rectángulo. El `#fdfdfd` que se midió antes salió de
+   una miniatura escalada —el remuestreo ensucia los bordes—; a tamaño nativo las
+   cuatro esquinas y los cuatro bordes de los tres archivos dan #ffffff. */
 [data-proyecto="distributed-systems"] .project-media.con-marca {
+    --marca-placa: #fff;
     --marca-zoom: 1.36;
 }
 
