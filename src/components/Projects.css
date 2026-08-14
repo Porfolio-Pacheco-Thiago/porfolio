@@ -335,10 +335,14 @@
    demás dejaba una junta visible alrededor del video: seis puntos de diferencia
    alcanzan para que se vea el rectángulo. El `#fdfdfd` que se midió antes salió de
    una miniatura escalada —el remuestreo ensucia los bordes—; a tamaño nativo las
-   cuatro esquinas y los cuatro bordes de los tres archivos dan #ffffff. */
+   cuatro esquinas y los cuatro bordes de los tres archivos dan #ffffff.
+
+   El acercamiento lo manda el más apretado de los tres, porque comparten el valor.
+   Midiendo el dibujo a lo largo de los 3s de cada uno, el tope de la nube es 1.36 y
+   el de la base de datos 1.26: a 1.36 el segundo perdía los bordes. */
 [data-proyecto="distributed-systems"] .project-media.con-marca {
     --marca-placa: #fff;
-    --marca-zoom: 1.36;
+    --marca-zoom: 1.18;
 }
 
 [data-proyecto="cassandra-engine"] .project-media.con-marca {
