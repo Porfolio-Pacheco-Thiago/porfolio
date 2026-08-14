@@ -317,12 +317,14 @@
 
 [data-proyecto="specforge"] .project-media.con-marca {
     --marca-placa: #0c0c0c;
-    --marca-zoom: 1.3;
+    /* Su PNG trae 33,6% del ancho en margen negro —146px de un lado y 137 del
+       otro sobre 843—, así que el tope antes de tocar el dibujo es 1.51. */
+    --marca-zoom: 1.45;
 }
 
 [data-proyecto="zorro-ocas"] .project-media.con-marca {
     --marca-placa: #3f3f3f;
-    --marca-zoom: 1.1;
+    --marca-zoom: 1;
 }
 
 /* Los tres videos son iconos chicos en un lienzo cuadrado de 1500px: casi todo lo que
