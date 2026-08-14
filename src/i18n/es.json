@@ -199,23 +199,39 @@
         "id": "vibetrip",
         "title": "VibeTrip",
         "shortDesc": "Un ecosistema full-stack integral para el descubrimiento de viajes, modelado a partir de TripAdvisor.",
-        "fullDesc": "Una plataforma full-stack robusta inspirada en TripAdvisor, diseñada para facilitar el descubrimiento de viajes a nivel global. Cuenta con una interfaz UI/UX fluida para la exploración de destinos, reseñas dinámicas generadas por usuarios y herramientas interactivas de planificación de viajes, todo respaldado por una arquitectura de base de datos altamente optimizada.",
+        "fullDesc": "Plataforma web full-stack colaborativa para la planificación y descubrimiento de viajes. Integra un backend asíncrono robusto y un frontend moderno de alto rendimiento con mapas interactivos (Leaflet), tableros analíticos (ECharts) y gestión completa de multimedia. Desarrollado en equipo aplicando CI/CD con GitHub Actions para testing automatizado, validación de migraciones de base de datos y despliegue en VPS.",
         "tags": [
-          "Full Stack",
-          "Web App",
-          "Viajes"
+          "FastAPI",
+          "Next.js 15",
+          "PostgreSQL",
+          "React 19",
+          "TypeScript"
         ]
       },
       {
         "id": "cassandra-engine",
         "title": "Motor de Cassandra",
         "shortDesc": "Un motor de base de datos Cassandra distribuido y de alto rendimiento, programado completamente desde cero en Rust.",
-        "fullDesc": "Una implementación desde cero y sin dependencias externas de un motor de base de datos distribuida Apache Cassandra, escrito íntegramente en Rust. Este sistema se adhiere estrictamente a los protocolos nativos de Cassandra —incluyendo el protocolo binario CQL y el protocolo Gossip para el descubrimiento de nodos P2P—, garantizando tolerancia a fallos, alta disponibilidad y una rigurosa consistencia de datos a través de clústeres distribuidos.",
+        "fullDesc": "Implementación desde cero en Rust de una base de datos distribuida estilo Apache Cassandra de más de 18.400 líneas de código. Cuenta con parser nativo de CQL, particionado por token mediante Murmur3, descubrimiento por Gossip, hinted handoff y reparación en lectura. Incluye una aplicación gráfica de simulación aérea para demostrar lecturas concurrentes bajo distintos niveles de consistencia (QUORUM/ONE) sobre TLS.",
         "tags": [
           "Rust",
-          "Bases de Datos",
           "Sistemas Distribuidos",
-          "Bajo Nivel"
+          "NoSQL",
+          "TLS",
+          "eGUI"
+        ]
+      },
+      {
+        "id": "distributed-systems",
+        "title": "Money Laundering Analysis",
+        "shortDesc": "Pipeline distribuido y tolerante a fallos para el análisis en paralelo de extractos bancarios masivos.",
+        "fullDesc": "Pipeline distribuido y tolerante a fallos diseñado para la ingesta y análisis en paralelo de extractos bancarios masivos. Implementa el algoritmo Bully para la elección de líder y garantiza un procesamiento de semántica exactly-once mediante checkpoints atómicos y deduplicación por número de secuencia. Escala dinámicamente mediante ruteo particionado por hash sobre RabbitMQ, recuperándose automáticamente de caídas de nodos sin perder estado.",
+        "tags": [
+          "Sistemas Distribuidos",
+          "RabbitMQ",
+          "Python",
+          "Tolerancia a Fallos",
+          "Docker"
         ]
       },
       {
@@ -234,34 +250,39 @@
         "id": "predictive-models",
         "title": "Modelos Predictivos y Análisis con IA",
         "shortDesc": "Una suite de modelos avanzados de machine learning para análisis predictivo, clustering y clasificación de sentimientos con PNL.",
-        "fullDesc": "Diseñé un portafolio diverso de pipelines avanzados de machine learning. Esto abarca modelos predictivos robustos para el pronóstico del clima y precios inmobiliarios aprovechando Random Forest y XGBoost, junto con sofisticadas arquitecturas de ensamble de PNL (Voting/Stacking, Naive Bayes, Redes Neuronales) para un análisis de sentimientos de reseñas de películas altamente preciso.",
+        "fullDesc": "Portafolio integral de Machine Learning y PLN aplicado a cinco datasets complejos. Abarca desde la ingesta de big data y detección multivariada de anomalías con Isolation Forest, hasta clasificadores por ensamble (XGBoost, Random Forest, Stacking). Destaca un pipeline de análisis de sentimientos que evalúa desde regresión logística sobre TF-IDF hasta redes neuronales Bi-LSTM en Keras, manejando negaciones y lematización en español.",
         "tags": [
           "Machine Learning",
           "Python",
-          "PNL",
-          "XGBoost"
+          "PLN",
+          "XGBoost",
+          "TensorFlow"
         ]
       },
       {
         "id": "monopoly",
         "title": "Motor de Monopoly",
         "shortDesc": "Un motor de juego de Monopoly completamente funcional construido desde cero en Java, con gestión de estado compleja y temas de UI personalizados.",
-        "fullDesc": "Desarrollé un motor de juego de Monopoly personalizado completamente desde cero utilizando Java, demostrando un sólido dominio de la Programación Orientada a Objetos (POO). El proyecto cuenta con una implementación robusta de mecánicas de juego complejas —incluyendo gestión de propiedades, subastas y lógica bancaria— complementada con interfaces gráficas personalizadas.",
+        "fullDesc": "Simulador interactivo de escritorio basado en una arquitectura orientada a objetos con estricta separación MVC. El motor desacopla la lógica del modelo de la interfaz gráfica, permitiendo configurar completamente el tablero, reglas y personajes mediante archivos externos sin modificar el código core. Implementa patrones de diseño avanzados como Abstract Factory para la gestión dinámica de las acciones del jugador.",
         "tags": [
-          "Java",
-          "POO",
-          "Juego"
+          "Java 17",
+          "JavaFX",
+          "MVC",
+          "Design Patterns",
+          "Maven"
         ]
       },
       {
         "id": "zorro-ocas",
         "title": "Zorro y Ocas (Assembly)",
         "shortDesc": "Un juego de terminal basado en lógica programado estrictamente en lenguaje Ensamblador para dominar la arquitectura de CPU y gestión de memoria.",
-        "fullDesc": "Un riguroso proyecto técnico que consiste en un juego de terminal basado en lógica desarrollado íntegramente en lenguaje Ensamblador de bajo nivel. Este proyecto fue construido explícitamente para dominar la gestión de memoria de bajo nivel, la arquitectura de CPU y la interacción directa con el hardware, presentando una ejecución algorítmica altamente optimizada.",
+        "fullDesc": "Motor de juego de estrategia clásico desarrollado íntegramente en Assembly x86-64 (sintaxis Intel) para Linux. Escrito respetando estrictamente la convención de llamadas System V AMD64, permitiendo la vinculación directa con un driver de 55 pruebas unitarias automatizadas en C. Implementa un renderizado eficiente en terminal con soporte para secuencias de escape ANSI y caracteres UTF-8/Emojis.",
         "tags": [
-          "Assembly",
-          "Bajo Nivel",
-          "Juego"
+          "Assembly x86-64",
+          "C",
+          "NASM",
+          "System V ABI",
+          "Low Level"
         ]
       }
     ]

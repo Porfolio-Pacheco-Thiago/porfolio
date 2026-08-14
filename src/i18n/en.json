@@ -199,23 +199,39 @@
         "id": "vibetrip",
         "title": "VibeTrip",
         "shortDesc": "A comprehensive, full-stack travel discovery ecosystem modeled after TripAdvisor.",
-        "fullDesc": "A robust, full-stack platform inspired by TripAdvisor, engineered to facilitate global travel discovery. It features a seamless UI/UX for destination exploration, dynamic user-generated reviews, and interactive trip-planning tools, all backed by a highly optimized database architecture.",
+        "fullDesc": "A collaborative full-stack web platform for trip planning and discovery. It combines a robust asynchronous backend with a modern, high-performance frontend featuring interactive maps (Leaflet), analytics dashboards (ECharts) and full media management. Built as a team, applying CI/CD with GitHub Actions for automated testing, database migration validation and VPS deployment.",
         "tags": [
-          "Full Stack",
-          "Web App",
-          "Travel"
+          "FastAPI",
+          "Next.js 15",
+          "PostgreSQL",
+          "React 19",
+          "TypeScript"
         ]
       },
       {
         "id": "cassandra-engine",
         "title": "Cassandra Engine",
         "shortDesc": "A high-performance, distributed Cassandra database engine engineered entirely from scratch in Rust.",
-        "fullDesc": "A zero-dependency, ground-up implementation of an Apache Cassandra distributed database engine written entirely in Rust. This system strictly adheres to native Cassandra protocols—including the CQL binary protocol and Gossip protocol for peer-to-peer node discovery—ensuring fault tolerance, high availability, and rigorous data consistency across distributed clusters.",
+        "fullDesc": "A from-scratch Rust implementation of an Apache Cassandra-style distributed database, over 18,400 lines of code. It features a native CQL parser, token partitioning via Murmur3, Gossip-based discovery, hinted handoff and read repair. It ships with a graphical flight simulation app that demonstrates concurrent reads under different consistency levels (QUORUM/ONE) over TLS.",
         "tags": [
           "Rust",
-          "Databases",
           "Distributed Systems",
-          "Low-Level"
+          "NoSQL",
+          "TLS",
+          "eGUI"
+        ]
+      },
+      {
+        "id": "distributed-systems",
+        "title": "Money Laundering Analysis",
+        "shortDesc": "A fault-tolerant distributed pipeline for analysing massive bank statements in parallel.",
+        "fullDesc": "A fault-tolerant distributed pipeline built to ingest and analyse massive bank statements in parallel. It implements the Bully algorithm for leader election and guarantees exactly-once processing semantics through atomic checkpoints and sequence-number deduplication. It scales dynamically through hash-partitioned routing over RabbitMQ, recovering from node failures automatically without losing state.",
+        "tags": [
+          "Distributed Systems",
+          "RabbitMQ",
+          "Python",
+          "Fault Tolerance",
+          "Docker"
         ]
       },
       {
@@ -234,34 +250,39 @@
         "id": "predictive-models",
         "title": "Predictive Models & AI Analysis",
         "shortDesc": "A suite of advanced machine learning models for predictive analytics, clustering, and NLP sentiment classification.",
-        "fullDesc": "Engineered a diverse portfolio of advanced machine learning pipelines. This encompasses robust predictive models for weather forecasting and real estate pricing leveraging Random Forest and XGBoost, alongside sophisticated NLP ensemble architectures (Voting/Stacking, Naive Bayes, Neural Networks) for highly accurate film review sentiment analysis.",
+        "fullDesc": "A comprehensive Machine Learning and NLP portfolio applied to five complex datasets. It spans big-data ingestion and multivariate anomaly detection with Isolation Forest through to ensemble classifiers (XGBoost, Random Forest, Stacking). It is anchored by a sentiment analysis pipeline that evaluates everything from logistic regression over TF-IDF to Bi-LSTM neural networks in Keras, handling negation and lemmatisation in Spanish.",
         "tags": [
           "Machine Learning",
           "Python",
           "NLP",
-          "XGBoost"
+          "XGBoost",
+          "TensorFlow"
         ]
       },
       {
         "id": "monopoly",
         "title": "Monopoly Game Engine",
         "shortDesc": "A fully functional Monopoly game engine built from scratch in Java, featuring complex state management and custom UI themes.",
-        "fullDesc": "Developed a custom Monopoly game engine entirely from scratch using Java, demonstrating a strong command of Object-Oriented Programming (OOP). The project features a robust implementation of complex game mechanics—including property management, player auctions, and banking logic—complemented by custom graphical interfaces.",
+        "fullDesc": "An interactive desktop simulator built on an object-oriented architecture with strict MVC separation. The engine decouples model logic from the graphical interface, letting the board, rules and characters be configured entirely through external files without touching core code. It implements advanced design patterns such as Abstract Factory for dynamic management of player actions.",
         "tags": [
-          "Java",
-          "OOP",
-          "Game"
+          "Java 17",
+          "JavaFX",
+          "MVC",
+          "Design Patterns",
+          "Maven"
         ]
       },
       {
         "id": "zorro-ocas",
         "title": "Zorro y Ocas (Assembly)",
         "shortDesc": "A logic-based terminal game programmed strictly in Assembly language to master CPU architecture and memory management.",
-        "fullDesc": "A rigorous technical project consisting of a logic-based terminal game developed entirely in low-level Assembly language. This project was explicitly built to master low-level memory management, CPU architecture, and direct hardware interaction, featuring highly optimized algorithmic execution.",
+        "fullDesc": "A classic strategy game engine developed entirely in x86-64 Assembly (Intel syntax) for Linux. Written in strict accordance with the System V AMD64 calling convention, which allows it to link directly against a driver of 55 automated unit tests written in C. It implements efficient terminal rendering with support for ANSI escape sequences and UTF-8 characters and emoji.",
         "tags": [
-          "Assembly",
-          "Low-Level",
-          "Game"
+          "Assembly x86-64",
+          "C",
+          "NASM",
+          "System V ABI",
+          "Low Level"
         ]
       }
     ]
