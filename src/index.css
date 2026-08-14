@@ -162,6 +162,25 @@
   --proy-marco: color-mix(in srgb, var(--accent) 52%, var(--border));
   --proy-barra: color-mix(in srgb, var(--accent) 62%, var(--bg-secondary));
 
+  /* La carcasa del celular y del monitor de la sección de proyectos. Es un metal
+     dibujado a mano: cuatro paradas de degradado para la chapa, dos tonos de canto
+     para el grosor —que es un `box-shadow` y no caras 3D— y uno para los detalles
+     (los botones del costado, el pie del monitor).
+
+     **En oscuro es plateada y en claro es negra**, que es al revés de lo que se
+     esperaría de un aparato. La razón es el fondo: en oscuro el aparato se apoya
+     sobre `#1a1a1a` y una carcasa negra desaparecía contra la página; en claro se
+     apoya sobre el verde de `--bg-primary`, donde la negra recorta perfecto. El
+     material sigue al contraste, no al objeto real. La pantalla queda negra en los
+     dos temas: una pantalla apagada es negra y punto. */
+  --aparato-luz: #f2f2f5;
+  --aparato-medio: #d2d2da;
+  --aparato-hondo: #babac4;
+  --aparato-brillo: #e9e9ef;
+  --aparato-canto: #a3a3ae;
+  --aparato-canto-claro: #c6c6d1;
+  --aparato-detalle: #adadb8;
+
   /* Color de la marca. No sigue al acento a propósito: es el verde del logo tal
      como estaba en los PNG originales (#43ec67 en oscuro, #018c1e en claro), y
      una marca no tiene por qué moverse cuando se retoca la paleta. */
@@ -227,6 +246,16 @@
      no contra el casi-blanco de `--bg-secondary`. */
   --proy-marco: color-mix(in srgb, var(--accent) 62%, var(--bg-card));
   --proy-barra: color-mix(in srgb, var(--accent) 62%, var(--bg-card));
+
+  /* La carcasa negra, que es la original: en claro el aparato se apoya sobre el
+     verde de la página y recorta sin ayuda. Ver la nota del tema oscuro. */
+  --aparato-luz: #3a3a41;
+  --aparato-medio: #16161a;
+  --aparato-hondo: #0b0b0f;
+  --aparato-brillo: #2c2c33;
+  --aparato-canto: #1b1b20;
+  --aparato-canto-claro: #2f2f36;
+  --aparato-detalle: #3d3d45;
 
   /* En claro el contorno del nombre es más grueso: ver la nota del tema oscuro. */
   --borde-nombre-svg: 220;
