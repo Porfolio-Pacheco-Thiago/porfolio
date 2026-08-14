@@ -164,6 +164,7 @@
     "viewMore": "Más Información",
     "showLess": "Ver Menos",
     "demoHint": "Elegí una demo para verla en el celular. Tocá de nuevo para volver.",
+    "demoHintMonitor": "Elegí una captura para verla en el monitor. Tocá de nuevo para volver.",
     "player": {
       "label": "Controles de la demo",
       "of": "de",

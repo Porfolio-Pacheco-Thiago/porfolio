@@ -752,6 +752,62 @@
     100% { transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px); }
 }
 
+/* ── El otro chasis: un monitor ───────────────────────────────────────────
+   Mismo comportamiento y mismo código que el celular —gira, se endereza, tiene la
+   misma botonera y la misma barra—; lo único distinto es la carcasa, porque lo que
+   tiene que mostrar es apaisado. Una captura de escritorio en una pantalla 1:2
+   entraba de canto.
+
+   El giro es el mismo `fono-girar`, pero el monitor es ancho y a 26° de rotación en
+   Y un plano ancho se escorza mucho más que uno angosto: la mitad de la pantalla se
+   volvía ilegible. De ahí su propio juego de fotogramas, con la mitad de amplitud. */
+.fono.es-monitor {
+    width: min(330px, 92%, 44vh);
+    padding: 7px 7px 8px;
+    border-radius: 9px;
+    /* Menos canto que el celular: un monitor es un panel fino, no un ladrillo. */
+    box-shadow:
+        5px 4px 0 -2px #1b1b20,
+        8px 6px 0 -4px #2f2f36,
+        0 26px 55px rgb(var(--sombra-rgb) / 0.5);
+    animation-name: monitor-girar;
+    transform: rotateZ(-6deg) rotateY(-15deg) translateY(-4px);
+}
+
+@keyframes monitor-girar {
+    0% { transform: rotateZ(-6deg) rotateY(-15deg) translateY(-4px); }
+    50% { transform: rotateZ(-4deg) rotateY(13deg) translateY(4px); }
+    100% { transform: rotateZ(-6deg) rotateY(-15deg) translateY(-4px); }
+}
+
+/* El pie: cuello y base en un solo elemento, dibujados con dos fondos. Cuelga por
+   debajo del marco y gira con él, como los botones del canto del celular. Es plano
+   a propósito — ver la nota sobre `preserve-3d` más arriba. */
+.fono-pie {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 34%;
+    height: 13px;
+    transform: translateX(-50%);
+    background:
+        /* la base, apoyada abajo */
+        linear-gradient(#2f2f36, #16161a) bottom / 100% 4px no-repeat,
+        /* el cuello, angosto y centrado */
+        linear-gradient(#3a3a41, #26262c) top 0 left 50% / 22% 10px no-repeat;
+    border-radius: 0 0 3px 3px;
+}
+
+/* Enderezado, el monitor no se escala: ya ocupa casi todo el ancho de su columna y
+   un `scale` lo sacaría del bloque, que recorta. */
+.fono.es-monitor.is-demo {
+    transform: rotateZ(0deg) rotateY(0deg);
+}
+
+.project-card.is-reproduciendo .fono.es-monitor {
+    width: min(430px, 96%);
+}
+
 /* La proporción la fija la pantalla y el celular la envuelve: así el bisel no
    entra en la cuenta y la pantalla calza exacta con el video (720×1440). */
 .fono-pantalla {
@@ -760,6 +816,19 @@
     border-radius: 23px;
     overflow: hidden;
     background: #000;
+}
+
+/* 16:9 y esquinas casi rectas. Y `contain` en vez de `cover`: las capturas de estos
+   tres proyectos no son 16:9 —Monopoly es casi 4:3 y Zorro más cuadrado todavía— así
+   que recortarlas les comería el tablero. Lo que sobra queda en negro, que es lo que
+   se ve en un monitor cuando la imagen no llena la pantalla. */
+.fono.es-monitor .fono-pantalla {
+    aspect-ratio: 16 / 9;
+    border-radius: 3px;
+}
+
+.fono.es-monitor .fono-pantalla :is(img, video) {
+    object-fit: contain;
 }
 
 /* El video es **intocable**: sin `pointer-events` no hay menú contextual ni

@@ -4,7 +4,7 @@ import { SiGithub } from 'react-icons/si';
 import { useLang } from '../context/lang-context';
 import { projectMeta } from '../data/projects';
 import Gallery from './ui/Gallery';
-import PhoneDemo from './ui/PhoneDemo';
+import DemoDispositivo from './ui/DemoDispositivo';
 import LogoBucle from './ui/LogoBucle';
 import { getCover, getPortada, getVideos, getImagenes, getMarca } from '../lib/media';
 import WireFigure from './ui/WireFigure';
@@ -77,7 +77,7 @@ export default function Projects() {
 
             <div className="projects-grid" ref={grillaRef}>
                 {items.map((item, index) => {
-                    const { Icon, repo } = projectMeta[item.id] ?? {};
+                    const { Icon, repo, pantalla } = projectMeta[item.id] ?? {};
                     const isExpanded = expandedId === item.id;
                     const carpeta = `projects/${item.id}`;
                     // Un proyecto puede traer una tapa en tres versiones —quieta por
@@ -88,10 +88,26 @@ export default function Projects() {
                     // tarjeta cerrada y le deja el lugar a la captura al abrirla.
                     const marca = getMarca(carpeta);
                     const hayMarca = Boolean(marca.imagen || marca.videos.length);
-                    // Los videos se van al celular y la galería se queda con las
+                    // Los videos se van al aparato y la galería se queda con las
                     // imágenes, sin repetir la que ya se ve como tapa.
                     const videos = getVideos(carpeta);
                     const imagenes = getImagenes(carpeta, cover);
+                    // En un monitor van también las capturas, no solo los videos: son
+                    // proyectos de escritorio y de web, y una captura apaisada dentro de
+                    // la pantalla del aparato se lee mucho mejor que en la grilla de la
+                    // galería.
+                    //
+                    // Se piden sin excluir la tapa —a diferencia de `imagenes`— porque
+                    // acá esa exclusión estorba: la tapa de Monopoly y la de Zorro son
+                    // capturas del programa, y dejarlas afuera le sacaba al monitor
+                    // justo la principal. Lo que sí se saca es la tapa explícita
+                    // (`cover.*`), que no es una captura sino la pieza de portada.
+                    const medios = pantalla === 'monitor'
+                        ? [
+                            ...getImagenes(carpeta).filter(m => !/^cover\./i.test(m.nombre)),
+                            ...videos,
+                        ]
+                        : videos;
 
                     // Descripción larga, tags y repo. Se arma una vez y se coloca en la
                     // columna del celular o suelto, según el proyecto tenga videos o no.
@@ -239,37 +255,40 @@ export default function Projects() {
                                         columna derecha; sin celular, uno debajo del otro. En los
                                         dos casos viven dentro del bloque expandible, así que en
                                         la vista chica no existen ni reciben foco. */}
-                                    {videos.length > 0 ? (
+                                    {medios.length > 0 ? (
                                         // `key` atado a si está abierta: al cerrar, el
                                         // componente se **remonta** y vuelve solo a su
-                                        // estado inicial —sin demo elegida, celular
+                                        // estado inicial —sin demo elegida, aparato
                                         // girando, video desmontado y por lo tanto en
                                         // silencio—. Es la forma idiomática de resetear
                                         // estado en React: nada de apagar cosas una por
                                         // una desde afuera ni de efectos de limpieza.
-                                        <PhoneDemo
+                                        <DemoDispositivo
                                             key={isExpanded ? 'abierta' : 'cerrada'}
-                                            videos={videos}
+                                            medios={medios}
+                                            dispositivo={pantalla === 'monitor' ? 'monitor' : 'fono'}
                                             label={item.title}
                                             onPlayingChange={va => setReproduciendoId(va ? item.id : null)}
                                         >
                                             {aparte}
-                                        </PhoneDemo>
+                                        </DemoDispositivo>
                                     ) : (
                                         aparte
                                     )}
 
-                                    {/* Con celular, la galería solo aparece si quedan
-                                        imágenes que mostrar; sin celular sigue siendo
-                                        la de siempre, marcador incluido. */}
-                                    {videos.length === 0 ? (
+                                    {/* Con aparato, la galería solo aparece si quedan
+                                        imágenes que él no se haya llevado; sin aparato
+                                        sigue siendo la de siempre, marcador incluido.
+                                        En un monitor no queda ninguna, porque se lleva
+                                        las capturas además de los videos. */}
+                                    {medios.length === 0 ? (
                                         <Gallery
                                             className="project-gallery"
                                             carpeta={carpeta}
                                             medios={imagenes}
                                             label={item.title}
                                         />
-                                    ) : imagenes.length > 0 && (
+                                    ) : imagenes.length > 0 && pantalla !== 'monitor' && (
                                         <Gallery
                                             className="project-gallery"
                                             carpeta={carpeta}

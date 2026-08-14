@@ -164,6 +164,7 @@
     "viewMore": "Learn More",
     "showLess": "Show Less",
     "demoHint": "Pick a demo to play it on the phone. Tap again to go back.",
+    "demoHintMonitor": "Pick a capture to view it on the monitor. Tap again to go back.",
     "player": {
       "label": "Demo controls",
       "of": "of",

@@ -1,19 +1,35 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    FiFastForward, FiMaximize, FiPause, FiPlay, FiRewind, FiVolume2, FiVolumeX,
+    FiFastForward, FiImage, FiMaximize, FiPause, FiPlay, FiRewind, FiVolume2, FiVolumeX,
 } from 'react-icons/fi';
 import { useLang } from '../../context/lang-context';
 
 /**
- * El celular de la referencia tamalsen: un iPhone en diagonal que gira sobre su
- * eje mostrando una captura. Al elegir una demo se endereza y reproduce ese
- * video adentro; al volver a tocar el mismo botón, vuelve a girar.
+ * El aparato de la referencia tamalsen: en diagonal, girando sobre su eje y
+ * mostrando algo en la pantalla. Al elegir un medio se endereza y lo pone de
+ * frente; al volver a tocar el mismo botón, vuelve a girar.
  *
- * Reemplaza a los videos de la galería: metidos en el hueco 4/3 entraban
- * completos pero chicos, y acá la pantalla tiene la proporción exacta del video.
+ * Viene en dos chasis, que es lo **único** que los diferencia:
+ *
+ *  - `fono`    — un iPhone vertical. Lo usa Melodía, que es una app de celular y
+ *                cuyas grabaciones son 720×1440.
+ *  - `monitor` — una pantalla apaisada sobre un pie. La usan los proyectos de
+ *                escritorio y web, cuyas capturas son apaisadas y en un celular
+ *                entrarían de canto.
+ *
+ * Todo lo demás —el giro, el enderezado, la botonera, la barra del reproductor—
+ * es el mismo código, porque es el mismo comportamiento.
+ *
+ * Acepta imágenes y videos mezclados. Un video trae la barra del reproductor; una
+ * imagen no, porque no hay nada que controlar. En reposo la pantalla muestra la
+ * primera imagen, o si no hay ninguna, la portada del primer video.
+ *
+ * Reemplaza a la galería: metidos en el hueco 4/3 los medios entraban completos
+ * pero chicos, y acá la pantalla tiene la proporción del aparato.
  *
  * @param {object} props
- * @param {Array<{nombre: string, src: string, poster?: string}>} props.videos
+ * @param {Array<{nombre: string, tipo: 'video'|'imagen', src: string, poster?: string}>} props.medios
+ * @param {'fono'|'monitor'} [props.dispositivo]  Chasis. Por defecto `fono`.
  * @param {string} props.label  Nombre del proyecto, para los textos accesibles.
  * @param {React.ReactNode} [props.children]  Va en la columna derecha, debajo de
  *   la barra del reproductor. Lo usa `Projects` para poner ahí los tags y el link
@@ -58,7 +74,9 @@ import { useLang } from '../../context/lang-context';
  *
  * El giro se apaga con `prefers-reduced-motion` desde el CSS.
  */
-export default function PhoneDemo({ videos, label, children, onPlayingChange, className = '', ...props }) {
+export default function DemoDispositivo({
+    medios, dispositivo = 'fono', label, children, onPlayingChange, className = '', ...props
+}) {
     const { t } = useLang();
     // `null` = en reposo, girando. Un número = esa demo, quieta y de frente.
     const [activa, setActiva] = useState(null);
@@ -77,9 +95,14 @@ export default function PhoneDemo({ videos, label, children, onPlayingChange, cl
     const [mudo, setMudo] = useState(false);
 
     const enDemo = activa !== null;
-    const video = enDemo ? videos[activa] : undefined;
-    // En reposo la pantalla muestra el poster del primero que tenga uno.
-    const reposo = videos.find(v => v.poster)?.poster;
+    const medio = enDemo ? medios[activa] : undefined;
+    // Solo un video trae reproductor. Una imagen se pone de frente y ya está: no hay
+    // aguja que mover ni volumen que bajar.
+    const video = medio?.tipo === 'video' ? medio : undefined;
+    // En reposo la pantalla muestra la primera imagen; si el proyecto solo tiene
+    // videos —el caso de Melodía— el poster del primero que tenga uno.
+    const reposo = medios.find(m => m.tipo === 'imagen')?.src
+        ?? medios.find(m => m.poster)?.poster;
 
     // Arranca la demo al elegirla. Va acá y no en el atributo `autoplay` porque
     // con audio los navegadores lo bloquean salvo que haya un gesto del usuario
@@ -128,6 +151,13 @@ export default function PhoneDemo({ videos, label, children, onPlayingChange, cl
         el?.getAnimations().forEach(a => {
             try { a.commitStyles(); a.cancel(); } catch { /* navegador sin commitStyles */ }
         });
+        // Pasar de un video a una imagen desmonta el `<video>` sin que dispare `pause`,
+        // igual que al apagar. Sin este aviso la tarjeta se quedaría con la ventana
+        // contraída, creyendo que todavía hay algo reproduciéndose.
+        if (medios[i].tipo !== 'video' && va) {
+            setVa(false);
+            onPlayingChange?.(false);
+        }
         setActiva(i);
         // Dos frames: al segundo ya está aplicada `is-demo`. Recién ahí se saca el
         // estilo en línea —que si no le ganaría a la regla— y la transición corre
@@ -171,9 +201,22 @@ export default function PhoneDemo({ videos, label, children, onPlayingChange, cl
                 {/* El grosor del celular es un `box-shadow` sólido y los botones
                     laterales son dos spans: no hay caras 3D de verdad, porque eso
                     exigiría `preserve-3d` y su costo por frame. */}
-                <div ref={fonoRef} className={`fono ${enDemo ? 'is-demo' : ''} ${volviendo ? 'is-volviendo' : ''}`}>
-                    <span className="fono-lateral fono-lateral-izq" aria-hidden="true" />
-                    <span className="fono-lateral fono-lateral-der" aria-hidden="true" />
+                <div
+                    ref={fonoRef}
+                    className={`fono es-${dispositivo} ${enDemo ? 'is-demo' : ''} ${volviendo ? 'is-volviendo' : ''}`}
+                >
+                    {/* El chasis. En el celular son los dos botones del canto; en el
+                        monitor, el cuello y la base del pie. En los dos casos son
+                        elementos planos: el volumen lo da el `box-shadow`, porque caras
+                        3D de verdad exigirían `preserve-3d`. */}
+                    {dispositivo === 'monitor' ? (
+                        <span className="fono-pie" aria-hidden="true" />
+                    ) : (
+                        <>
+                            <span className="fono-lateral fono-lateral-izq" aria-hidden="true" />
+                            <span className="fono-lateral fono-lateral-der" aria-hidden="true" />
+                        </>
+                    )}
                     <div className="fono-pantalla">
                         {video ? (
                             // Sin `controls` y sin subtítulos: los controles son los de
@@ -203,6 +246,11 @@ export default function PhoneDemo({ videos, label, children, onPlayingChange, cl
                                     setMudo(e.currentTarget.muted);
                                 }}
                             />
+                        ) : medio ? (
+                            // Una imagen elegida: se pone de frente en la pantalla, sin
+                            // barra debajo. `alt` vacío porque el botón que la puso ya
+                            // la nombra, y el nombre está a la vista.
+                            <img key={medio.nombre} src={medio.src} alt="" decoding="async" />
                         ) : (
                             reposo && <img src={reposo} alt="" loading="lazy" decoding="async" />
                         )}
@@ -211,19 +259,27 @@ export default function PhoneDemo({ videos, label, children, onPlayingChange, cl
             </div>
 
             <div className="fono-controles">
-                <p className="fono-ayuda">{t('projects.demoHint')}</p>
+                {/* La ayuda nombra el aparato que hay a la vista: "en el celular" sobre
+                    un monitor era una instrucción falsa. */}
+                <p className="fono-ayuda">
+                    {t(dispositivo === 'monitor' ? 'projects.demoHintMonitor' : 'projects.demoHint')}
+                </p>
 
                 <div className="fono-botones">
-                    {videos.map((v, i) => (
+                    {medios.map((m, i) => (
                         <button
-                            key={v.nombre}
+                            key={m.nombre}
                             type="button"
                             className={`fono-boton ${activa === i ? 'is-activa' : ''}`}
                             onClick={e => { e.stopPropagation(); elegir(i); }}
                             aria-pressed={activa === i}
                         >
-                            <FiPlay size={13} aria-hidden="true" />
-                            <span>{nombreDemo(t, v.nombre)}</span>
+                            {/* El ícono dice qué va a pasar al tocarlo: reproducir algo,
+                                o traer una captura al frente. */}
+                            {m.tipo === 'video'
+                                ? <FiPlay size={13} aria-hidden="true" />
+                                : <FiImage size={13} aria-hidden="true" />}
+                            <span>{nombreDemo(t, m.nombre)}</span>
                         </button>
                     ))}
                 </div>
@@ -240,7 +296,7 @@ export default function PhoneDemo({ videos, label, children, onPlayingChange, cl
                     El nombre del grupo describe qué controla, no de qué proyecto es:
                     con solo `label` anunciaba "Melodía, grupo", que no dice nada sobre
                     lo que hay adentro. */}
-                {enDemo && (
+                {video && (
                     <div
                         className="fono-barra"
                         role="group"
@@ -382,5 +438,10 @@ function nombreDemo(t, archivo) {
     const clave = `projects.demos.${base}`;
     const texto = t(clave);
     if (texto !== clave) return texto;
-    return base.replace(/[-_]/g, ' ').replace(/^./, c => c.toUpperCase());
+    // Sin traducción, el nombre del archivo prolijeado. El índice de adelante se cae:
+    // está para ordenar las capturas (`1-tablero`, `2-fichas`), no para leerse.
+    return base
+        .replace(/^\d+[-_]/, '')
+        .replace(/[-_]/g, ' ')
+        .replace(/^./, c => c.toUpperCase());
 }
