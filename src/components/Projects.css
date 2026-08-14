@@ -651,7 +651,9 @@
 .project-card.expanded .project-extra {
     max-height: 1400px;
     opacity: 1;
-    margin-bottom: 1rem;
+    /* Poco: en las tarjetas con aparato el bloque llega casi al pie de la tarjeta, y
+       cada píxel de acá es un píxel que el celular tiene para no cruzar el borde. */
+    margin-bottom: 0.25rem;
 }
 
 /* Descripción, tags y repo. Con celular esto cae en su columna derecha —de ahí que
@@ -737,7 +739,16 @@
     perspective: 1100px;
     display: grid;
     place-items: center;
-    padding: 2.1rem 0;
+    /* Asimétrico, y por eso no es un descuido. Arriba el aire tiene que cubrir lo que
+       la caja del aparato crece al girar; abajo no hace falta tanto, porque el giro
+       deja 33px de sobra de ese lado —el `translateY` de los fotogramas lo empuja
+       hacia arriba— y el padding de más era lo que hacía que el celular de Melodía
+       cruzara el borde inferior de su tarjeta. Con `place-items: center`, recortarlo
+       de abajo sube el aparato sin cambiarle el tamaño. */
+    padding: 2.1rem 0 0;
+    /* Y encima se lo sube un poco más. El desplazamiento va acá y no en `.fono`
+       porque ahí lo pisaría la animación del giro, que también es un `transform`. */
+    transform: translateY(-0.5rem);
 }
 
 /* El monitor necesita más que el celular: es más ancho, así que al girar su caja
