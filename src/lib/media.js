@@ -115,10 +115,13 @@ export function getMarca(carpeta) {
     // abierta— porque los huecos tienen proporciones muy distintas: 2.3:1 el de la
     // cerrada y más de 5:1 el de la abierta.
     const grande = imagenes.find(m => ES_APAISADO.test(m.nombre));
+    const chico = imagenes.find(m => !ES_APAISADO.test(m.nombre));
     return {
-        // Con un solo logo, ese sirve para los dos huecos.
-        imagen: imagenes.find(m => !ES_APAISADO.test(m.nombre))?.src ?? grande?.src,
-        grande: grande?.src,
+        // El respaldo va en los dos sentidos: con un solo logo, ese cubre los dos
+        // huecos. Es el caso de Monopoly, cuyo wordmark sirve igual de bien en la franja
+        // apaisada, y el de SpecForge y Cassandra.
+        imagen: chico?.src ?? grande?.src,
+        grande: grande?.src ?? chico?.src,
         // Ya vienen ordenados por nombre desde `getMedia`, que es de dónde sale el
         // orden del bucle: el número del archivo es el turno. Se lleva también la
         // portada —`getMedia` la empareja por nombre— porque un video que no llega a

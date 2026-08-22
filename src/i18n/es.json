@@ -213,13 +213,14 @@
         "id": "cassandra-engine",
         "title": "Motor de Cassandra",
         "shortDesc": "Un motor de base de datos Cassandra distribuido y de alto rendimiento, programado completamente desde cero en Rust.",
-        "fullDesc": "Implementación desde cero en Rust de una base de datos distribuida estilo Apache Cassandra de más de 18.400 líneas de código. Cuenta con parser nativo de CQL, particionado por token mediante Murmur3, descubrimiento por Gossip, hinted handoff y reparación en lectura. Incluye una aplicación gráfica de simulación aérea para demostrar lecturas concurrentes bajo distintos niveles de consistencia (QUORUM/ONE) sobre TLS.",
+        "fullDesc": "Desarrollo desde cero de un motor de base de datos distribuida peer-to-peer idéntico a Apache Cassandra, escrito en más de 18.400 líneas de Rust. La arquitectura implementa un anillo lógico con Consistent Hashing, descubrimiento vía Gossip Protocol y Seed Nodes, garantizando alta disponibilidad mediante Hinted Handoff, Read Repair y reconciliación Anti-Entropy con árboles de Merkle. Incluye un parser nativo completo para CQL, Coordinator Nodes y niveles de consistencia configurables (ONE, QUORUM, ALL). Su tolerancia a fallos y consistencia eventual se validan en tiempo real mediante una aplicación concurrente de simulación de vuelos.",
         "tags": [
           "Rust",
           "Sistemas Distribuidos",
-          "NoSQL",
-          "TLS",
-          "eGUI"
+          "P2P",
+          "Consistent Hashing",
+          "Motor DB",
+          "Consistencia Eventual"
         ]
       },
       {

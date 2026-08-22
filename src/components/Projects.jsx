@@ -20,6 +20,41 @@ export default function Projects() {
     const grillaRef = useRef(null);
     const items = getList('projects.items');
 
+    /**
+     * Corre un cambio de estado dentro de una View Transition, para que el navegador
+     * anime el reacomodo en vez de saltar.
+     *
+     * Lo necesita sobre todo el paso a reproducción: ahí no se mueve una propiedad sino
+     * el acomodo entero —el reparto de columnas, la posición de cada pieza en la grilla,
+     * el `display: contents` de los controles—, y nada de eso es animable con
+     * transiciones. Sin esto, todo se teletransporta mientras el ancho del monitor va
+     * viajando solo, que es lo que se veía mal.
+     */
+    const conTransicion = (cambio) => {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!document.startViewTransition || reduced) {
+            cambio();
+            return;
+        }
+        // Igual que en `toggle`: sin cortar la anterior, dos cambios seguidos encadenan
+        // morphs sobre capturas viejas.
+        activaRef.current?.skipTransition();
+        // Mientras dura el morph, la sección apaga sus propias transiciones. Son seis, de
+        // 0.85s, sobre las mismas propiedades que la View Transition ya está moviendo: la
+        // altura de la foto, el ancho y la pose del aparato, la opacidad del marco. La VT
+        // pinta capturas, así que esas transiciones siguen corriendo por debajo sin verse,
+        // y cuando la VT termina —a los 0.5s— todavía van por la mitad: el acomodo salta a
+        // un estado intermedio y recién ahí sigue deslizándose. Con un solo reloj el
+        // movimiento es uno solo.
+        document.documentElement.classList.add('morfando');
+        const transicion = document.startViewTransition(() => flushSync(cambio));
+        activaRef.current = transicion;
+        transicion.finished.finally(() => {
+            if (activaRef.current === transicion) activaRef.current = null;
+            document.documentElement.classList.remove('morfando');
+        });
+    };
+
     const toggle = (id) => {
         const cerrando = expandedId === id;
         // Se le clava el alto a la grilla antes de tocar nada. Las tarjetas que no se
@@ -72,12 +107,14 @@ export default function Projects() {
             <WireFigure kind="tetrahedron" detail={3} spin="flat" className="wire-decor at-right" size={720} line={7} seconds={115} tiltX={14} tiltZ={16} />
             <div className="section-header reveal">
                 <h2 className="section-title">{t('projects.title')}</h2>
-                <p className="section-subtitle">{t('projects.subtitle')}</p>
+                {/* Sin subtítulo: "Proyectos de Ingeniería Destacados" debajo de
+                    "Proyectos" no agregaba nada que el título no dijera ya. La clave
+                    sigue en i18n por si hace falta en otro lado, igual que `shortDesc`. */}
             </div>
 
             <div className="projects-grid" ref={grillaRef}>
                 {items.map((item, index) => {
-                    const { Icon, repo, pantalla } = projectMeta[item.id] ?? {};
+                    const { Icon, repo, pantalla, carrusel } = projectMeta[item.id] ?? {};
                     const isExpanded = expandedId === item.id;
                     const carpeta = `projects/${item.id}`;
                     // Un proyecto puede traer una tapa en tres versiones —quieta por
@@ -280,8 +317,10 @@ export default function Projects() {
                                             key={isExpanded ? 'abierta' : 'cerrada'}
                                             medios={medios}
                                             dispositivo={pantalla === 'monitor' ? 'monitor' : 'fono'}
+                                            auto={Boolean(carrusel)}
                                             label={item.title}
                                             onPlayingChange={va => setReproduciendoId(va ? item.id : null)}
+                                            conTransicion={conTransicion}
                                         >
                                             {aparte}
                                         </DemoDispositivo>

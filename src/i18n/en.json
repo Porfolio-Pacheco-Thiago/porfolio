@@ -213,13 +213,14 @@
         "id": "cassandra-engine",
         "title": "Cassandra Engine",
         "shortDesc": "A high-performance, distributed Cassandra database engine engineered entirely from scratch in Rust.",
-        "fullDesc": "A from-scratch Rust implementation of an Apache Cassandra-style distributed database, over 18,400 lines of code. It features a native CQL parser, token partitioning via Murmur3, Gossip-based discovery, hinted handoff and read repair. It ships with a graphical flight simulation app that demonstrates concurrent reads under different consistency levels (QUORUM/ONE) over TLS.",
+        "fullDesc": "From-scratch development of a distributed peer-to-peer database engine identical to Apache Cassandra, written in over 18,400 lines of Rust. The architecture implements a logical ring with Consistent Hashing, node discovery via Gossip Protocol and Seed Nodes, ensuring high availability through Hinted Handoff, Read Repair, and Anti-Entropy reconciliation using Merkle Trees. It features a fully functional native CQL parser, Coordinator Nodes, and configurable consistency levels (ONE, QUORUM, ALL). Its fault tolerance and eventual consistency mechanisms are validated in real-time through a concurrent flight tracking simulation application.",
         "tags": [
           "Rust",
+          "P2P",
           "Distributed Systems",
-          "NoSQL",
-          "TLS",
-          "eGUI"
+          "Consistent Hashing",
+          "DB Engine",
+          "Eventual Consistency"
         ]
       },
       {

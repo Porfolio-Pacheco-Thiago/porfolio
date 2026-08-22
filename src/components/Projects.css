@@ -52,6 +52,10 @@
        arranca de golpe y frena al final: a 0.45s se sentía un salto más que una
        animación. */
     --demo-anim: 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+    /* Lo que tarda el relevo del carrusel. Bastante menos que los 3s que se queda
+       cada pieza, para que el movimiento se lea como un relevo y no como un vaivén
+       permanente. */
+    --relevo: 0.6s;
     /* La banda clara que cruza el marco al pasar el mouse. Sale del acento para no
        salirse de la paleta: un tornasol como el de la referencia, sobre un sitio de
        un solo verde, se leería como un error de color. */
@@ -211,7 +215,13 @@
    lo liberaron los tags, que en reposo no se muestran. */
 .project-media {
     position: relative;
-    height: clamp(112px, 15.3vh, 156px);
+    /* Este alto es lo que fija el de la tarjeta cerrada, y por lo tanto el de la grilla
+       y el de la tarjeta abierta, que se dibuja encima ocupándola entera. Está calibrado
+       para que la sección entera —encabezado más grilla— entre en una pantalla: medido,
+       la sección mide 944px de los 953 disponibles, y los 93px que quedan por encima del
+       encabezado son el hueco que deja el navbar fijo. Subirlo más empieza a empujar la
+       grilla fuera de la ventana. */
+    height: clamp(120px, 16.3vh, 168px);
     /* El hueco a los tres lados restantes; abajo lo pone el padding del marco. */
     margin: var(--trazo) var(--trazo) 0;
     overflow: hidden;
@@ -330,6 +340,15 @@
     --marca-zoom: 1;
 }
 
+/* Su `logo-grande.png` es 2000x500, o sea 4:1, y la franja de la tarjeta abierta es
+   5.2:1. Con `contain` eso lo deja limitado por el alto: entraría a 840px de ancho y
+   dejaría unos 125px de placa a cada lado. Así que el hueco se adapta a la pieza en vez
+   de al revés — 1091 de ancho útil entre 4 son 273 de alto, más el padding de la marca.
+   Es el único proyecto con esta regla, porque es el único con un `-grande` propio. */
+[data-proyecto="zorro-ocas"].expanded .project-media {
+    height: clamp(200px, 29.2vh, 278px);
+}
+
 /* Los tres videos son iconos chicos en un lienzo cuadrado de 1500px: casi todo lo que
    se recorta al acercar es lienzo vacío, de ahí que aguanten el acercamiento más
    grande de los cinco.
@@ -348,7 +367,11 @@
     --marca-zoom: 1.18;
 }
 
+/* Sin placa: el PNG ya viene con transparencia, así que el logo se apoya directo sobre
+   el fondo de la tarjeta en los dos huecos. */
 [data-proyecto="cassandra-engine"] .project-media.con-marca {
+    --marca-placa: transparent;
+    --marca-placa-grande: transparent;
     --marca-zoom: 1.15;
 }
 
@@ -414,6 +437,17 @@
 .project-card.expanded .project-marca {
     opacity: 0;
     transition: opacity 0.35s ease 0.2s;
+}
+
+/* Con marca, la tapa no se dibuja. Mientras las placas eran opacas daba igual —quedaba
+   tapada de todos modos— pero la de Cassandra es transparente, y ahí la captura se veía
+   por detrás del logo. Sacándola queda el fondo del marco, que es el de la página.
+
+   No hace falta una excepción para la tarjeta abierta: desde que un proyecto con un solo
+   logo lo usa también en la franja apaisada, la tapa ya no era la capa visible en ningún
+   estado. */
+.project-media.con-marca .project-cover {
+    opacity: 0;
 }
 
 /* Sin captura debajo no hay nada que descubrir, así que la marca se queda también con
@@ -509,24 +543,28 @@
 /* La ampliación al pasar el mouse es para las capturas, que están muy recortadas y
    no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
    entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
-.project-card.expanded .project-media:hover:has(.es-animada) {
+.project-card.expanded .project-media:not(.con-marca):hover:has(.es-animada) {
     overflow: hidden;
 }
 
-.project-card.expanded .project-media:hover .project-cover.es-oscuro,
-.project-card.expanded .project-media:hover .project-cover.es-claro,
-.project-card.expanded .project-media:hover .project-cover.es-animada {
+.project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-oscuro,
+.project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-claro,
+.project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-animada {
     width: 100%;
     height: 100%;
     box-shadow: none;
 }
 
-.project-card.expanded .project-media:hover {
+/* Acotado a las franjas que muestran una captura. Donde la franja muestra un logo
+   —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
+   mejor: un logo ya se ve entero, y agrandarlo al pasar el mouse es movimiento sin
+   información. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
+.project-card.expanded .project-media:not(.con-marca):hover {
     /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
     overflow: visible;
 }
 
-.project-card.expanded .project-media:hover .project-cover {
+.project-card.expanded .project-media:not(.con-marca):hover .project-cover {
     height: min(58vh, 470px);
     /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
        bandas laterales que deja `contain`. */
@@ -645,7 +683,17 @@
 .project-extra {
     max-height: 0;
     opacity: 0;
-    overflow: hidden;
+    /* `clip` en vez de `hidden`, para poder pedirle un margen de recorte. El bloque
+       necesita recortar —es lo que hace que su despliegue se pueda animar con
+       `max-height`— pero el aparato que gira adentro se sale un poco de su caja, y
+       recortarlo justo en el borde le comía las puntas.
+       Antes esto se compensaba con padding en `.fono-escena`, o sea empujando el
+       aparato hacia adentro; el costo era una franja vacía entre la foto y el
+       aparato. Con el margen de recorte el aparato puede pintar afuera y el aire de
+       arriba vuelve a ser una decisión de composición y no una obligación técnica.
+       Donde no esté soportado se recorta en el borde, que es lo que hacía antes. */
+    overflow: clip;
+    overflow-clip-margin: 2.5rem;
 }
 
 .project-card.expanded .project-extra {
@@ -745,10 +793,10 @@
        hacia arriba— y el padding de más era lo que hacía que el celular de Melodía
        cruzara el borde inferior de su tarjeta. Con `place-items: center`, recortarlo
        de abajo sube el aparato sin cambiarle el tamaño. */
-    padding: 2.1rem 0 0;
+    padding: 0.8rem 0 0;
     /* Y encima se lo sube un poco más. El desplazamiento va acá y no en `.fono`
        porque ahí lo pisaría la animación del giro, que también es un `transform`. */
-    transform: translateY(-0.5rem);
+    transform: translateY(-0.95rem);
 }
 
 /* El monitor necesita más que el celular: es más ancho, así que al girar su caja
@@ -766,7 +814,7 @@
     position: relative;
     /* Acotado también por el alto disponible: la tarjeta abierta ya no crece, así que
        un celular más ancho es un celular que se sale por abajo. */
-    width: min(205px, 60%, 26vh);
+    width: min(215px, 62%, 27vh);
     /* El bisel. Fino a propósito: los marcos gordos son de un teléfono viejo, y acá
        además le comen lugar a la pantalla, que es lo que se vino a ver. El radio de
        la pantalla es este valor menos el del cuerpo, para que las dos curvas sean
@@ -831,8 +879,99 @@
    tamaño lo agrandaba 75px más allá de su caja de layout, y esa parte la recortaba
    el `overflow: hidden` del bloque expandible — se comían los bordes de arriba y
    abajo. Acá ya es grande por ancho; no necesita escalarse. */
+/* Mientras corre el morph, la sección no anima nada por su cuenta: la View Transition
+   es el único reloj. Ver la nota en `conTransicion`, en Projects.jsx. La bandera va en
+   `<html>` porque el morph es del documento entero, no de una tarjeta. */
+.morfando .project-card,
+.morfando .project-card * {
+    transition: none !important;
+}
+
+/* Y el giro del aparato se congela: la VT captura una imagen del antes y otra del
+   después, y si entre las dos el aparato siguió girando, el morph interpola entre dos
+   poses distintas y se ve un tirón. */
+.morfando .fono {
+    animation-play-state: paused;
+}
+
+/* ── El paso a reproducción, morfeado ────────────────────────────────────
+   Sin nombres, una View Transition hace un fundido cruzado de la página entera: el
+   acomodo igual cambia de golpe, solo que tapado por un fundido. Con nombres, el
+   navegador reconoce cada pieza a los dos lados del cambio y la lleva de una posición a
+   la otra — que es lo que hace falta acá, porque el aparato se muda de la mitad
+   izquierda al borde derecho y la descripción pasa de una columna angosta al ancho
+   completo.
+
+   Los nombres van sobre la tarjeta **abierta** y no sobre todas: un
+   `view-transition-name` repetido en el documento aborta la transición entera, y solo
+   hay una tarjeta abierta por vez. Van sobre `.fono-escena` y no sobre `.fono` porque
+   nombrar un elemento le crea un contexto de apilamiento propio, y `.fono` es el que
+   lleva la animación del giro. */
+.project-card.expanded .fono-escena {
+    view-transition-name: demo-aparato;
+}
+
+.project-card.expanded .project-aparte {
+    view-transition-name: demo-aparte;
+}
+
+.project-card.expanded .fono-botones {
+    view-transition-name: demo-botones;
+}
+
+::view-transition-group(demo-aparato),
+::view-transition-group(demo-aparte),
+::view-transition-group(demo-botones) {
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reproduciendo **en un monitor**, el bloque pasa a una sola columna: el monitor
+   arriba y la botonera, la barra y la descripción abajo. Un monitor a 620px no entra en
+   media fila, y la mitad de al lado no tiene nada que defender en ese momento — la foto
+   de arriba ya se contrajo y le cedió su alto.
+
+   Acotado al monitor a propósito. Aplicado también al celular, el bloque se hacía más
+   alto que la tarjeta y la descripción terminaba recortada por el `overflow` del bloque
+   expandible: el celular es angosto y alto, así que apilar le suma todo su alto en vez
+   de aprovechar el ancho que sobra.
+
+   Va después de `.fono-bloque:has(.fono.es-monitor)` porque tienen la misma
+   especificidad y desempata el orden. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) {
+    /* Ancho del monitor mientras se reproduce. Vive acá y no en la regla del aparato
+       porque lo necesitan dos: el propio monitor y la columna que lo aloja. */
+    --monitor-video: 915px;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-bloque {
+    /* El monitor se va contra el borde derecho y el reproductor ocupa lo que queda a su
+       izquierda.
+
+       Las dos pistas son **no intrínsecas** a propósito. Con la columna del monitor en
+       `auto`, la descripción —que abarca las dos— le vuelca encima su ancho de contenido
+       y la columna se lleva los 1088px enteros, dejando la del reproductor en cero. Es
+       el mismo reparto de pistas intrínsecas que ya había mordido con la botonera. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--monitor-video));
+    align-items: center;
+    /* Poco espacio entre renglones. El de la grilla es 1.5rem, pensado para la columna
+       de al lado; acá el renglón de abajo es la descripción y el de arriba lo ocupa el
+       monitor, que ya trae su propio aire en la escena. Sumados dejaban un vacío grande
+       justo debajo del aparato. */
+    row-gap: 0.35rem;
+    /* Y poco entre columnas: cada píxel de separación se lo saca a la barra, que con el
+       monitor a 885px es la que anda justa. */
+    column-gap: 0.6rem;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-escena {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    justify-self: end;
+}
+
 .project-card.is-reproduciendo .fono {
-    width: min(300px, 70%);
+    width: min(330px, 70%);
 }
 
 .project-card.is-reproduciendo .fono.is-demo {
@@ -922,8 +1061,155 @@
     transform: rotateZ(0deg) rotateY(0deg);
 }
 
+/* Más chico que sin reproducir, no más grande. Apilado el monitor ya no compite por
+   el ancho sino por el alto, y cada 100px de ancho son 56 de alto que le saca a la
+   descripción, que abajo tiene que entrar entera. */
 .project-card.is-reproduciendo .fono.es-monitor {
-    width: min(620px, 96%);
+    width: var(--monitor-video, 717px);
+}
+
+/* Y la escena deja de reservar aire para el giro: reproduciendo el monitor está
+   derecho, así que su caja ya no crece y ese margen no defiende nada. Son casi 80px
+   que le quedan a lo de abajo. */
+.project-card.is-reproduciendo .fono-escena {
+    padding-block: 0.4rem 0;
+}
+
+/* Apilada, los controles se reordenan en dos renglones en vez de cuatro:
+   el botón de la demo y la barra del reproductor comparten el primero, y la
+   descripción con los tags y el repo ocupan el segundo. Cada renglón que se ahorra es
+   alto que gana el monitor, que es lo que se vino a agrandar.
+
+   La barra deja de ocupar todo el ancho y se queda con el que tenía en la columna de
+   Melodía: una aguja de 1100px es imposible de apuntar, y el espacio que libera a los
+   costados es justamente donde entra el botón. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-controles {
+    /* `display: contents` disuelve la caja: sus tres hijos —botonera, barra y el bloque
+       de descripción— pasan a ser items de la grilla del bloque y se pueden colocar uno
+       por uno. Sin esto, los tres quedarían encerrados en la columna izquierda, y la
+       descripción a 370px de ancho se iría a diez renglones. */
+    display: contents;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-botones {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    justify-content: center;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-barra {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    /* Toda la columna: acá el ancho lo fija el hueco que deja el monitor, no un tope
+       propio. */
+    width: 100%;
+    /* Y adentro se aprieta todo lo que se puede. Con el monitor grande la columna queda
+       en poco más de 200px, y con el padding y las separaciones de la barra ancha el
+       botón de pantalla completa se salía por el costado. */
+    gap: 0.3rem;
+    padding: 0.7rem 0.5rem 1rem;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-transporte,
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios {
+    gap: 0.15rem;
+}
+
+/* En esta columna la barra mide unos 370px y el nombre de la pista no entra: se parte
+   en cuatro renglones y se le encima al transporte. Se va, y no se pierde nada — lo
+   dice el botón que está justo encima, y el proyecto lo dice el título de la tarjeta. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-pista {
+    display: none;
+}
+
+/* Por el mismo motivo se va el contador: en 370px cada control pelea por el lugar, y
+   el minutero es lo primero que se puede resignar — la aguja de abajo ya muestra por
+   dónde va. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-tiempos {
+    display: none;
+}
+
+/* Y el volumen deja de estar siempre a la vista: se guarda detrás de su propio botón y
+   sube al pasarle el mouse por encima. Es un control que casi nadie toca ocupando el
+   ancho de tres. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-barra {
+    /* La barra recorta —tiene esquinas redondeadas y fondos que se salen— pero el
+       volumen tiene que poder asomar por arriba. */
+    overflow: visible;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios {
+    position: relative;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-volumen {
+    position: absolute;
+    left: 50%;
+    /* Vertical con un cuarto de vuelta, y no con `writing-mode`: el control ya está
+       dibujado a mano con los pseudoelementos de la pista y el pulgar, y rotarlo los
+       lleva a todos sin tocar ninguno. El giro es antihorario, así que el cero queda
+       abajo y el máximo arriba, que es como se lee un volumen.
+
+       El `2rem` no es decorativo: la caja mide 5rem de largo, al girar sobre su centro
+       ocupa esos 5rem hacia arriba y hacia abajo por igual, y con este desplazamiento su
+       borde inferior cae **justo** sobre el borde de arriba del botón. Un hueco entre
+       los dos sería una zona muerta donde el puntero pierde el `:hover` y el control se
+       cierra justo cuando lo vas a agarrar. */
+    bottom: calc(100% + 1.6rem);
+    width: 5rem;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    box-shadow: 0 6px 18px rgb(var(--sombra-rgb) / 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) rotate(-90deg) translateX(0.4rem);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:hover .fono-volumen,
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:focus-within .fono-volumen {
+    opacity: 1;
+    pointer-events: auto;
+    /* El desplazamiento va **después** del giro, así que corre a lo largo del control:
+       sube. */
+    transform: translateX(-50%) rotate(-90deg) translateX(0);
+}
+
+/* Sin el deslizamiento, pero igual accesible: aparece y desaparece sin moverse. */
+@media (prefers-reduced-motion: reduce) {
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-volumen {
+        transition: opacity 0.18s ease;
+        transform: translateX(-50%) rotate(-90deg);
+    }
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .project-aparte {
+    /* Debajo de todo y a lo ancho de las dos columnas. Adentro pasa de columna a
+       renglones: la descripción se lleva uno entero y los tags comparten el siguiente
+       con el link al repo, que se va al extremo opuesto. */
+    grid-column: 1 / -1;
+    grid-row: 3;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 1.5rem;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .project-fulldesc {
+    flex: 1 0 100%;
+}
+
+/* Apilada, la descripción ocupa el ancho entero y suelta su tope de 62ch. Es la única
+   parte del sitio donde ese tope no aplica, y es a propósito: acá el renglón largo no
+   es un problema de lectura sino la forma de que el texto ocupe tres renglones en vez
+   de seis, que es justo el alto que necesitaba el monitor. En la columna angosta del
+   estado normal el tope sigue valiendo. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .project-fulldesc {
+    max-width: none;
 }
 
 /* La proporción la fija la pantalla y el celular la envuelve: así el bisel no
@@ -931,6 +1217,8 @@
 .fono-pantalla {
     aspect-ratio: 1 / 2;
     width: 100%;
+    /* Marco de referencia de las dos piezas del relevo, que van en absoluto. */
+    position: relative;
     border-radius: 26px;
     overflow: hidden;
     background: #000;
@@ -947,6 +1235,40 @@
 
 .fono.es-monitor .fono-pantalla :is(img, video) {
     object-fit: contain;
+}
+
+/* El relevo del carrusel: las dos piezas suben a la vez, la que entra desde abajo y la
+   que sale hacia arriba, como el rodillo de una máquina tragamonedas. Se dispara solo
+   porque la `key` de React remonta cada imagen, así que las animaciones arrancan de
+   cero en cada cambio sin coordinar nada desde JS.
+
+   Van las dos en absoluto para que se superpongan; el recorte lo pone el
+   `overflow: hidden` de la pantalla. */
+.fono-pieza {
+    position: absolute;
+    inset: 0;
+    animation: fono-sube-entra var(--relevo) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.fono-pieza.is-saliente {
+    animation-name: fono-sube-sale;
+}
+
+@keyframes fono-sube-entra {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes fono-sube-sale {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fono-pieza { animation: none; }
+    /* Sin animación no llega el `animationend` que la desmonta, así que se la saca
+       de la vista desde acá. */
+    .fono-pieza.is-saliente { display: none; }
 }
 
 /* El video es **intocable**: sin `pointer-events` no hay menú contextual ni

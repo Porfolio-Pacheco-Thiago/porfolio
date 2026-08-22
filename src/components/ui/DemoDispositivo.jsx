@@ -27,16 +27,34 @@ import { useLang } from '../../context/lang-context';
  * Reemplaza a la galería: metidos en el hueco 4/3 los medios entraban completos
  * pero chicos, y acá la pantalla tiene la proporción del aparato.
  *
+ * En modo `auto` los medios se parten en dos roles: las **capturas** se turnan solas en
+ * la pantalla cada `SEGUNDOS_POR_PIEZA`, subiendo una sobre otra, y los **videos** son
+ * lo único que queda en la botonera. De ahí salen los dos casos que hay hoy:
+ *
+ *  - Con videos (Cassandra) el aparato sigue girando entre demo y demo, con sus
+ *    capturas pasando en la pantalla, y la botonera queda con el botón de la demo.
+ *  - Sin videos (VibeTrip) no hay nada que elegir, así que no hay botonera ni línea de
+ *    ayuda, y el aparato se queda quieto y de frente: girar sin motivo distrae de lo
+ *    único que está pasando, que es el carrusel.
+ *
  * @param {object} props
  * @param {Array<{nombre: string, tipo: 'video'|'imagen', src: string, poster?: string}>} props.medios
  * @param {'fono'|'monitor'} [props.dispositivo]  Chasis. Por defecto `fono`.
+ * @param {boolean} [props.auto]  Las capturas pasan solas y la botonera queda solo con
+ *   los videos.
  * @param {string} props.label  Nombre del proyecto, para los textos accesibles.
  * @param {React.ReactNode} [props.children]  Va en la columna derecha, debajo de
  *   la barra del reproductor. Lo usa `Projects` para poner ahí los tags y el link
  *   al repo, que en la referencia van al costado del celular y no abajo.
- * @param {(reproduciendo: boolean) => void} [props.onPlayingChange]  Avisa cuando
- *   el video arranca o se detiene. `Projects` lo usa para contraer la foto de la
- *   tarjeta y darle ese espacio al celular mientras se está viendo una demo.
+ * @param {(enDemo: boolean) => void} [props.onPlayingChange]  Avisa cuando se pone o
+ *   se saca una demo de video. Ojo que **no** es "el video está corriendo": una pausa
+ *   no lo baja, porque la demo sigue puesta. `Projects` lo usa para contraer la foto de
+ *   la tarjeta y reacomodar el resto mientras se está viendo una demo, y desarmar todo
+ *   eso cada vez que alguien aprieta pausa sería un salto.
+ * @param {(cambio: () => void) => void} [props.conTransicion]  Corre un cambio de estado
+ *   dentro de una View Transition. Sin esto el empalme se hace con transiciones de CSS,
+ *   que alcanzan cuando solo se mueve la pose del aparato pero no cuando cambia el
+ *   acomodo entero. Lo pasa `Projects`.
  * @param {string} [props.className]  Se suma a la clase propia, no la reemplaza.
  *
  * El resto de props va al contenedor, igual que en `ui/Gallery.jsx`: así se le
@@ -74,12 +92,26 @@ import { useLang } from '../../context/lang-context';
  *
  * El giro se apaga con `prefers-reduced-motion` desde el CSS.
  */
+/** Cuánto se queda cada pieza en pantalla en el carrusel automático. */
+const SEGUNDOS_POR_PIEZA = 3;
 export default function DemoDispositivo({
-    medios, dispositivo = 'fono', label, children, onPlayingChange, className = '', ...props
+    medios, dispositivo = 'fono', auto = false, label, children, onPlayingChange,
+    conTransicion, className = '', ...props
 }) {
     const { t } = useLang();
-    // `null` = en reposo, girando. Un número = esa demo, quieta y de frente.
+    // En modo `auto` los medios se parten en dos roles distintos: las capturas pasan
+    // solas en la pantalla y los videos son lo único que se puede elegir. Sin `auto`
+    // todo es elegible, que es como funcionaba antes.
+    const piezas = auto ? medios.filter(m => m.tipo === 'imagen') : [];
+    const elegibles = auto ? medios.filter(m => m.tipo === 'video') : medios;
+
+    // `null` = en reposo. Un número = esa demo, quieta y de frente.
     const [activa, setActiva] = useState(null);
+    // Qué captura está en pantalla, y cuál se está yendo mientras dura el relevo. La
+    // saliente se limpia sola cuando termina su animación de salida.
+    const [pieza, setPieza] = useState(0);
+    const [saliente, setSaliente] = useState(null);
+    const indiceRef = useRef(0);
     // Mientras vuelve al giro: corta la animación para que la transición pueda
     // llevarlo de frente hasta la pose inicial. Ver `elegir`.
     const [volviendo, setVolviendo] = useState(false);
@@ -94,15 +126,47 @@ export default function DemoDispositivo({
     const [volumen, setVolumen] = useState(1);
     const [mudo, setMudo] = useState(false);
 
-    const enDemo = activa !== null;
-    const medio = enDemo ? medios[activa] : undefined;
+    // Quieto y de frente: porque se eligió una demo, o —con carrusel y nada que
+    // elegir— porque no hay ningún motivo para que gire. Lo primero es VibeTrip, que
+    // no tiene videos; Cassandra sí los tiene, así que sigue girando entre demo y demo
+    // mientras sus capturas se turnan en la pantalla.
+    const enDemo = activa !== null || (auto && elegibles.length === 0);
+    const medio = activa !== null ? elegibles[activa] : undefined;
     // Solo un video trae reproductor. Una imagen se pone de frente y ya está: no hay
     // aguja que mover ni volumen que bajar.
     const video = medio?.tipo === 'video' ? medio : undefined;
-    // En reposo la pantalla muestra la primera imagen; si el proyecto solo tiene
-    // videos —el caso de Melodía— el poster del primero que tenga uno.
+    // Lo que va en la pantalla sin ninguna demo puesta: la captura que le toca al
+    // carrusel, o —sin carrusel— la primera imagen, y si el proyecto solo tiene videos
+    // (Melodía) el poster del primero que tenga uno.
+    const enPantalla = auto ? piezas[pieza] : undefined;
     const reposo = medios.find(m => m.tipo === 'imagen')?.src
         ?? medios.find(m => m.poster)?.poster;
+
+    // El carrusel. Solo en modo `auto`, y solo si hay más de una pieza que mostrar.
+    //
+    // Se apaga con `prefers-reduced-motion`: un carrusel que avanza solo es movimiento
+    // que el usuario no pidió y del que no puede salir, que es justamente lo que esa
+    // preferencia viene a evitar. Ahí se queda en la primera.
+    //
+    // El índice también vive en un ref porque el relevo necesita las dos piezas a la
+    // vez: la que entra y la que sale, que se quedan juntas en pantalla mientras dura
+    // el desplazamiento. Con solo el estado habría que leer el valor viejo desde el
+    // actualizador, que es donde no se pueden tener efectos.
+    //
+    // Se para mientras hay una demo puesta: el video tapa la pantalla, así que serían
+    // relevos que nadie ve.
+    useEffect(() => {
+        if (!auto || piezas.length < 2 || activa !== null) return undefined;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+        const id = window.setInterval(() => {
+            const viejo = indiceRef.current;
+            const proximo = (viejo + 1) % piezas.length;
+            indiceRef.current = proximo;
+            setSaliente(viejo);
+            setPieza(proximo);
+        }, SEGUNDOS_POR_PIEZA * 1000);
+        return () => window.clearInterval(id);
+    }, [auto, piezas.length, activa]);
 
     // Arranca la demo al elegirla. Va acá y no en el atributo `autoplay` porque
     // con audio los navegadores lo bloquean salvo que haya un gesto del usuario
@@ -129,6 +193,44 @@ export default function DemoDispositivo({
         const el = fonoRef.current;
         const apagando = activa === i;
 
+        // Con morph, **todos** los cambios de estado tienen que caer en el mismo commit.
+        // El aviso al padre arranca la View Transition, y esta saca su captura del
+        // "después" en ese mismo instante: si `setActiva` se aplicara más tarde, lo que
+        // se captura es el acomodo grande pero sin demo puesta —aparato girando, sin
+        // barra, con la botonera de siempre— y el morph termina en esa pantalla
+        // intermedia antes de saltar a la de verdad.
+        //
+        // El corte del giro también va adentro, y no antes: la captura del "antes" ya se
+        // tomó con el aparato girado, así que el morph lo lleva de esa pose a la de
+        // frente. Sacándolo afuera, las dos capturas salen iguales y el enderezado se
+        // pierde.
+        const morfando = Boolean(conTransicion)
+            && Boolean(document.startViewTransition)
+            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (morfando) {
+            conTransicion(() => {
+                el?.getAnimations().forEach(a => {
+                    try { a.cancel(); } catch { /* nada que cancelar */ }
+                });
+                if (el) el.style.transform = '';
+                if (apagando) {
+                    setActiva(null);
+                    setVa(false);
+                    onPlayingChange?.(false);
+                    return;
+                }
+                if (elegibles[i].tipo === 'video') {
+                    onPlayingChange?.(true);
+                } else if (va) {
+                    setVa(false);
+                    onPlayingChange?.(false);
+                }
+                setActiva(i);
+            });
+            return;
+        }
+
         if (apagando) {
             // Volviendo al giro: se corta la animación con una clase mientras la
             // transición lleva el celular de frente hasta la pose inicial, que es
@@ -151,10 +253,15 @@ export default function DemoDispositivo({
         el?.getAnimations().forEach(a => {
             try { a.commitStyles(); a.cancel(); } catch { /* navegador sin commitStyles */ }
         });
-        // Pasar de un video a una imagen desmonta el `<video>` sin que dispare `pause`,
-        // igual que al apagar. Sin este aviso la tarjeta se quedaría con la ventana
-        // contraída, creyendo que todavía hay algo reproduciéndose.
-        if (medios[i].tipo !== 'video' && va) {
+        // El aviso sale de **elegir**, no de que el video arranque: mientras haya una
+        // demo puesta la tarjeta se queda en su acomodo grande, aunque esté en pausa.
+        // Antes salía del evento `play`/`pause` del elemento, y entonces darle pausa
+        // devolvía la tarjeta al acomodo anterior de golpe.
+        if (elegibles[i].tipo === 'video') {
+            onPlayingChange?.(true);
+        } else if (va) {
+            // Y pasar de un video a una imagen desmonta el `<video>` sin que dispare
+            // `pause`, así que el apagado hay que avisarlo a mano.
             setVa(false);
             onPlayingChange?.(false);
         }
@@ -236,8 +343,11 @@ export default function DemoDispositivo({
                                 poster={video.poster}
                                 playsInline
                                 aria-label={`${nombreDemo(t, video.nombre)} — ${label}`}
-                                onPlay={() => { setVa(true); onPlayingChange?.(true); }}
-                                onPause={() => { setVa(false); onPlayingChange?.(false); }}
+                                // `va` es solo el ícono del botón de la barra. El acomodo
+                                // de la tarjeta **no** cuelga de esto: lo decide `elegir`,
+                                // así una pausa no la desarma.
+                                onPlay={() => setVa(true)}
+                                onPause={() => setVa(false)}
                                 onTimeUpdate={e => setTiempo(e.currentTarget.currentTime)}
                                 onLoadedMetadata={e => setDuracion(e.currentTarget.duration)}
                                 onLoadStart={() => { setTiempo(0); setDuracion(0); setVa(false); }}
@@ -247,10 +357,31 @@ export default function DemoDispositivo({
                                 }}
                             />
                         ) : medio ? (
-                            // Una imagen elegida: se pone de frente en la pantalla, sin
-                            // barra debajo. `alt` vacío porque el botón que la puso ya
-                            // la nombra, y el nombre está a la vista.
+                            // Una imagen elegida a mano: se pone de frente y ya está, sin
+                            // barra debajo. `alt` vacío porque el botón que la puso ya la
+                            // nombra y el nombre está a la vista.
                             <img key={medio.nombre} src={medio.src} alt="" decoding="async" />
+                        ) : enPantalla ? (
+                            // El carrusel. Las `key` remontan cada imagen al cambiar de
+                            // pieza, que es lo que hace arrancar las dos animaciones del
+                            // relevo sin coordinar nada desde JS.
+                            <>
+                                {/* La que se va, todavía en pantalla mientras sube. Sin
+                                    ella el relevo dejaría ver el fondo negro por detrás
+                                    durante medio segundo, y lo que se lee entonces no es
+                                    un desplazamiento sino un parpadeo. */}
+                                {saliente !== null && piezas[saliente] && (
+                                    <img
+                                        key={`sale-${piezas[saliente].nombre}`}
+                                        className="fono-pieza is-saliente"
+                                        src={piezas[saliente].src}
+                                        alt=""
+                                        aria-hidden="true"
+                                        onAnimationEnd={() => setSaliente(null)}
+                                    />
+                                )}
+                                <img key={enPantalla.nombre} className="fono-pieza" src={enPantalla.src} alt="" decoding="async" />
+                            </>
                         ) : (
                             reposo && <img src={reposo} alt="" loading="lazy" decoding="async" />
                         )}
@@ -259,14 +390,20 @@ export default function DemoDispositivo({
             </div>
 
             <div className="fono-controles">
-                {/* La ayuda nombra el aparato que hay a la vista: "en el celular" sobre
-                    un monitor era una instrucción falsa. */}
-                <p className="fono-ayuda">
-                    {t(dispositivo === 'monitor' ? 'projects.demoHintMonitor' : 'projects.demoHint')}
-                </p>
+                {/* La ayuda explica que se elija una captura, así que solo tiene sentido
+                    donde las capturas se eligen. Con carrusel no: en VibeTrip no hay
+                    botonera, y en Cassandra el único botón es el de la demo, que se
+                    explica solo. La ayuda nombra además el aparato que hay a la vista:
+                    "en el celular" sobre un monitor era una instrucción falsa. */}
+                {!auto && elegibles.length > 0 && (
+                    <p className="fono-ayuda">
+                        {t(dispositivo === 'monitor' ? 'projects.demoHintMonitor' : 'projects.demoHint')}
+                    </p>
+                )}
 
+                {elegibles.length > 0 && (
                 <div className="fono-botones">
-                    {medios.map((m, i) => (
+                    {elegibles.map((m, i) => (
                         <button
                             key={m.nombre}
                             type="button"
@@ -283,6 +420,7 @@ export default function DemoDispositivo({
                         </button>
                     ))}
                 </div>
+                )}
 
                 {/* La barra del reproductor, debajo de los botones de selección. Solo
                     aparece cuando hay algo que controlar.
