@@ -358,10 +358,17 @@ export default function DemoDispositivo({
                             // vacío le prometería a un lector de pantalla algo que no
                             // está—. Ver la misma nota en ui/Gallery.jsx.
                             // `onLoadStart` pone la aguja en cero al cambiar de demo,
-                            // antes de que llegue la duración del nuevo archivo, y baja
-                            // `va`: un elemento recién montado está en pausa, y si no,
-                            // al reabrir la tarjeta el botón decía "Pausar" sobre un
-                            // video detenido.
+                            // antes de que llegue la duración del nuevo archivo, y
+                            // sincroniza `va` **leyendo el elemento**, que es el único
+                            // que sabe si está andando. Antes lo forzaba a `false`
+                            // suponiendo que un elemento recién montado está en pausa.
+                            // Es cierto al montarlo, pero `loadstart` no es solo eso: el
+                            // `play()` que arranca la demo sale de un efecto, y si el
+                            // evento llega después el `false` pisa al `true` que puso
+                            // `play` y el botón queda en triángulo con el video andando.
+                            // Leerlo cubre los dos casos, incluido el que motivó el
+                            // `false`: al reabrir la tarjeta el elemento está pausado de
+                            // verdad, así que sigue dando "Reproducir".
                             // eslint-disable-next-line jsx-a11y/media-has-caption
                             <video
                                 key={video.nombre}
@@ -382,7 +389,7 @@ export default function DemoDispositivo({
                                 onPause={() => setVa(false)}
                                 onTimeUpdate={e => setTiempo(e.currentTarget.currentTime)}
                                 onLoadedMetadata={e => setDuracion(e.currentTarget.duration)}
-                                onLoadStart={() => { setTiempo(0); setDuracion(0); setVa(false); }}
+                                onLoadStart={e => { setTiempo(0); setDuracion(0); setVa(!e.currentTarget.paused); }}
                                 onVolumeChange={e => {
                                     setVolumen(e.currentTarget.volume);
                                     setMudo(e.currentTarget.muted);
