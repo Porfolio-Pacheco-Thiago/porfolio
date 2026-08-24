@@ -1719,23 +1719,28 @@
     }
 }
 
-@media (max-width: 768px) {
-    .fono-bloque {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .project-card {
-        width: 100%;
-    }
-
-    .project-media {
-        height: 160px;
-    }
-}
+/* Una tarjeta por fila. Cubre también todo lo que hay por debajo, así que el bloque de
+   768 no vuelve a declararlo. */
 @media (max-width: 900px) {
     .project-card {
         width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    /* El aparato y su columna de al lado se apilan. */
+    .fono-bloque {
+        grid-template-columns: 1fr;
+    }
+
+    /* Alto propio para la ventana de la tarjeta **cerrada**: el `clamp` de la regla base
+       está calibrado contra el alto de la ventana para que la sección entera entre en
+       una pantalla de escritorio, y en un teléfono ese cálculo no viene al caso.
+
+       No alcanza a la tarjeta abierta: ahí manda `.project-card.expanded .project-media`,
+       que son tres clases contra una, y la franja se sigue estirando para tomar el alto
+       que sobra. */
+    .project-media {
+        height: 160px;
     }
 }
