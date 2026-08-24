@@ -179,20 +179,35 @@ los pasos.
 La idea es atacar primero lo que puede obligar a repensar algo, y dejar para el final lo
 que es puro acomodo.
 
-### 3.1 El aparato (monitor y celular) — el más caro
+### 3.1 El aparato (monitor y celular) — **hecho**
 
-`--monitor-video: 880px` (`Projects.css:1035`) es un ancho fijo en px. Por debajo de
-~1000px de viewport no entra, y con él se cae el acomodo de reproducción entero: el monitor
-a la derecha, el reproductor a la izquierda y la descripción abajo (`:1046`).
+Resultó bastante menos caro de lo previsto, porque **el estado en reposo ya era fluido**:
+`.fono` se mide con `min(215px, 62%, 27vh)` y `.fono.es-monitor` con
+`min(485px, 90%, 58vh)`. Los porcentajes y los `vh` ya se acomodan solos.
 
-En angosto eso tiene que apilarse: aparato arriba, controles debajo, descripción al final.
-Es el mismo contenido en otro orden, no un diseño nuevo.
+Lo que no se acomodaba era el **acomodo de reproducción**, que cuelga de
+`--monitor-video: 880px` — un ancho en px que no entra en ninguna pantalla angosta, ni él
+ni la columna que lo aloja. Por debajo de 900 pasa a `100%` y la grilla a una sola columna.
 
-Mientras se toca esto, ver también:
-- `Projects.css:1165` — `width: var(--monitor-video, 717px)`, otro px fijo.
-- El giro 3D del aparato. `CLAUDE.md` documenta un problema térmico con transforms 3D en
-  este repo; en un teléfono es peor. Evaluar apagarlo por debajo de cierto ancho, como ya
-  se apaga con `prefers-reduced-motion` (`Projects.css:1706`).
+Deshacer las ubicaciones explícitas fue todo lo que hizo falta: el orden del DOM **ya era
+el correcto** —aparato, botonera, barra, descripción— porque los controles van con
+`display: contents` y se disuelven en la grilla. Sin anularlas se superponían en la única
+columna que queda.
+
+Y Cassandra recupera su segundo párrafo: se escondía porque la tarjeta abierta no podía
+crecer, y acá crece.
+
+**No hizo falta tocar el giro 3D.** Reproduciendo, el aparato ya está derecho por
+`.project-card.is-reproduciendo .fono.is-demo { transform: none }`, así que el `scale(1.1)`
+—que sobre un monitor al 100% se saldría un 10% por los costados— no llega a aplicarse.
+Queda pendiente la decisión de apagarlo **en reposo** por el tema térmico que documenta
+`CLAUDE.md`; es una decisión de gusto, no algo roto, así que no la tomé.
+
+**Una inconsistencia que queda anotada:** el aparato se apila en dos umbrales distintos
+según cuál sea. El monitor a 900, con estas reglas; el celular a 768, con el
+`.fono-bloque { grid-template-columns: 1fr }` que ya existía. Entre 769 y 900 el celular
+sigue en dos columnas, y entra —se midió—, pero son dos números para la misma idea.
+Unificarlos entra en la revisión de la escala de breakpoints.
 
 ### 3.2 Trayectoria
 

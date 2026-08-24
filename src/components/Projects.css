@@ -1760,6 +1760,43 @@
         flex: none;
         height: clamp(120px, 38vw, 260px);
     }
+
+    /* ── El acomodo de reproducción, apilado ──────────────────────────────
+       En ancho el monitor se va contra el borde derecho y el reproductor ocupa lo que
+       queda a su izquierda, con la descripción abajo cruzando las dos columnas. Eso
+       cuelga de `--monitor-video`, que es un ancho en **px**: a 880 no entra en ninguna
+       pantalla angosta, y la columna que lo aloja tampoco.
+
+       Acá pasa a `100%` y la grilla a una sola columna. El orden del DOM ya es el que
+       corresponde —aparato, botonera, barra, descripción— porque los controles van con
+       `display: contents` y se disuelven en la grilla; lo único que hay que deshacer son
+       las ubicaciones explícitas, que si no se superponen en la única columna que queda.
+
+       El aparato en reposo no necesita nada: `.fono` y `.fono.es-monitor` ya se miden con
+       `min()` contra un porcentaje y un `vh`. */
+    .project-card.is-reproduciendo:has(.fono.es-monitor) {
+        --monitor-video: 100%;
+    }
+
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-bloque {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-escena,
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-barra,
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .project-aparte {
+        grid-column: auto;
+        grid-row: auto;
+        justify-self: stretch;
+    }
+
+    /* Y Cassandra recupera su segundo párrafo. Se escondía porque la tarjeta abierta no
+       podía crecer y el acomodo estaba calculado para tres renglones de descripción; acá
+       la tarjeta crece, así que no hay nada que ahorrar y no hay motivo para mostrar
+       menos de lo que dice. */
+    [data-proyecto="cassandra-engine"].is-reproduciendo .project-fulldesc:not(:first-of-type) {
+        display: block;
+    }
 }
 
 @media (max-width: 768px) {
