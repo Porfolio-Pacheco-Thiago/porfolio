@@ -17,12 +17,12 @@ There is no `npm run deploy` — the old `gh-pages` script was removed because i
 publishes through a branch, which is the *other* Pages mode and fights with this one.
 The live site is <https://porfolio-pacheco-thiago.github.io/porfolio/>.
 
-Docker alternative for the dev server: `docker-compose up` (mounts the repo, hot-reload, same port 5173). Use the standalone `docker-compose` binary — the `docker compose` plugin subcommand is not installed on this machine.
+Docker alternative for the dev server: `docker compose up` (mounts the repo, hot-reload, same port 5173). Use the `docker compose` plugin subcommand — the standalone `docker-compose` binary is not installed on this machine.
 
 Two Docker gotchas, both already hit once:
 
 - It creates a root-owned empty `node_modules/` on the host as a volume mount point, which makes a later host-side `npm install` fail with EACCES. `rmdir node_modules` first.
-- `docker-compose.yml` keeps `node_modules` in a separate anonymous volume so host and container don't clobber each other. That means **installing a dependency on the host does not reach a running container** — it keeps serving with its own stale `node_modules` and its own in-memory Vite config, producing confusing errors whose stack traces point at `/app/...` rather than the host path. After any `package.json` change, run `docker-compose down -v && docker-compose up -d --build`. The `-v` matters: without it the stale volume survives. Source edits alone need nothing — those flow through the bind mount.
+- `docker-compose.yml` keeps `node_modules` in a separate anonymous volume so host and container don't clobber each other. That means **installing a dependency on the host does not reach a running container** — it keeps serving with its own stale `node_modules` and its own in-memory Vite config, producing confusing errors whose stack traces point at `/app/...` rather than the host path. After any `package.json` change, run `docker compose down -v && docker compose up -d --build`. The `-v` matters: without it the stale volume survives. Source edits alone need nothing — those flow through the bind mount.
 
 There are no tests in this project.
 
