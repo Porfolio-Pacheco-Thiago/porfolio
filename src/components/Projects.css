@@ -1027,10 +1027,12 @@
        porque lo necesitan dos: el propio monitor y la columna que lo aloja.
 
        El alto sale de este ancho, por la proporción de la pantalla, así que este número
-       es en realidad el reparto entre el monitor y la descripción de abajo. Bajó de 915
-       cuando las descripciones pasaron a dos párrafos: este acomodo estaba calculado
-       para que el texto ocupara tres renglones, y con dos párrafos ocupa seis. */
-    --monitor-video: 730px;
+       es en realidad el reparto entre el monitor y la descripción de abajo. Abajo va un
+       párrafo solo —ver la regla que esconde el resto—, así que el monitor se queda casi
+       con todo: lo que bajó de 915 es lo que el primer párrafo de Cassandra pide de más,
+       porque ocupa cuatro renglones y no los tres para los que este acomodo estaba
+       calculado, más unos pocos píxeles de margen para no depender del redondeo. */
+    --monitor-video: 880px;
 }
 
 .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-bloque {
@@ -1059,10 +1061,12 @@
     justify-self: end;
 }
 
-/* Solo el celular: el monitor pisa este ancho con `--monitor-video`. Como allá, el alto
-   sale del ancho por la proporción de la pantalla, así que este número reparte entre el
-   aparato y la descripción de abajo, y bajó de 330 por lo mismo — dos párrafos ocupan el
-   doble de alto que el renglón triple para el que estaba calculado el acomodo. */
+/* Solo el celular: el monitor pisa este ancho con `--monitor-video`.
+
+   Bajó de 330 por una razón distinta a la del monitor, y que no se arregla escondiendo
+   texto: acá la descripción va **al lado** del aparato y no debajo, así que el alto de
+   la tarjeta lo fija el celular solo. A 330 medía 652px contra los 695 de la tarjeta y
+   se pasaba del borde con uno o con dos párrafos. */
 .project-card.is-reproduciendo .fono {
     width: min(310px, 70%);
 }
@@ -1198,16 +1202,22 @@
     /* Toda la columna: acá el ancho lo fija el hueco que deja el monitor, no un tope
        propio. */
     width: 100%;
-    /* Y adentro se aprieta todo lo que se puede. Con el monitor grande la columna queda
-       en poco más de 200px, y con el padding y las separaciones de la barra ancha el
-       botón de pantalla completa se salía por el costado. */
+    /* Los dos grupos a los extremos. Sin esto quedan pegados en el medio: el nombre de
+       la pista y el reloj se esconden en esta columna —ver las reglas de abajo— y sin
+       ellos no hay nada que los separe, así que los cinco botones se leían como un solo
+       bloque apretado con el resto de la barra vacío al costado. */
+    justify-content: space-between;
     gap: 0.3rem;
     padding: 0.7rem 0.5rem 1rem;
 }
 
+/* Adentro de cada grupo el aire alcanza para respirar: los cinco botones suman 170px en
+   una columna de 222, así que lo que antes se recortaba al mínimo —por miedo a que el
+   botón de pantalla completa se saliera— ahora entra sin problema. El que manda sigue
+   siendo el ancho de la columna, que es lo que deja libre el monitor. */
 .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-transporte,
 .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios {
-    gap: 0.15rem;
+    gap: 0.3rem;
 }
 
 /* En esta columna la barra mide unos 370px y el nombre de la pista no entra: se parte
@@ -1294,6 +1304,19 @@
 
 .project-card.is-reproduciendo:has(.fono.es-monitor) .project-fulldesc {
     flex: 1 0 100%;
+}
+
+/* Solo Cassandra, y solo mientras se reproduce: va el primer párrafo y nada más. Este
+   acomodo está calculado
+   para una descripción de tres renglones —es lo que deja al aparato en su tamaño bueno—
+   y las descripciones pasaron a tener dos párrafos, o sea el doble. De los dos, el que
+   se queda es el primero: dice qué es el proyecto, que es lo que hace falta para
+   entender lo que se está viendo en la pantalla. El segundo es el detalle de
+   arquitectura, y está entero a un clic, apenas se corta la demo.
+
+   Va con `display: none` y no con `visibility`: acá el punto es que no ocupe alto. */
+[data-proyecto="cassandra-engine"].is-reproduciendo .project-fulldesc:not(:first-of-type) {
+    display: none;
 }
 
 /* Apilada, la descripción ocupa el ancho entero y suelta su tope de 62ch. Es la única
