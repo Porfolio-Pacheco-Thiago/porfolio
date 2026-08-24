@@ -188,39 +188,49 @@
         "id": "melodia",
         "title": "Melodía",
         "shortDesc": "A highly advanced, full-stack music streaming platform engineered with a seamless UI and groundbreaking AI capabilities.",
-        "fullDesc": "An ambitious, full-stack recreation of Spotify that matches its core streaming infrastructure while introducing two disruptive features. It boasts an advanced audio-recognition engine (Shazam-style) capable of identifying tracks via humming or ambient playback. Furthermore, it integrates a real-time 'AI Cover' engine, allowing users to seamlessly map any artist's vocal model onto any track—effortlessly engineering crossovers like Michael Jackson performing a Queen anthem.",
+        "fullDesc": "A full-stack recreation of Spotify that extends the streaming experience with disruptive features. It combines an intuitive design with AI innovation, making it possible to identify songs by humming them (Shazam-style) and to generate 'AI Covers' in real time, putting dynamic voice cloning fully within reach of the end user.\n\nArchitecturally, the acoustic recognition engine uses audio fingerprinting and spectrogram analysis to search for live matches. The AI pipeline, for its part, runs stem separation and orchestrates Deep Learning models (Voice Conversion) to synthesize new audio on the fly, leaning on hardware acceleration to process the heavy computational load with low latency.",
         "tags": [
-          "AI",
-          "Music",
-          "Full Stack",
-          "Machine Learning"
+          "PyTorch",
+          "RVC",
+          "Librosa",
+          "FFmpeg",
+          "Python",
+          "FastAPI",
+          "React/Next.js",
+          "Tailwind CSS",
+          "PostgreSQL",
+          "MongoDB",
+          "CUDA"
         ]
       },
       {
         "id": "vibetrip",
         "title": "VibeTrip",
         "shortDesc": "A comprehensive, full-stack travel discovery ecosystem modeled after TripAdvisor.",
-        "fullDesc": "A collaborative full-stack web platform for trip planning and discovery. It combines a robust asynchronous backend with a modern, high-performance frontend featuring interactive maps (Leaflet), analytics dashboards (ECharts) and full media management. Built as a team, applying CI/CD with GitHub Actions for automated testing, database migration validation and VPS deployment.",
+        "fullDesc": "A collaborative web platform that centralizes the planning and discovery of group trips. It offers a fluid, interactive experience through dynamic maps and analytics dashboards, making it easier to organize complex itineraries and manage multimedia content in a concurrent environment built as a team.\n\nArchitecturally, it combines a high-performance frontend with hybrid rendering and a robust asynchronous backend built on clean architecture principles. The system handles strict schema validation, secure authentication and file processing with storage limits. The whole ecosystem is backed by continuous integration pipelines (CI/CD) for automated testing, relational migration control and container deployment.",
         "tags": [
+          "Next.js",
+          "React",
           "FastAPI",
-          "Next.js 15",
           "PostgreSQL",
-          "React 19",
-          "TypeScript"
+          "TypeScript",
+          "Docker",
+          "GitHub Actions",
+          "Tailwind CSS"
         ]
       },
       {
         "id": "cassandra-engine",
         "title": "Cassandra Engine",
         "shortDesc": "A high-performance, distributed Cassandra database engine engineered entirely from scratch in Rust.",
-        "fullDesc": "From-scratch development of a distributed peer-to-peer database engine identical to Apache Cassandra, written in over 18,400 lines of Rust. The architecture implements a logical ring with Consistent Hashing, node discovery via Gossip Protocol and Seed Nodes, ensuring high availability through Hinted Handoff, Read Repair, and Anti-Entropy reconciliation using Merkle Trees. It features a fully functional native CQL parser, Coordinator Nodes, and configurable consistency levels (ONE, QUORUM, ALL). Its fault tolerance and eventual consistency mechanisms are validated in real-time through a concurrent flight tracking simulation application.",
+        "fullDesc": "A peer-to-peer distributed database engine built completely from scratch, faithfully replicating the internal architecture of Apache Cassandra. To validate its fault tolerance and eventual consistency in a highly concurrent environment, the system runs as the real-time database behind a graphical distributed flight simulation application.\n\nArchitecturally, it is written in Rust and implements a logical ring with Consistent Hashing and node discovery through the Gossip Protocol and Seed Nodes. It guarantees data resilience through Hinted Handoff, Read Repair and reconciliation with Merkle trees. It also includes a native CQL parser and orchestrates transactions across coordinator nodes under configurable consistency levels (ONE, QUORUM, ALL).",
         "tags": [
           "Rust",
-          "P2P",
           "Distributed Systems",
           "Consistent Hashing",
-          "DB Engine",
-          "Eventual Consistency"
+          "Gossip Protocol",
+          "Merkle Trees",
+          "CQL"
         ]
       },
       {
@@ -265,26 +275,27 @@
         "id": "monopoly",
         "title": "Monopoly Game Engine",
         "shortDesc": "A fully functional Monopoly game engine built from scratch in Java, featuring complex state management and custom UI themes.",
-        "fullDesc": "An interactive desktop simulator built on an object-oriented architecture with strict MVC separation. The engine decouples model logic from the graphical interface, letting the board, rules and characters be configured entirely through external files without touching core code. It implements advanced design patterns such as Abstract Factory for dynamic management of player actions.",
+        "fullDesc": "An interactive desktop simulator that recreates the dynamics of a classic multiplayer board game. It stands out for its flexible structural design, where the board, the rules and the game pieces are not fixed in the code but are built and customized entirely dynamically from external configuration files.\n\nArchitecturally, it implements object-oriented development with a strict MVC (Model-View-Controller) separation, guaranteeing that the core logic operates independently of the graphical interface. It uses advanced design patterns, such as Abstract Factory, to dynamically manage the states and actions of a turn, and it is built on the Java module system (JPMS) to produce an optimized runtime that can be deployed in containers.",
         "tags": [
           "Java 17",
           "JavaFX",
           "MVC",
-          "Design Patterns",
-          "Maven"
+          "JPMS",
+          "Maven",
+          "Docker"
         ]
       },
       {
         "id": "zorro-ocas",
         "title": "Zorro y Ocas (Assembly)",
         "shortDesc": "A logic-based terminal game programmed strictly in Assembly language to master CPU architecture and memory management.",
-        "fullDesc": "A classic strategy game engine developed entirely in x86-64 Assembly (Intel syntax) for Linux. Written in strict accordance with the System V AMD64 calling convention, which allows it to link directly against a driver of 55 automated unit tests written in C. It implements efficient terminal rendering with support for ANSI escape sequences and UTF-8 characters and emoji.",
+        "fullDesc": "A classic strategy game engine built from scratch in assembly language. It demonstrates complete command of the internal architecture of computers, prioritizing extreme performance and the manual management of resources without the abstractions of modern languages.\n\nArchitecturally, it is written in x86-64 Assembly (Linux) in strict accordance with the System V AMD64 convention for the management of the stack and the registers. It stands out for its memory indirection system, which maps bytes to UTF-8 characters at runtime, and for very low-level rendering through ANSI sequences, linking natively against libc.",
         "tags": [
           "Assembly x86-64",
-          "C",
           "NASM",
-          "System V ABI",
-          "Low Level"
+          "GCC",
+          "libc",
+          "Linux"
         ]
       }
     ]

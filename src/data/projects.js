@@ -15,7 +15,10 @@ export const projectMeta = {
     // la org y no a un fork nuestro, para no romper la atribución de los commits.
     melodia: { Icon: FiMusic, repo: 'https://github.com/Melodia-ID2' },
     // `carrusel`: el monitor se queda quieto y derecho, y las capturas pasan solas.
-    // Sin botonera. Es el único así por ahora.
+    // Sin botonera. Acepta `true` para el ritmo de siempre —tres segundos por pieza,
+    // con las dos deslizándose como el rodillo de una tragamonedas— o un objeto para
+    // apartarse de ese ritmo: `segundos` cuánto dura cada una y `corte` para cambiarlas
+    // de golpe, sin relevo.
     vibetrip: { Icon: FaPlane, repo: 'https://github.com/Porfolio-Pacheco-Thiago/vibe-trip', pantalla: 'monitor', carrusel: true },
     // Con carrusel y video a la vez: las capturas se turnan solas en la pantalla
     // mientras el monitor gira, y la botonera queda con el único botón que importa,
@@ -27,6 +30,14 @@ export const projectMeta = {
     'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems' },
     specforge: { Icon: FaMicroscope, repo: '#' },
     'predictive-models': { Icon: FaBrain, repo: 'https://github.com/Porfolio-Pacheco-Thiago/machine-learning' },
-    monopoly: { Icon: FaDice, repo: 'https://github.com/Porfolio-Pacheco-Thiago/monopoly', pantalla: 'monitor' },
-    'zorro-ocas': { Icon: FiTerminal, repo: 'https://github.com/Porfolio-Pacheco-Thiago/assembly-game', pantalla: 'monitor' },
+    // `bucle`: en vez de una botonera con una demo para elegir, el video queda puesto en
+    // el monitor desde el principio, mudo y repitiéndose. El aparato se planta de frente
+    // como con `carrusel`, y sin nada que controlar tampoco va la barra del reproductor.
+    // `velocidad` es el `playbackRate`: la partida grabada se juega despacio y a 1.3 se
+    // sigue igual pero no se hace larga.
+    monopoly: { Icon: FaDice, repo: 'https://github.com/Porfolio-Pacheco-Thiago/monopoly', pantalla: 'monitor', bucle: { velocidad: 1.3 } },
+    // El único con carrusel a corte: son cuatro estados de la misma partida, y pasar
+    // uno por segundo sin relevo se lee como el juego avanzando. Con el deslizamiento
+    // de las otras, a un segundo por pieza, la pantalla no llega a quedarse quieta.
+    'zorro-ocas': { Icon: FiTerminal, repo: 'https://github.com/Porfolio-Pacheco-Thiago/assembly-game', pantalla: 'monitor', carrusel: { segundos: 1, corte: true } },
 };

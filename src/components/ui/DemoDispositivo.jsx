@@ -40,6 +40,8 @@ import { useLang } from '../../context/lang-context';
  * @param {object} props
  * @param {Array<{nombre: string, tipo: 'video'|'imagen', src: string, poster?: string}>} props.medios
  * @param {'fono'|'monitor'} [props.dispositivo]  Chasis. Por defecto `fono`.
+ * @param {number} [props.segundos]  Cuánto se queda cada captura en pantalla.
+ * @param {boolean} [props.corte]  Cambia de captura de golpe, sin el relevo deslizado.
  * @param {boolean} [props.auto]  Las capturas pasan solas y la botonera queda solo con
  *   los videos.
  * @param {string} props.label  Nombre del proyecto, para los textos accesibles.
@@ -95,15 +97,21 @@ import { useLang } from '../../context/lang-context';
 /** Cuánto se queda cada pieza en pantalla en el carrusel automático. */
 const SEGUNDOS_POR_PIEZA = 3;
 export default function DemoDispositivo({
-    medios, dispositivo = 'fono', auto = false, label, children, onPlayingChange,
+    medios, dispositivo = 'fono', auto = false, segundos = SEGUNDOS_POR_PIEZA,
+    corte = false, bucle = null, label, children, onPlayingChange,
     conTransicion, className = '', ...props
 }) {
     const { t } = useLang();
     // En modo `auto` los medios se parten en dos roles distintos: las capturas pasan
     // solas en la pantalla y los videos son lo único que se puede elegir. Sin `auto`
     // todo es elegible, que es como funcionaba antes.
+    // En modo `bucle` el video no se elige: está puesto desde el principio y se repite
+    // solo. Así que no queda nada en la botonera —de ahí el arreglo vacío— y el aparato
+    // no tiene ningún motivo para girar, igual que un carrusel sin videos.
+    const enBucle = Boolean(bucle);
     const piezas = auto ? medios.filter(m => m.tipo === 'imagen') : [];
-    const elegibles = auto ? medios.filter(m => m.tipo === 'video') : medios;
+    const elegibles = enBucle ? [] : (auto ? medios.filter(m => m.tipo === 'video') : medios);
+    const videoEnBucle = enBucle ? medios.find(m => m.tipo === 'video') : undefined;
 
     // `null` = en reposo. Un número = esa demo, quieta y de frente.
     const [activa, setActiva] = useState(null);
@@ -130,8 +138,8 @@ export default function DemoDispositivo({
     // elegir— porque no hay ningún motivo para que gire. Lo primero es VibeTrip, que
     // no tiene videos; Cassandra sí los tiene, así que sigue girando entre demo y demo
     // mientras sus capturas se turnan en la pantalla.
-    const enDemo = activa !== null || (auto && elegibles.length === 0);
-    const medio = activa !== null ? elegibles[activa] : undefined;
+    const enDemo = activa !== null || enBucle || (auto && elegibles.length === 0);
+    const medio = activa !== null ? elegibles[activa] : videoEnBucle;
     // Solo un video trae reproductor. Una imagen se pone de frente y ya está: no hay
     // aguja que mover ni volumen que bajar.
     const video = medio?.tipo === 'video' ? medio : undefined;
@@ -162,11 +170,15 @@ export default function DemoDispositivo({
             const viejo = indiceRef.current;
             const proximo = (viejo + 1) % piezas.length;
             indiceRef.current = proximo;
-            setSaliente(viejo);
+            // A corte no hay relevo, así que no hay saliente: la pieza vieja no tiene
+            // que quedarse en pantalla porque nada se desplaza por encima de ella. Y
+            // conviene que no quede: sin animación no llega el `animationend` que la
+            // desmonta, y se acumularían capturas viejas encima de la buena.
+            if (!corte) setSaliente(viejo);
             setPieza(proximo);
-        }, SEGUNDOS_POR_PIEZA * 1000);
+        }, segundos * 1000);
         return () => window.clearInterval(id);
-    }, [auto, piezas.length, activa]);
+    }, [auto, piezas.length, activa, segundos, corte]);
 
     // Arranca la demo al elegirla. Va acá y no en el atributo `autoplay` porque
     // con audio los navegadores lo bloquean salvo que haya un gesto del usuario
@@ -177,6 +189,21 @@ export default function DemoDispositivo({
         if (activa === null) return;
         videoRef.current?.play().catch(() => { /* sin permiso de audio, queda en pausa */ });
     }, [activa]);
+
+    // El bucle arranca solo, sin que nadie lo elija, y corre más rápido que la grabación
+    // original. Lo que habilita el arranque automático es `muted`: con audio los
+    // navegadores lo bloquean salvo que haya un gesto del usuario detrás. Acá no se
+    // pierde nada, porque el archivo directamente no tiene pista de audio —se la sacamos
+    // al comprimirlo, que además es de donde salió la mayor parte del ahorro—.
+    //
+    // La velocidad se vuelve a poner en `canplay` y no solo acá: `playbackRate` es del
+    // elemento, no del archivo, y vuelve a 1 cada vez que el navegador recarga la fuente.
+    useEffect(() => {
+        const el = videoRef.current;
+        if (!enBucle || !el) return;
+        el.playbackRate = bucle.velocidad ?? 1;
+        el.play().catch(() => { /* si lo rechazan, el póster queda a la vista */ });
+    }, [enBucle, bucle]);
 
     /**
      * Tocar la demo que ya está puesta la saca; tocar otra, cambia de video.
@@ -342,6 +369,11 @@ export default function DemoDispositivo({
                                 src={video.src}
                                 poster={video.poster}
                                 playsInline
+                                loop={enBucle}
+                                muted={enBucle}
+                                onCanPlay={enBucle
+                                    ? e => { e.currentTarget.playbackRate = bucle.velocidad ?? 1; }
+                                    : undefined}
                                 aria-label={`${nombreDemo(t, video.nombre)} — ${label}`}
                                 // `va` es solo el ícono del botón de la barra. El acomodo
                                 // de la tarjeta **no** cuelga de esto: lo decide `elegir`,
@@ -380,7 +412,20 @@ export default function DemoDispositivo({
                                         onAnimationEnd={() => setSaliente(null)}
                                     />
                                 )}
-                                <img key={enPantalla.nombre} className="fono-pieza" src={enPantalla.src} alt="" decoding="async" />
+                                {/* A corte la `key` es fija a propósito: es justo lo
+                                    contrario del relevo. Con la `key` por nombre React
+                                    desmonta la `img` y monta otra en su lugar, y ese
+                                    remonte es lo que arranca la animación; fija, en
+                                    cambio, parchea el `src` sobre el mismo elemento, que
+                                    ya tiene la imagen decodificada del ciclo anterior.
+                                    El cambio es un solo cuadro, sin blanco en el medio. */}
+                                <img
+                                    key={corte ? 'carrusel' : enPantalla.nombre}
+                                    className={`fono-pieza ${corte ? 'es-corte' : ''}`}
+                                    src={enPantalla.src}
+                                    alt=""
+                                    decoding="async"
+                                />
                             </>
                         ) : (
                             reposo && <img src={reposo} alt="" loading="lazy" decoding="async" />
@@ -390,16 +435,10 @@ export default function DemoDispositivo({
             </div>
 
             <div className="fono-controles">
-                {/* La ayuda explica que se elija una captura, así que solo tiene sentido
-                    donde las capturas se eligen. Con carrusel no: en VibeTrip no hay
-                    botonera, y en Cassandra el único botón es el de la demo, que se
-                    explica solo. La ayuda nombra además el aparato que hay a la vista:
-                    "en el celular" sobre un monitor era una instrucción falsa. */}
-                {!auto && elegibles.length > 0 && (
-                    <p className="fono-ayuda">
-                        {t(dispositivo === 'monitor' ? 'projects.demoHintMonitor' : 'projects.demoHint')}
-                    </p>
-                )}
+                {/* Sin línea de ayuda: los botones traen su ícono —un play o una imagen—
+                    y con eso se explican solos. El renglón que había arriba costaba unos
+                    30px de alto en una tarjeta que no puede crecer, y ese alto le hacía
+                    falta a la descripción. */}
 
                 {elegibles.length > 0 && (
                 <div className="fono-botones">
@@ -434,7 +473,7 @@ export default function DemoDispositivo({
                     El nombre del grupo describe qué controla, no de qué proyecto es:
                     con solo `label` anunciaba "Melodía, grupo", que no dice nada sobre
                     lo que hay adentro. */}
-                {video && (
+                {video && !enBucle && (
                     <div
                         className="fono-barra"
                         role="group"

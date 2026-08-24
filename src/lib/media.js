@@ -25,6 +25,9 @@ const ES_LOGO = /^logo/i;
 // forzar una sola convención significaba renombrar archivos ya subidos.
 const ES_APAISADO = /(grande|largo)/i;
 const ES_CHICO = /(chico|cuadrado)/i;
+// Y, aparte del hueco, el tema. Mismo sufijo que ya usan las tapas (`portada-claro`):
+// el archivo sin marcar es el del tema oscuro y `-claro` el del claro.
+const ES_CLARO = /claro/i;
 // La tapa de un proyecto puede venir en tres versiones —una por tema y una animada—
 // y ninguna de las tres es un elemento más de la galería.
 const ES_PORTADA = /^portada/i;
@@ -103,8 +106,14 @@ export function getVideos(carpeta) {
  *    en bucle. Los usa el proyecto de sistemas distribuidos, donde una sola pieza
  *    quieta no alcanzaba para contar que son tres cosas distintas coordinándose.
  *
+ * Cualquiera de las dos imágenes puede venir además en dos versiones, una por tema,
+ * con el mismo sufijo que las tapas: `logo.png` es la del tema oscuro y `logo-claro.png`
+ * la del claro. Hace falta cuando el logo trae texto de un solo color, que contra uno de
+ * los dos fondos queda ilegible —el caso de Cassandra, cuyo wordmark es gris oscuro—.
+ *
  * @param {string} carpeta
- * @returns {{imagen?: string, grande?: string, videos: Array<{src: string, poster?: string}>}}
+ * @returns {{imagen?: string, grande?: string, claro?: string, grandeClaro?: string,
+ *            videos: Array<{src: string, poster?: string}>}}
  */
 export function getMarca(carpeta) {
     const logos = getMedia(carpeta).filter(m => ES_LOGO.test(m.nombre));
@@ -114,14 +123,20 @@ export function getMarca(carpeta) {
     // distintos —el chico a la tarjeta cerrada, el grande a la franja de arriba de la
     // abierta— porque los huecos tienen proporciones muy distintas: 2.3:1 el de la
     // cerrada y más de 5:1 el de la abierta.
-    const grande = imagenes.find(m => ES_APAISADO.test(m.nombre));
-    const chico = imagenes.find(m => !ES_APAISADO.test(m.nombre));
+    const grande = imagenes.find(m => ES_APAISADO.test(m.nombre) && !ES_CLARO.test(m.nombre));
+    const grandeClaro = imagenes.find(m => ES_APAISADO.test(m.nombre) && ES_CLARO.test(m.nombre));
+    const chico = imagenes.find(m => !ES_APAISADO.test(m.nombre) && !ES_CLARO.test(m.nombre));
+    const chicoClaro = imagenes.find(m => !ES_APAISADO.test(m.nombre) && ES_CLARO.test(m.nombre));
     return {
         // El respaldo va en los dos sentidos: con un solo logo, ese cubre los dos
         // huecos. Es el caso de Monopoly, cuyo wordmark sirve igual de bien en la franja
         // apaisada, y el de SpecForge y Cassandra.
         imagen: chico?.src ?? grande?.src,
         grande: grande?.src ?? chico?.src,
+        // El par por tema, cuando el proyecto lo trae. Sigue los mismos respaldos que
+        // los de arriba, así un proyecto con un solo logo por tema los cubre igual.
+        claro: chicoClaro?.src ?? grandeClaro?.src,
+        grandeClaro: grandeClaro?.src ?? chicoClaro?.src,
         // Ya vienen ordenados por nombre desde `getMedia`, que es de dónde sale el
         // orden del bucle: el número del archivo es el turno. Se lleva también la
         // portada —`getMedia` la empareja por nombre— porque un video que no llega a
@@ -242,7 +257,9 @@ export function getFotos(carpeta) {
  * resto de las convenciones de esta carpeta:
  *
  *  - `portada.webp`          el cuadro quieto sobre fondo oscuro
- *  - `portada-claro.webp`    el mismo, sobre fondo claro
+ *  - `portada-claro.webp`    el mismo, sobre fondo claro — opcional: un dibujo que
+ *                            sólo funciona sobre uno de los dos fondos no la trae, y
+ *                            entonces la oscura sirve a los dos temas
  *  - `portada-animada.webp`  la animación, con transparencia para servir a los dos
  *
  * @param {string} carpeta

@@ -188,39 +188,49 @@
         "id": "melodia",
         "title": "Melodía",
         "shortDesc": "Una plataforma full-stack de streaming de música altamente avanzada, diseñada con una interfaz fluida y capacidades revolucionarias de IA.",
-        "fullDesc": "Una ambiciosa recreación full-stack de Spotify que iguala su infraestructura principal de streaming e introduce dos funcionalidades disruptivas. Cuenta con un avanzado motor de reconocimiento de audio (estilo Shazam) capaz de identificar canciones mediante tarareo o sonido ambiente. Además, integra un motor de 'Cover IA' en tiempo real, permitiendo a los usuarios mapear sin problemas el modelo vocal de cualquier artista en cualquier pista, generando sin esfuerzo crossovers como Michael Jackson interpretando un himno de Queen.",
+        "fullDesc": "Recreación full-stack de Spotify que expande la experiencia de streaming con funcionalidades disruptivas. Combina un diseño intuitivo con innovación en IA, permitiendo identificar canciones por tarareo (estilo Shazam) y generar 'Covers IA' en tiempo real, haciendo que la clonación vocal dinámica sea totalmente accesible para el usuario final.\n\nA nivel arquitectónico, el motor de reconocimiento acústico emplea audio fingerprinting y análisis de espectrogramas para buscar coincidencias en vivo. Por su parte, el pipeline de IA ejecuta la separación de pistas y orquesta modelos de Deep Learning (Voice Conversion) para sintetizar nuevo audio al vuelo, apoyándose en aceleración por hardware para procesar la pesada carga computacional con baja latencia.",
         "tags": [
-          "IA",
-          "Música",
-          "Full Stack",
-          "Machine Learning"
+          "PyTorch",
+          "RVC",
+          "Librosa",
+          "FFmpeg",
+          "Python",
+          "FastAPI",
+          "React/Next.js",
+          "Tailwind CSS",
+          "PostgreSQL",
+          "MongoDB",
+          "CUDA"
         ]
       },
       {
         "id": "vibetrip",
         "title": "VibeTrip",
         "shortDesc": "Un ecosistema full-stack integral para el descubrimiento de viajes, modelado a partir de TripAdvisor.",
-        "fullDesc": "Plataforma web full-stack colaborativa para la planificación y descubrimiento de viajes. Integra un backend asíncrono robusto y un frontend moderno de alto rendimiento con mapas interactivos (Leaflet), tableros analíticos (ECharts) y gestión completa de multimedia. Desarrollado en equipo aplicando CI/CD con GitHub Actions para testing automatizado, validación de migraciones de base de datos y despliegue en VPS.",
+        "fullDesc": "Plataforma web colaborativa que centraliza la planificación y el descubrimiento de viajes en grupo. Ofrece una experiencia fluida e interactiva mediante mapas dinámicos y tableros analíticos, facilitando la organización de itinerarios complejos y la gestión de contenido multimedia en un entorno concurrente desarrollado en equipo.\n\nA nivel arquitectónico, integra un frontend de alto rendimiento con renderizado híbrido y un backend asíncrono robusto bajo principios de arquitectura limpia. El sistema maneja validación estricta de esquemas, autenticación segura y procesamiento de archivos con límites de almacenamiento. Todo el ecosistema está respaldado por pipelines de integración continua (CI/CD) para testing automatizado, control de migraciones relacionales y despliegue en contenedores.",
         "tags": [
+          "Next.js",
+          "React",
           "FastAPI",
-          "Next.js 15",
           "PostgreSQL",
-          "React 19",
-          "TypeScript"
+          "TypeScript",
+          "Docker",
+          "GitHub Actions",
+          "Tailwind CSS"
         ]
       },
       {
         "id": "cassandra-engine",
         "title": "Motor de Cassandra",
         "shortDesc": "Un motor de base de datos Cassandra distribuido y de alto rendimiento, programado completamente desde cero en Rust.",
-        "fullDesc": "Desarrollo desde cero de un motor de base de datos distribuida peer-to-peer idéntico a Apache Cassandra, escrito en más de 18.400 líneas de Rust. La arquitectura implementa un anillo lógico con Consistent Hashing, descubrimiento vía Gossip Protocol y Seed Nodes, garantizando alta disponibilidad mediante Hinted Handoff, Read Repair y reconciliación Anti-Entropy con árboles de Merkle. Incluye un parser nativo completo para CQL, Coordinator Nodes y niveles de consistencia configurables (ONE, QUORUM, ALL). Su tolerancia a fallos y consistencia eventual se validan en tiempo real mediante una aplicación concurrente de simulación de vuelos.",
+        "fullDesc": "Motor de base de datos distribuida peer-to-peer construido completamente desde cero, replicando fielmente la arquitectura interna de Apache Cassandra. Para validar su tolerancia a fallos y consistencia eventual en un entorno de alta concurrencia, el sistema opera como base de datos en tiempo real para una aplicación gráfica de simulación de vuelos distribuidos.\n\nA nivel arquitectónico, está desarrollado en Rust e implementa un anillo lógico con Consistent Hashing y descubrimiento de nodos vía Gossip Protocol y Seed Nodes. Garantiza la resiliencia de los datos mediante Hinted Handoff, Read Repair y reconciliación con árboles de Merkle. Además, incorpora un parser nativo para CQL y orquesta las transacciones a través de nodos coordinadores bajo niveles de consistencia configurables (ONE, QUORUM, ALL).",
         "tags": [
           "Rust",
           "Sistemas Distribuidos",
-          "P2P",
           "Consistent Hashing",
-          "Motor DB",
-          "Consistencia Eventual"
+          "Gossip Protocol",
+          "Merkle Trees",
+          "CQL"
         ]
       },
       {
@@ -265,26 +275,27 @@
         "id": "monopoly",
         "title": "Motor de Monopoly",
         "shortDesc": "Un motor de juego de Monopoly completamente funcional construido desde cero en Java, con gestión de estado compleja y temas de UI personalizados.",
-        "fullDesc": "Simulador interactivo de escritorio basado en una arquitectura orientada a objetos con estricta separación MVC. El motor desacopla la lógica del modelo de la interfaz gráfica, permitiendo configurar completamente el tablero, reglas y personajes mediante archivos externos sin modificar el código core. Implementa patrones de diseño avanzados como Abstract Factory para la gestión dinámica de las acciones del jugador.",
+        "fullDesc": "Simulador de escritorio interactivo que recrea la dinámica de un clásico juego de mesa para múltiples jugadores. Destaca por su diseño estructural flexible, donde el tablero, las reglas y los elementos del juego no están fijos en el código, sino que se construyen y personalizan de manera totalmente dinámica a partir de archivos de configuración externos.\n\nA nivel arquitectónico, implementa un desarrollo orientado a objetos con una estricta separación MVC (Modelo-Vista-Controlador), garantizando que la lógica central opere de forma independiente a la interfaz gráfica. Hace uso de patrones de diseño avanzados, como Abstract Factory, para gestionar dinámicamente los estados y acciones del turno, y está construido bajo el sistema de módulos de Java (JPMS) para generar un runtime optimizado y desplegable en contenedores.",
         "tags": [
           "Java 17",
           "JavaFX",
           "MVC",
-          "Design Patterns",
-          "Maven"
+          "JPMS",
+          "Maven",
+          "Docker"
         ]
       },
       {
         "id": "zorro-ocas",
         "title": "Zorro y Ocas (Assembly)",
         "shortDesc": "Un juego de terminal basado en lógica programado estrictamente en lenguaje Ensamblador para dominar la arquitectura de CPU y gestión de memoria.",
-        "fullDesc": "Motor de juego de estrategia clásico desarrollado íntegramente en Assembly x86-64 (sintaxis Intel) para Linux. Escrito respetando estrictamente la convención de llamadas System V AMD64, permitiendo la vinculación directa con un driver de 55 pruebas unitarias automatizadas en C. Implementa un renderizado eficiente en terminal con soporte para secuencias de escape ANSI y caracteres UTF-8/Emojis.",
+        "fullDesc": "Motor de juego de estrategia clásico construido desde cero en lenguaje ensamblador. Demuestra un dominio absoluto de la arquitectura interna de las computadoras, priorizando el rendimiento extremo y la gestión manual de recursos sin las abstracciones de los lenguajes modernos.\n\nA nivel arquitectónico, está desarrollado en Assembly x86-64 (Linux) respetando estrictamente la convención System V AMD64 para la gestión de pila y registros. Destaca por su sistema de indirección de memoria para mapear bytes a caracteres UTF-8 en tiempo de ejecución, y un renderizado de muy bajo nivel mediante secuencias ANSI, vinculando de forma nativa contra libc.",
         "tags": [
           "Assembly x86-64",
-          "C",
           "NASM",
-          "System V ABI",
-          "Low Level"
+          "GCC",
+          "libc",
+          "Linux"
         ]
       }
     ]

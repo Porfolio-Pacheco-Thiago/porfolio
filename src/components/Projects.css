@@ -124,16 +124,36 @@
    grilla: ya no puede crecer y empujar la sección, así que lo que mida de más se lo
    quita al celular y a la descripción, que van debajo. Con `28.5vh` el contenido se
    pasaba 85px del borde y el celular quedaba cortado. */
-.project-card.expanded .project-media {
-    height: clamp(150px, 19.4vh, 215px);
+/* ── El alto de la franja de la tarjeta abierta ───────────────────────────
+   No es un valor: es lo que sobra. La tarjeta abierta no puede crecer —es `inset: 0`
+   sobre el hueco de la grilla— así que cualquier alto fijo acá es una apuesta contra el
+   largo del texto y el tamaño de la pantalla, y se pierde de los dos lados: si se queda
+   corto el logo sale diminuto, y si se pasa el contenido termina fuera del borde. Hubo
+   una regla por proyecto tratando de acertarle a cada caso, y con cada cambio de copy
+   había que volver a medirlas.
+
+   Con la tarjeta en columna flexible y la ventana como único elemento que se estira, el
+   reparto lo hace el navegador: lo de abajo ocupa lo que necesita y la franja se queda
+   con todo el resto. El logo queda siempre lo más alto que entra, y el contenido nunca
+   se pasa, porque lo que crece es justamente lo que sobraba. */
+.project-card.expanded {
+    display: flex;
+    flex-direction: column;
 }
 
-/* Los que **no** tienen demo en el celular tienen lugar de sobra —el celular es lo que
-   llena la mitad de abajo— así que su foto puede ser bastante más alta. Le viene bien
-   sobre todo a la que va con `contain`: cuanto más alto el hueco, menos relleno a los
-   costados. */
-.project-card.expanded:not(:has(.fono-bloque)) .project-media {
-    height: clamp(200px, 30.5vh, 300px);
+.project-card.expanded .project-marco {
+    flex: 1 1 auto;
+    /* Un piso para que no llegue a leerse como una raya en vez de una ventana. */
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card.expanded .project-media {
+    height: auto;
+    flex: 1 1 auto;
+    /* Sin esto un elemento flexible no baja de su contenido y no podría achicarse. */
+    min-height: 0;
 }
 
 /* ── Hover: la tarjeta se inclina y el marco se pone brilloso ──────────────
@@ -340,15 +360,6 @@
     --marca-zoom: 1;
 }
 
-/* Su `logo-grande.png` es 2000x500, o sea 4:1, y la franja de la tarjeta abierta es
-   5.2:1. Con `contain` eso lo deja limitado por el alto: entraría a 840px de ancho y
-   dejaría unos 125px de placa a cada lado. Así que el hueco se adapta a la pieza en vez
-   de al revés — 1091 de ancho útil entre 4 son 273 de alto, más el padding de la marca.
-   Es el único proyecto con esta regla, porque es el único con un `-grande` propio. */
-[data-proyecto="zorro-ocas"].expanded .project-media {
-    height: clamp(200px, 29.2vh, 278px);
-}
-
 /* Los tres videos son iconos chicos en un lienzo cuadrado de 1500px: casi todo lo que
    se recorta al acercar es lienzo vacío, de ahí que aguanten el acercamiento más
    grande de los cinco.
@@ -374,6 +385,26 @@
     --marca-placa-grande: transparent;
     --marca-zoom: 1.15;
 }
+
+/* Y sin la placa del marco tampoco. Con las dos anteriores en `transparent` lo que
+   quedaba asomando era el fondo de `.project-marco` —`--bg-primary` plano—, que no es
+   el fondo de la página: el sol verde de `body::before` va en una capa fija por detrás
+   del contenido, así que un relleno opaco lo tapa y la ventana se leía como un
+   rectángulo gris en medio del degradado. Se nota solo acá porque es el único proyecto
+   cuya ventana no está cubierta por una captura.
+
+   No descubre nada de atrás con la tarjeta abierta: mientras hay una expandida las
+   demás quedan en `visibility: hidden`, así que detrás está la página y nada más. */
+[data-proyecto="cassandra-engine"] .project-marco {
+    background: transparent;
+}
+
+/* El hover no lleva excepción a propósito: ahí vuelve la placa gris. La regla de
+   `.project-card:not(.expanded):hover .project-marco` apila dos fondos —uno opaco
+   recortado a `padding-box` y el degradado a `border-box`— y le gana en especificidad a
+   la de arriba, así que el centro se rellena con `--bg-primary` mientras el mouse está
+   encima y vuelve a quedar sin fondo al salir. Es lo buscado: en reposo el logo se apoya
+   sobre la página, y el hover lo levanta sobre una superficie. */
 
 [data-proyecto="monopoly"] .project-media.con-marca {
     --marca-zoom: 1.0;
@@ -439,6 +470,29 @@
     transition: opacity 0.35s ease 0.2s;
 }
 
+/* ── La marca según el tema ───────────────────────────────────────────────
+   Cuando un logo trae sus dos versiones, las dos están en el DOM y acá se elige. Va
+   por `visibility` y no por `opacity`, que es lo que usan las tapas, porque la opacidad
+   de la marca ya está tomada: es la que la hace entrar y salir al abrir la tarjeta
+   —`.project-card.expanded .project-marca`— y una regla de tema encima competiría con
+   esa por la misma propiedad. `visibility` es ortogonal, así que las dos conviven, y a
+   diferencia de `display: none` la copia escondida igual se descarga y se decodifica:
+   cambiar de tema no deja el hueco vacío mientras baja el archivo. */
+.project-marca.es-claro,
+.project-marca-grande.es-claro {
+    visibility: hidden;
+}
+
+[data-theme="light"] .project-marca.es-oscuro,
+[data-theme="light"] .project-marca-grande.es-oscuro {
+    visibility: hidden;
+}
+
+[data-theme="light"] .project-marca.es-claro,
+[data-theme="light"] .project-marca-grande.es-claro {
+    visibility: visible;
+}
+
 /* Con marca, la tapa no se dibuja. Mientras las placas eran opacas daba igual —quedaba
    tapada de todos modos— pero la de Cassandra es transparente, y ahí la captura se veía
    por detrás del logo. Sacándola queda el fondo del marco, que es el de la página.
@@ -479,14 +533,25 @@
     background: #000;
 }
 
+/* Las dos reglas de tema claro van condicionadas a que exista la versión clara. La
+   tapa en tres versiones no obliga a traer las tres: un dibujo puede funcionar sobre un
+   solo fondo y no tener sentido sobre el otro. Es el caso de los modelos predictivos,
+   cuya red neuronal vive del brillo de los nodos contra el negro; sobre blanco las
+   conexiones se pierden. Ese proyecto entonces no trae `portada-claro`, y sin ella acá
+   no hay nada que intercambiar: la oscura se queda, y la animada —que es transparente y
+   toma el fondo de su propia capa— se queda sobre negro para acompañarla.
+
+   Se expresa como la ausencia del archivo y no como una excepción por proyecto para que
+   la regla sea una sola: el que quiera cambiar con el tema trae las dos piezas, el que
+   no, trae una. */
 .project-cover.es-claro,
-[data-theme="light"] .project-cover.es-animada {
+[data-theme="light"] .project-media:has(.es-claro) .project-cover.es-animada {
     background: #fff;
 }
 
 /* Cerrada: la quieta del tema que corresponda. */
 .project-cover.es-claro,
-[data-theme="light"] .project-cover.es-oscuro {
+[data-theme="light"] .project-media:has(.es-claro) .project-cover.es-oscuro {
     opacity: 0;
 }
 
@@ -559,7 +624,11 @@
    —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
    mejor: un logo ya se ve entero, y agrandarlo al pasar el mouse es movimiento sin
    información. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
+/* Al agrandarse con el mouse la franja recupera un alto propio, así que ahí tiene que
+   dejar de estirarse: si no, `flex-grow` la devolvería al alto del hueco y el alto de
+   abajo no se vería. */
 .project-card.expanded .project-media:not(.con-marca):hover {
+    flex: none;
     /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
     overflow: visible;
 }
@@ -723,6 +792,12 @@
     line-height: 1.65;
     /* ~65 caracteres: más ancho que esto y el ojo pierde el renglón al volver. */
     max-width: 62ch;
+}
+
+/* El aire entre párrafos, sólo cuando hay más de uno. Va en `em` para que siga al
+   tamaño del texto. */
+.project-fulldesc + .project-fulldesc {
+    margin-top: 0.85em;
 }
 
 /* Un solo marco limpio para las capturas, con el mismo borde y radio que la
@@ -1254,6 +1329,12 @@
     animation-name: fono-sube-sale;
 }
 
+/* El carrusel a corte: la pieza aparece puesta, sin subir. No hay `is-saliente` que
+   apagar porque en este modo no se monta ninguna —ver el efecto del intervalo—. */
+.fono-pieza.es-corte {
+    animation: none;
+}
+
 @keyframes fono-sube-entra {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
@@ -1296,12 +1377,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
-}
-
-.fono-ayuda {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
 }
 
 .fono-botones {

@@ -114,7 +114,7 @@ export default function Projects() {
 
             <div className="projects-grid" ref={grillaRef}>
                 {items.map((item, index) => {
-                    const { Icon, repo, pantalla, carrusel } = projectMeta[item.id] ?? {};
+                    const { Icon, repo, pantalla, carrusel, bucle } = projectMeta[item.id] ?? {};
                     const isExpanded = expandedId === item.id;
                     const carpeta = `projects/${item.id}`;
                     // Un proyecto puede traer una tapa en tres versiones —quieta por
@@ -150,7 +150,14 @@ export default function Projects() {
                     // columna del celular o suelto, según el proyecto tenga videos o no.
                     const aparte = (
                         <div className="project-aparte">
-                            <p className="project-fulldesc">{item.fullDesc}</p>
+                            {/* Un `<p>` por párrafo, separados por una línea en blanco en
+                                el JSON. Como texto plano dentro de un solo `<p>` los saltos
+                                los come el HTML y los párrafos se pegan en un bloque. Los
+                                que traen una sola parte —que son casi todos— siguen dando
+                                un único `<p>`, igual que antes. */}
+                            {item.fullDesc.split('\n\n').map(parrafo => (
+                                <p className="project-fulldesc" key={parrafo.slice(0, 40)}>{parrafo}</p>
+                            ))}
                             <div className="project-tags">
                                 {item.tags.map(tag => (
                                     <span key={tag} className="tag">{tag}</span>
@@ -224,7 +231,14 @@ export default function Projects() {
                                     {marca.videos.length > 0 ? (
                                         <LogoBucle className="project-marca" videos={marca.videos} />
                                     ) : marca.imagen && (
-                                        <img className="project-marca" src={marca.imagen} alt="" loading="lazy" decoding="async" />
+                                        <img className={`project-marca ${marca.claro ? 'es-oscuro' : ''}`} src={marca.imagen} alt="" loading="lazy" decoding="async" />
+                                    )}
+                                    {/* Y su versión para el tema claro, cuando el logo trae
+                                        una. Conviven en el DOM como las tapas, por lo mismo:
+                                        que la que entra ya esté decodificada, así cambiar de
+                                        tema no deja el hueco vacío mientras baja. */}
+                                    {marca.claro && (
+                                        <img className="project-marca es-claro" src={marca.claro} alt="" loading="lazy" decoding="async" />
                                     )}
                                     {/* El logo apaisado, para la franja de la tarjeta
                                         abierta. Es un archivo aparte del chico porque los
@@ -232,7 +246,10 @@ export default function Projects() {
                                         cerrada contra más de 5:1 abierta— y una sola pieza
                                         no sirve para los dos. */}
                                     {marca.grande && (
-                                        <img className="project-marca-grande" src={marca.grande} alt="" loading="lazy" decoding="async" />
+                                        <img className={`project-marca-grande ${marca.grandeClaro ? 'es-oscuro' : ''}`} src={marca.grande} alt="" loading="lazy" decoding="async" />
+                                    )}
+                                    {marca.grandeClaro && (
+                                        <img className="project-marca-grande es-claro" src={marca.grandeClaro} alt="" loading="lazy" decoding="async" />
                                     )}
                                     {portada.animada || portada.claro ? (
                                         // Las tres conviven en el DOM y el CSS elige: la
@@ -243,7 +260,14 @@ export default function Projects() {
                                         // parpadeo mientras baja.
                                         <>
                                             <img className="project-cover es-oscuro" src={portada.oscuro} alt="" loading="lazy" decoding="async" />
-                                            <img className="project-cover es-claro" src={portada.claro} alt="" loading="lazy" decoding="async" />
+                                            {/* La clara es opcional: sin ella la oscura sirve
+                                                a los dos temas, y el CSS lo detecta por si
+                                                está o no en el DOM. Sin esta guarda quedaba
+                                                una `img` sin `src`, que en tema claro tapaba
+                                                la buena con su fondo blanco. */}
+                                            {portada.claro && (
+                                                <img className="project-cover es-claro" src={portada.claro} alt="" loading="lazy" decoding="async" />
+                                            )}
                                             <img className="project-cover es-animada" src={portada.animada} alt="" loading="lazy" decoding="async" />
                                         </>
                                     ) : cover ? (
@@ -318,6 +342,9 @@ export default function Projects() {
                                             medios={medios}
                                             dispositivo={pantalla === 'monitor' ? 'monitor' : 'fono'}
                                             auto={Boolean(carrusel)}
+                                            segundos={carrusel?.segundos}
+                                            corte={carrusel?.corte}
+                                            bucle={bucle}
                                             label={item.title}
                                             onPlayingChange={va => setReproduciendoId(va ? item.id : null)}
                                             conTransicion={conTransicion}
