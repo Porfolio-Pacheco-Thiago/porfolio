@@ -260,6 +260,10 @@
 .project-card.expanded.is-reproduciendo .project-media,
 .project-card.is-reproduciendo .project-barra {
     height: 0;
+    /* La ventana abierta se estira para quedarse con el alto que sobra; acá no tiene que
+       hacerlo, porque el alto que le toca es cero. Sin esto `flex-grow` le devuelve el
+       hueco y el `height: 0` de arriba no se ve. */
+    flex: none;
 }
 
 .project-card.is-reproduciendo .project-marco {
@@ -267,6 +271,11 @@
     padding-bottom: 0;
     border-width: 0;
     opacity: 0;
+    /* Y por lo mismo el marco deja de estirarse y suelta su piso: mientras se reproduce
+       no hay ventana, así que su alto mínimo no tiene a qué aplicarse y lo único que
+       hacía era dejar una tira vacía arriba del monitor. */
+    flex: 0 0 auto;
+    min-height: 0;
 }
 
 /* El recuadro se apoyaba en la esquina de la ventana; sin ventana no tiene de qué
@@ -1015,8 +1024,13 @@
    especificidad y desempata el orden. */
 .project-card.is-reproduciendo:has(.fono.es-monitor) {
     /* Ancho del monitor mientras se reproduce. Vive acá y no en la regla del aparato
-       porque lo necesitan dos: el propio monitor y la columna que lo aloja. */
-    --monitor-video: 915px;
+       porque lo necesitan dos: el propio monitor y la columna que lo aloja.
+
+       El alto sale de este ancho, por la proporción de la pantalla, así que este número
+       es en realidad el reparto entre el monitor y la descripción de abajo. Bajó de 915
+       cuando las descripciones pasaron a dos párrafos: este acomodo estaba calculado
+       para que el texto ocupara tres renglones, y con dos párrafos ocupa seis. */
+    --monitor-video: 730px;
 }
 
 .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-bloque {
@@ -1045,8 +1059,12 @@
     justify-self: end;
 }
 
+/* Solo el celular: el monitor pisa este ancho con `--monitor-video`. Como allá, el alto
+   sale del ancho por la proporción de la pantalla, así que este número reparte entre el
+   aparato y la descripción de abajo, y bajó de 330 por lo mismo — dos párrafos ocupan el
+   doble de alto que el renglón triple para el que estaba calculado el acomodo. */
 .project-card.is-reproduciendo .fono {
-    width: min(330px, 70%);
+    width: min(310px, 70%);
 }
 
 .project-card.is-reproduciendo .fono.is-demo {
