@@ -209,13 +209,37 @@ según cuál sea. El monitor a 900, con estas reglas; el celular a 768, con el
 sigue en dos columnas, y entra —se midió—, pero son dos números para la misma idea.
 Unificarlos entra en la revisión de la escala de breakpoints.
 
-### 3.2 Trayectoria
+### 3.2 Trayectoria — **hecho**
 
-Ya tiene su colapso a una columna en `Journey.css:1158`: la línea se va al margen y todo
-cuelga de ella. Es la parte más resuelta del sitio.
+El plan decía que era "la parte más resuelta del sitio" y que solo faltaba verificar. Era
+al revés: el bloque de 768 existía pero **no funcionaba**. Se escribió en el mismo commit
+que el rediseño y quedó apuntando a una estructura que ese mismo commit cambió.
 
-Falta revisar: los acordeones por cliente y las listas anidadas (los tres modos de
-`Journey.jsx`) con el ancho de un teléfono, y las galerías.
+Cuatro cosas, en orden de gravedad:
+
+1. **La tarjeta medía 21px de ancho útil.** El bloque fijaba `left: 20px` sobre la línea
+   visual, pero quien posiciona todo es la variable `--eje-x`, que seguía en 50%. Los
+   bloques se medían contra un eje que ya no estaba ahí. Ahora se mueve la variable, que
+   es el mecanismo que el propio diseño tiene para esto: su comentario dice que al
+   moverla *"todo lo demás la sigue solo"*.
+2. **Las filas se pisaban.** El alto del ítem sale de `--foto`, que en ancho es el alto de
+   la foto y de la fila a la vez. En una columna angosta el título se parte en más
+   renglones y pedía 155px contra los 105 fijos. Acá el alto lo pone el contenido, y para
+   eso el bloque vuelve al flujo.
+3. **El expandido se recortaba**, 1227px de contenido en 747 de caja. Mismo techo que en
+   Proyectos y por el mismo motivo: en ancho la tarjeta abierta se acota a lo que hay
+   hasta el pie del timeline para que la sección entre en pantalla. Acá se scrollea igual.
+4. **Los tags se salían** hasta 342px: `.nested-tags` va con `flex-wrap: nowrap`.
+
+**Dos lecciones de método, las dos aprendidas por las malas:**
+
+- **Medir contra el contenedor, no contra el documento.** El desborde de los tags no
+  aparecía en `scrollWidth > clientWidth`: la simulación acota el timeline a 390px pero la
+  ventana sigue en 1920, así que hay lugar de sobra fuera de la tarjeta y la página no
+  acusa nada. Contra la tarjeta salta enseguida.
+- **Devolver el umbral antes de mirar otra cosa.** Dejé el 2000px puesto y el escritorio
+  quedó con el layout de teléfono hasta que el usuario lo vio. El truco es útil pero es
+  una granada sin seguro: restaurarlo va en el mismo paso que ponerlo, no al final.
 
 ### 3.3 Hero
 

@@ -1158,12 +1158,22 @@
 @media (max-width: 768px) {
     .timeline {
         padding-top: 2rem;
+        /* La línea se va al margen y todo cuelga de ella. Va por la variable y no
+           fijando `left` pieza por pieza: `--eje-x` es de dónde cuelga el conjunto —la
+           línea, los puntos, los conectores y el borde interno de los bloques—, así que
+           moverla los mueve a todos de una. Antes acá se fijaba `left: 20px` sobre la
+           línea sola, y los bloques seguían midiéndose contra un eje al 50% que ya no
+           estaba: la tarjeta terminaba con 21px de ancho útil. */
+        --eje-x: 20px;
+        --hueco-eje: 14px;
     }
 
-    /* En una columna angosta no hay dos lados: la línea se va al margen y todo
-       cuelga de ella. */
-    .timeline-axis {
-        left: 20px;
+    /* Y el eje deja de correrse al abrir una tarjeta. En dos columnas se va hacia el
+       lado contrario para darle ancho a la que se abre; en una sola no hay tal lado,
+       la tarjeta ya lo tiene todo. */
+    .experience[data-abierto="academic"] .timeline,
+    .experience[data-abierto="work"] .timeline {
+        --eje-x: 20px;
     }
 
     .timeline-axis-label {
@@ -1181,22 +1191,70 @@
         display: none;
     }
 
+    /* El alto de la fila deja de salir de la foto. En ancho `--foto` es el alto de las
+       seis filas por igual, y de esa igualdad depende la cuenta de la tarjeta abierta;
+       acá esa cuenta no corre —el eje no se mueve y la tarjeta no gana ancho al abrir—,
+       y en cambio el título se parte en más renglones y no entraba: el ítem medía 105px
+       fijos contra 155 que pedía el contenido, y las tarjetas se pisaban entre sí.
+
+       Se puede soltar `max-height` sin romper nada porque lo único que lo anima es el
+       colapso de una pista entera, y acá esa función no existe: se dispara desde los
+       rótulos del eje, que en esta columna están ocultos. */
+    .timeline-item {
+        height: auto;
+        max-height: none;
+    }
+
+    /* Y el bloque vuelve al flujo, que es lo que le da el alto al ítem. En ancho va en
+       absoluto **siempre** para que abrir sea mover cuatro números que ya estaban ahí y
+       la transición pueda animarlos; acá no se mueve a ningún lado al abrir, así que no
+       hay nada que animar y sí un alto que hay que poder medir.
+
+       Con el techo va lo mismo que en Proyectos: en ancho la tarjeta abierta se acota a
+       lo que hay hasta el pie del timeline, para que la sección entre en pantalla y no
+       crezca. Acá la página se scrollea igual, y ese techo lo único que hacía era
+       recortar —la entrada de docencia pedía 1227px y se quedaba en 747—. */
+    /* Las tres ramas del selector no son decorativas: las reglas base que ubican el
+       bloque van por `.cat-academic` y `.cat-work`, dos clases cada una, así que con un
+       selector más corto el `left` de la rama laboral seguía mandando y sus tarjetas se
+       salían 30px por la derecha. */
+    .timeline-item.cat-academic .timeline-bloque,
+    .timeline-item.cat-work .timeline-bloque,
+    .timeline-item.expanded .timeline-bloque {
+        position: relative;
+        inset: auto;
+        margin-left: calc(var(--eje-x) + var(--hueco-eje));
+        max-height: none;
+    }
+
+    .timeline-item.cat-academic .timeline-dot,
+    .timeline-item.cat-work .timeline-dot {
+        left: var(--eje-x);
+        right: auto;
+    }
+
+    /* El desplazamiento ya lo pone el bloque con su `left`, así que la ventana no lleva
+       ninguno propio. */
     .timeline-card,
     .timeline-item.cat-academic .timeline-card,
     .timeline-item.cat-work .timeline-card,
     .timeline-item.expanded .timeline-card {
         width: auto;
-        margin: 0 0 0 50px;
-    }
-
-    .timeline-item.cat-academic .timeline-dot,
-    .timeline-item.cat-work .timeline-dot {
-        left: 20px;
-        right: auto;
+        margin: 0;
     }
 
     .timeline-card-image {
         height: 80px;
+    }
+
+    /* Los tags se parten en varias filas. En ancho la ventana da de sobra y van en una
+       sola —`nowrap`—, pero en una columna de 356px los de Toyota se salían 342px por la
+       derecha. No se veía en la medición contra el documento: a 1920 hay lugar fuera de
+       la tarjeta, así que el desborde existe pero la página no lo acusa. Contra la
+       tarjeta sí. */
+    .nested-tags,
+    .timeline-tags {
+        flex-wrap: wrap;
     }
 }
 /* ── Lo que no se muestra en reposo ───────────────────────────────────────
