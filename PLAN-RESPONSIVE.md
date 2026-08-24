@@ -56,10 +56,10 @@ la medida de control, porque es la que se reparte sola:
 
 | id | franja |
 |---|---|
-| `cassandra-engine` | 125 |
+| `cassandra-engine` | 114 |
 | `melodia` | 162 |
-| `distributed-systems` | 174 |
-| `vibetrip` | 199 |
+| `distributed-systems` | 163 |
+| `vibetrip` | 188 |
 | `monopoly` | 220 |
 | `zorro-ocas` | 231 |
 | `specforge` | 257 |
@@ -70,10 +70,21 @@ visible, desborde 0. Melodía: celular 310×612, dos párrafos, desborde 0.
 
 ### El protocolo importa tanto como los números
 
-La primera corrida de esta tabla dio **+11px** en tres tarjetas —`zorro-ocas`, `specforge`
-y el alto de tarjeta, que salía 706 en vez de 695—. No era ruido: era medir una tarjeta
-mientras la **anterior todavía se estaba cerrando**. Durante esa transición la grilla mide
-11px de más, y como la franja toma el alto que sobra, se lleva la diferencia entera.
+Las dos primeras corridas de esta tabla dieron **+11px** en varias tarjetas, y el alto de
+tarjeta salía 706 en vez de 695. Costó dos intentos aislarlo, y no era ruido: es medir una
+tarjeta mientras la **anterior todavía se está cerrando**. Durante esa transición la grilla
+mide 11px de más, se clava ese alto —`Projects.jsx` fija el alto de la grilla en px al
+abrir— y la franja, que toma lo que sobra, se lleva la diferencia entera.
+
+Los 11px no son casualidad: son `--marco: 0.7rem`, el aire que la tarjeta abierta le da al
+marco, mientras su transición de `margin` todavía está corriendo sobre la tarjeta que se
+cierra.
+
+La moraleja es más incómoda que el número: **una línea base mal tomada es peor que no
+tener ninguna**, porque después cada diferencia parece una regresión. Con los valores de
+arriba, el paso 2 parecía haber movido tres tarjetas; la única forma de descartarlo fue
+`git stash` de los cambios y volver a medir, que dio idéntico. Si una medida no cierra,
+ese es el camino corto: stashear y comparar, no razonar sobre la tabla.
 
 O sea que la franja es un control excelente y por eso mismo delata cualquier suciedad del
 método. Antes de cada medición:
@@ -120,55 +131,46 @@ especificidad. Media query y especificidad son cosas independientes — estar ad
 
 ---
 
-## 2. El problema estructural: la tarjeta expandida
+## 2. El problema estructural: la tarjeta expandida — **hecho**
 
-Esto es el núcleo del trabajo, no un detalle.
+En ancho la tarjeta abierta es una capa: `position: absolute; inset: 0` sobre la grilla
+entera, y `Projects.jsx` le clava a la grilla su alto en px antes de abrir. Así la grilla
+no cambia de alto y la página no se mueve bajo el mouse.
 
-`Projects.css:112` pone la tarjeta abierta en `position: absolute; inset: 0` **sobre la
-grilla entera**. En escritorio la grilla son 3 filas, así que esa caja mide unos 695px y es
-un techo razonable. Todo lo que se ajustó en las últimas sesiones cuelga de que ese techo
-exista y sea ese:
+En angosto eso se cae: con una tarjeta por fila la grilla son ocho apiladas, y la abierta
+heredaría ese alto entero. Por debajo de 900 ahora vuelve al flujo, crece y empuja lo de
+abajo, que es lo que se espera en un teléfono.
 
-- la franja que se estira para tomar lo que sobra,
-- el reparto entre el monitor y la descripción al reproducir,
-- que Cassandra esconda su segundo párrafo.
+Tres piezas, y la tercera no es CSS:
 
-En angosto las tarjetas pasan a `width: 100%`, o sea **ocho apiladas**. La grilla mide
-varios miles de píxeles y la tarjeta abierta hereda ese alto entero. No es que se vea mal:
-es que todas las decisiones de alto dejan de tener sentido a la vez.
+1. `position: static` para la abierta.
+2. Las otras pasan de `visibility: hidden` a `display: none`. En ancho ocupan su lugar a
+   propósito —es lo que sostiene el alto de la grilla—; acá eso dejaría siete huecos.
+3. **La guarda en `Projects.jsx`.** Clavar el alto de la grilla no solo sobra en angosto:
+   es dañino, porque lo que clavaría es el alto de las ocho apiladas. El umbral está
+   repetido en el CSS y en el JS; si se mueve, se mueven los dos.
 
-**La pregunta a resolver primero** (antes de tocar una línea de las otras secciones): en
-angosto, ¿la tarjeta abierta sigue siendo una capa sobre la grilla, o vuelve al flujo?
+Y sin techo que repartir, la franja deja de estirarse y toma un alto propio proporcional
+al ancho (`clamp(120px, 38vw, 260px)`), que es lo que tiene sentido para una banda
+apaisada en una pantalla angosta.
 
-La razón de que sea una capa está en el comentario de `Projects.css:96`: que la grilla no
-cambie de alto, para que la página no se mueva bajo el mouse y la tarjeta aparezca donde ya
-estabas mirando. **En un teléfono ese argumento no aplica** — ahí se scrollea de todos
-modos, no hay mouse, y una tarjeta que crece empujando lo de abajo es el comportamiento
-esperado.
+### Lo que se corrigió del plan original
 
-Así que lo más probable es:
+- **No existe `expandedIsRight` ni intercambio de `order`.** `CLAUDE.md` lo describe, pero
+  es de una implementación anterior. Lo que hay es el alto clavado. La nota de `CLAUDE.md`
+  quedó vieja y conviene arreglarla cuando se toque ese archivo.
+- El morph de View Transitions no necesitó nada: sigue funcionando con la tarjeta en el
+  flujo.
 
-```css
-@media (max-width: 900px) {
-    .project-card.expanded {
-        position: static;   /* vuelve al flujo: crece y empuja */
-        inset: auto;
-    }
-    /* y con eso, la franja deja de repartir un techo que ya no existe */
-    .project-card.expanded .project-marco { flex: none; }
-    .project-card.expanded .project-media { height: <un alto propio>; }
-}
-```
+### Cómo se verificó sin poder achicar la ventana
 
-Ojo con el efecto secundario: las tarjetas no expandidas están en `visibility: hidden`
-**pero siguen ocupando su lugar** (`Projects.css:102`). Con la abierta de vuelta en el
-flujo, eso deja un hueco enorme debajo. En angosto probablemente tengan que ir a
-`display: none`.
+`resize_window` no tiene efecto sobre esta ventana, así que el truco fue **subir los dos
+umbrales a 2000px temporalmente** —el del CSS y el del JS—, mirar el resultado a 1920, y
+devolverlos. Con eso se comprobó lo que importa: `position: static`, grilla sin clavar,
+hermanas en `display: none`, la sección creciendo de 890 a 1035 y desborde 0.
 
-**Verificar también:** el morph de View Transitions (`Projects.jsx`, con `flushSync` y el
-intercambio de `order`) y el cálculo de `expandedIsRight`, que según `CLAUDE.md` supone una
-grilla de N columnas. Con una sola columna hay que confirmar que no queda haciendo cuentas
-sobre una geometría que ya no existe.
+Es la forma más barata de ver el layout angosto en esta máquina, y sirve para el resto de
+los pasos.
 
 ---
 

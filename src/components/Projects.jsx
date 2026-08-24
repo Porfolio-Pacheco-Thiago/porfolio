@@ -62,8 +62,15 @@ export default function Projects() {
         // se abre pasa a posición absoluta y sale del flujo: sin eso la grilla se queda
         // con seis tarjetas, o sea dos filas en vez de tres, y se acorta igual. Es la
         // única medición que quedó, y reemplaza a todo el scroll de recentrado.
+        //
+        // Salvo en angosto, donde la tarjeta abierta vuelve al flujo (ver el bloque de
+        // 900 en Projects.css). Ahí clavar el alto sería contraproducente por partida
+        // doble: lo que se clavaría es el alto de las ocho apiladas, y además la abierta
+        // ya no sale del flujo, así que no hay nada que compensar. El umbral está
+        // repetido acá y en el CSS; si se mueve, se mueven los dos.
         const grilla = grillaRef.current;
-        if (grilla && !cerrando && expandedId === null) {
+        const angosto = window.matchMedia('(max-width: 900px)').matches;
+        if (grilla && !cerrando && expandedId === null && !angosto) {
             grilla.style.height = `${grilla.getBoundingClientRect().height}px`;
         }
         const soltarGrilla = () => {

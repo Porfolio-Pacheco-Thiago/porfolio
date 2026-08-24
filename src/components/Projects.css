@@ -1725,6 +1725,41 @@
     .project-card {
         width: 100%;
     }
+
+    /* ── La tarjeta abierta vuelve al flujo ───────────────────────────────
+       En ancho es una capa: `position: absolute; inset: 0` sobre la grilla entera, para
+       que la grilla no cambie de alto y la página no se mueva bajo el mouse. Acá ese
+       argumento no existe —no hay mouse y se scrollea igual— y en cambio el efecto es
+       ruinoso: con una tarjeta por fila la grilla son ocho apiladas, o sea un par de
+       miles de píxeles, y la abierta heredaría ese alto entero.
+
+       De vuelta en el flujo crece y empuja lo de abajo, que es lo que se espera de una
+       tarjeta que se abre en un teléfono. */
+    .project-card.expanded {
+        position: static;
+        inset: auto;
+        width: 100%;
+    }
+
+    /* Y las otras se van del todo. En ancho quedan en `visibility: hidden` **ocupando su
+       lugar**, que es lo que mantiene el alto de la grilla; acá eso mismo dejaría siete
+       huecos vacíos debajo de la abierta. */
+    .projects-grid:has(.project-card.expanded) .project-card:not(.expanded) {
+        display: none;
+    }
+
+    /* Sin techo no hay resto que repartir: la franja deja de estirarse y toma un alto
+       propio, proporcional al ancho, que es lo que tiene sentido para una banda apaisada
+       en una pantalla angosta. */
+    .project-card.expanded .project-marco {
+        flex: none;
+        min-height: 0;
+    }
+
+    .project-card.expanded .project-media {
+        flex: none;
+        height: clamp(120px, 38vw, 260px);
+    }
 }
 
 @media (max-width: 768px) {
