@@ -241,18 +241,45 @@ Cuatro cosas, en orden de gravedad:
   quedó con el layout de teléfono hasta que el usuario lo vio. El truco es útil pero es
   una granada sin seguro: restaurarlo va en el mismo paso que ponerlo, no al final.
 
-### 3.3 Hero
+### 3.3 Hero — **hecho**
 
-Tiene 768 y 1400 (`Hero.css:448`, `:531`). El `width: 600px` de `Hero.css:17` es el
-resplandor decorativo, dentro de un `overflow: hidden` — no es riesgo de layout.
+El layout estaba bien: a 390 y a 768 no hay desborde y la columna apilada entra. Los dos
+arreglos fueron otra cosa.
 
-El punto real acá es el **peso**: `CLAUDE.md` dice que lo que queda de la página es casi
-todo el hero, 1,7 MB + 1,2 MB de video WebM. En una conexión móvil eso es el problema
-principal del sitio, más que cualquier layout. Considerar servir solo el póster
-(38 KB, ya optimizado) por debajo de cierto ancho.
+**El peso.** Era el punto real y salió como estaba previsto: por debajo de 768px el
+`<video>` se reemplaza por el `<img>` del póster, que es el mismo cuadro con su alfa en
+39 KB. Medido en el navegador, a 390px no se pide ningún `.webm`: **2,92 MB → 39 KB**.
+La decisión se toma una sola vez, al montar, y **no** se escucha el `change` del
+`matchMedia`, por dos razones: la pregunta que contesta —"¿este aparato gasta 1,2 MB en
+esto?"— no cambia porque se gire el teléfono, y escucharla implicaría cortarle el video a
+alguien que apenas achica la ventana. Se probó primero con listener y se sacó: en este
+entorno `resize_window` informa éxito y no redimensiona nada —ni siquiera dispara
+`resize`—, así que era una rama que no se podía ejercitar. Mejor no tenerla que tenerla
+sin probar.
+
+**La flecha caía encima del carrusel de marcas.** `.scroll-indicator` es `absolute`
+contra el pie del hero, que en escritorio tiene altura de sobra. Apilado el hero mide lo
+que mide su contenido y la flecha se superponía **48px** con `.marcas`, igual a 390 que a
+768. Se oculta debajo de 768: el dibujo es un mouse con rueda, que en una pantalla táctil
+no dice nada, y su trazo anima sin parar —la misma animación que el componente ya pausa al
+salir de vista—.
 
 **No re-encodear los WebM.** Ver la nota de `CLAUDE.md`: llevan alfa por `BlockAdditional`
-y ffmpeg lo pierde en silencio.
+y ffmpeg lo pierde en silencio. Acá no hizo falta tocarlos: no se recomprime nada, se
+elige no pedirlos.
+
+#### Dos cosas que aparecieron y **no** son de este paso
+
+- **El riel de contacto tapa el final del pie.** Debajo de 900px el riel pasa a ser una
+  barra fija abajo de 55px, y nada le reserva ese espacio: el contenido del pie termina a
+  48px del final del documento, así que la barra le come los últimos 7px. Es de 3.4 y se
+  arregla con un `padding-bottom` en `.footer` dentro del media query, no con uno en
+  `body` —el pie no tiene fondo propio, solo un borde arriba, y un `body` con relleno
+  dejaría una franja rara debajo—.
+- **La flecha roza el carrusel también en escritorio**, entre ~1024 y ~1300 con ventanas
+  de 900px de alto: las cajas se solapan en una esquina de 32×8px. En 1920×857 —la medida
+  de referencia— no pasa, y el ícono está centrado en su caja de 64px, así que es roce de
+  bounding box y no algo que se vea. Queda anotado y no se toca: es escritorio.
 
 ### 3.4 Habilidades, Navbar, Footer
 
@@ -287,6 +314,18 @@ en `CLAUDE.md` y ambas encontradas por las malas:
 2. En un tab oculto Chrome también **throttlea `setInterval` a ≥1000ms**, suspende la
    decodificación de video y nunca dispara `requestAnimationFrame`. Cualquier medición de
    tiempo o de reproducción ahí es basura, y un `await` sobre rAF cuelga la sesión.
+
+A eso se le suma una tercera, del paso 3.3: **Chrome no deja la ventana por debajo de
+500px de ancho**, así que 390 no se puede probar redimensionando. Lo que sí funciona es
+montar un `<iframe>` del mismo origen con `width: 390px`: adentro los media queries y las
+unidades de viewport ven 390 de verdad. Dos detalles al usarlo:
+
+- `resize_window` puede informar éxito y no redimensionar nada. Confirmar siempre contra
+  `innerWidth` antes de creerle a una medición, y desconfiar de dos mediciones seguidas
+  sin recargar: el cambio de tamaño llega tarde y se lee un ancho viejo.
+- En este sitio `<html>` lleva `overflow: clip visible`, así que `window.scrollTo` queda
+  clavado y no llega a donde se le pide. Para ver el pie del hero conviene agrandar el
+  iframe hasta que entre entero y escalarlo con `transform: scale()`, en vez de scrollear.
 
 Anchos a probar, alineados con los breakpoints que ya existen: **1920, 1400, 900, 768, 390**.
 En cada uno: desborde 0 en las ocho tarjetas, abiertas y cerradas, en los dos idiomas y en

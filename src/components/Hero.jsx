@@ -11,6 +11,10 @@ import heroVideoVp8 from '../assets/hero-vp8-alpha.webm';
 import heroPoster from '../assets/hero-poster-alpha.webp';
 import './Hero.css';
 
+// El mismo umbral que el `@media` de Hero.css: por debajo de acá el hero se apila
+// y el video se reemplaza por el póster.
+const ANGOSTO = '(max-width: 768px)';
+
 export default function Hero({ loading, contactoAbierto, onContacto }) {
     const { t, getList } = useLang();
     const videoRef = useRef(null);
@@ -20,6 +24,19 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
     // pantalla, y este proyecto ya tuvo un problema térmico con animaciones
     // permanentes. Se pausa cuando sale de vista.
     const [flechaVisible, setFlechaVisible] = useState(true);
+
+    // El video del hero pesa 1,2 MB (VP9) o 1,7 MB (VP8), y con `preload="auto"`
+    // se baja entero antes de que se vea nada. En un teléfono eso es lo más caro
+    // de la página —el resto junto pesa menos— y no compra nada que el póster no
+    // dé ya: es el mismo cuadro, con su alfa, en 39 KB. Debajo de 768px, que es
+    // donde el hero se apila, se sirve solo el póster.
+    //
+    // Se decide una vez y no se escucha el cambio a propósito. La pregunta que
+    // contesta es "¿este aparato gasta 1,2 MB en esto?", que no cambia porque se
+    // gire el teléfono, y escucharla significaría cortarle el video a alguien
+    // que apenas achica la ventana. Al ensanchar hay que recargar, que es lo que
+    // pasa igual en cualquier navegación.
+    const [angosto] = useState(() => window.matchMedia(ANGOSTO).matches);
 
     useEffect(() => {
         const el = flechaRef.current;
@@ -128,25 +145,27 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
                 </div>
                 <div className="hero-visual">
                     <div className="hero-video-wrapper reveal" style={{ transitionDelay: '200ms' }}>
-                        <video
-                            ref={videoRef}
-                            className="hero-video"
-                            muted
-                            playsInline
-                            preload="auto"
-                            poster={heroPoster}
-                            onClick={restartVideo}
-                            title="Click to replay"
-                        >
-                            {/* Los dos WebM llevan transparencia (alpha_mode=1). El VP8 no es
-                                un duplicado: es el fallback de alfa para navegadores que no
-                                soportan alfa en VP9. No recomprimir estos archivos con ffmpeg:
-                                su decodificador vp9 no lee el canal alfa de WebM y lo descarta
-                                silenciosamente, dejando el video con fondo opaco. */}
-                            <source src={heroVideoVp9} type="video/webm; codecs=vp9" />
-                            <source src={heroVideoVp8} type="video/webm; codecs=vp8" />
-                            <img src={heroPoster} alt="Thiago Pacheco" className="hero-video" />
-                        </video>
+                        {angosto
+                            ? <img src={heroPoster} alt="Thiago Pacheco" className="hero-video" />
+                            : <video
+                                ref={videoRef}
+                                className="hero-video"
+                                muted
+                                playsInline
+                                preload="auto"
+                                poster={heroPoster}
+                                onClick={restartVideo}
+                                title="Click to replay"
+                            >
+                                {/* Los dos WebM llevan transparencia (alpha_mode=1). El VP8 no es
+                                    un duplicado: es el fallback de alfa para navegadores que no
+                                    soportan alfa en VP9. No recomprimir estos archivos con ffmpeg:
+                                    su decodificador vp9 no lee el canal alfa de WebM y lo descarta
+                                    silenciosamente, dejando el video con fondo opaco. */}
+                                <source src={heroVideoVp9} type="video/webm; codecs=vp9" />
+                                <source src={heroVideoVp8} type="video/webm; codecs=vp8" />
+                                <img src={heroPoster} alt="Thiago Pacheco" className="hero-video" />
+                            </video>}
                     </div>
                 </div>
             </div>

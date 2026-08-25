@@ -484,9 +484,20 @@
         font-size: 16px;
     }
 
-        .hero-video {
+    .hero-video {
         height: 460px;
         transform: translateY(-1.5rem);
+    }
+
+    /* La flecha va `absolute` contra el pie del hero, que en escritorio tiene
+       altura de sobra. Apilado no sobra nada: el hero mide lo que mide su
+       contenido y la flecha cae encima del carrusel de marcas —48px de
+       solapamiento, medidos igual a 390 que a 768—. Tampoco tiene mucho para
+       decir en una pantalla táctil, donde el dibujo es un mouse con rueda, y su
+       trazo anima sin parar: es la misma animación que el propio componente
+       pausa al salir de vista. */
+    .scroll-indicator {
+        display: none;
     }
 
     .hero-bg-glow {
