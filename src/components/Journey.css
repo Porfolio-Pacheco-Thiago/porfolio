@@ -1178,6 +1178,9 @@
            estaba: la tarjeta terminaba con 21px de ancho útil. */
         --eje-x: 20px;
         --hueco-eje: 14px;
+        /* Alto de una entrada reducida a su marca, con una tarjeta abierta. Ver el
+           bloque de `display: none` de más abajo. */
+        --marca-sola: 2.2rem;
     }
 
     /* Y el eje deja de correrse al abrir una tarjeta. En dos columnas se va hacia el
@@ -1273,19 +1276,27 @@
         flex-wrap: wrap;
     }
 
-    /* ── Las otras entradas no se esconden ───────────────────────────────
-       En ancho, abrir una tarjeta pone en `opacity: 0` a las otras cinco **dejándoles
-       la fila**: la abierta flota por encima en `absolute`, así que esas filas son el
-       lugar que ocupa, y la línea de tiempo queda entera con sus seis marcas.
+    /* ── Las otras entradas se van **y sueltan su fila** ──────────────────
+       En ancho, abrir una tarjeta pone en `opacity: 0` a las otras cinco dejándoles la
+       fila: la abierta flota por encima en `absolute`, o sea que esas filas son
+       justamente el lugar que ocupa, y la línea de tiempo queda entera con sus seis
+       marcas sin que la sección crezca.
 
-       Acá no hay nada flotando: los bloques están en el flujo, así que esas cinco filas
-       invisibles se vuelven ~930px de vacío entre la tarjeta abierta y Proyectos. El
-       mecanismo que justificaba esconderlas no existe en esta columna, así que se
-       revierte y la lista se comporta como lo que parece: un acordeón que crece en su
-       lugar y deja el resto donde estaba. */
+       Acá no hay nada flotando —los bloques están en el flujo—, así que una fila
+       invisible es una fila vacía: eran ~930px de nada entre la tarjeta abierta y
+       Proyectos. Se esconden con `display: none`, que es lo mismo que hace la opacidad
+       pero soltando el espacio.
+
+       El punto de cada entrada no se va con el bloque: es hermano suyo, así que las seis
+       marcas siguen ahí y el eje sigue leyéndose como una línea de tiempo. Lo que sí
+       hace falta es darles alto, porque sin el bloque el ítem se quedaría en cero y los
+       seis puntos se apilarían uno encima del otro. */
     .experience[data-abierto] .timeline-item:not(.expanded) .timeline-bloque {
-        opacity: 1;
-        pointer-events: auto;
+        display: none;
+    }
+
+    .experience[data-abierto] .timeline-item:not(.expanded) {
+        min-height: var(--marca-sola);
     }
 
     /* ── La tarjeta abierta no puede pasar de una pantalla ────────────────
