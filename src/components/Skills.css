@@ -57,17 +57,19 @@
     padding: clamp(0.7rem, 1.5vh, 1.1rem) clamp(0.8rem, 1.6vh, 1.15rem);
 }
 
-/* Igual que las tarjetas de Trayectoria: la pieza entera responde, no solo el
-   borde. Sin sombra de tarjeta —eso era del patrón viejo—, el marco encendido
-   alcanza. */
-.skills-category:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 26px rgb(var(--sombra-rgb) / 0.18), 0 0 18px var(--accent-glow-raw);
-}
+@media (hover: hover) and (pointer: fine) {
+    /* Igual que las tarjetas de Trayectoria: la pieza entera responde, no solo el
+       borde. Sin sombra de tarjeta —eso era del patrón viejo—, el marco encendido
+       alcanza. */
+    .skills-category:hover {
+        border-color: var(--accent);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 26px rgb(var(--sombra-rgb) / 0.18), 0 0 18px var(--accent-glow-raw);
+    }
 
-.skills-category:hover .skills-barra {
-    background: var(--accent);
+    .skills-category:hover .skills-barra {
+        background: var(--accent);
+    }
 }
 
 /* Categoría con muchos items / nombres largos: ocupa 2 columnas
@@ -114,8 +116,10 @@
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.skills-category:hover .skill-item {
-    border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+@media (hover: hover) and (pointer: fine) {
+    .skills-category:hover .skill-item {
+        border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+    }
 }
 
 /* El ícono va del color del texto y un punto más grande que él: es lo que hace

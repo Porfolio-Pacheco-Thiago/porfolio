@@ -50,9 +50,11 @@
     transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.marcas-flecha:hover {
-    opacity: 1;
-    color: var(--accent-text);
+@media (hover: hover) and (pointer: fine) {
+    .marcas-flecha:hover {
+        opacity: 1;
+        color: var(--accent-text);
+    }
 }
 
 .marcas-flecha:active {
@@ -112,13 +114,15 @@
     transition: opacity 0.25s ease, background-color 0.25s ease;
 }
 
-/* Al pasar el mouse se encienden **los tres**, no el que está debajo del cursor: la
-   fila es una sola afirmación —quiénes te respaldan— y no seis elementos que se
-   eligen de a uno. Encender uno solo invitaba a clickearlo, y no llevan a ningún
-   lado; por eso tampoco cambian el cursor. */
-.marcas-carrusel:hover .marcas-logo {
-    opacity: 1;
-    background-color: var(--accent-text);
+@media (hover: hover) and (pointer: fine) {
+    /* Al pasar el mouse se encienden **los tres**, no el que está debajo del cursor: la
+       fila es una sola afirmación —quiénes te respaldan— y no seis elementos que se
+       eligen de a uno. Encender uno solo invitaba a clickearlo, y no llevan a ningún
+       lado; por eso tampoco cambian el cursor. */
+    .marcas-carrusel:hover .marcas-logo {
+        opacity: 1;
+        background-color: var(--accent-text);
+    }
 }
 
 @media (max-width: 768px) {

@@ -99,9 +99,11 @@
   transition: transform 0.25s ease;
 }
 
-.nav-link:hover {
-  color: var(--accent-text);
-  background: var(--accent-glow);
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover {
+    color: var(--accent-text);
+    background: var(--accent-glow);
+  }
 }
 
 .nav-link.active {
@@ -136,14 +138,16 @@
   font-size: 0.75rem;
 }
 
-.toggle-btn:hover {
-  /* `--accent-text` y no `--accent`: en tema claro el botón es verde oscuro, y
-     el acento a secas es otro verde oscuro que encima no se distingue. El de
-     texto está redefinido para esta superficie y sí se ve. En oscuro los dos
-     valen lo mismo, así que no cambia nada. */
-  border-color: var(--accent-text);
-  color: var(--accent-text);
-  box-shadow: 0 0 12px var(--accent-glow-raw);
+@media (hover: hover) and (pointer: fine) {
+  .toggle-btn:hover {
+    /* `--accent-text` y no `--accent`: en tema claro el botón es verde oscuro, y
+       el acento a secas es otro verde oscuro que encima no se distingue. El de
+       texto está redefinido para esta superficie y sí se ve. En oscuro los dos
+       valen lo mismo, así que no cambia nada. */
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+    box-shadow: 0 0 12px var(--accent-glow-raw);
+  }
 }
 
 .lang-toggle {
@@ -222,9 +226,16 @@
   transition: opacity 0.25s ease;
 }
 
-.nav-link:hover .nav-figure,
+/* `.active` va aparte: es el link de la sección en la que estás, y no tiene
+   nada que ver con dónde esté el puntero. */
 .nav-link.active .nav-figure {
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover .nav-figure {
+    opacity: 1;
+  }
 }
 
 .nav-link.active .nav-figure .wire-spin {

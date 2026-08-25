@@ -321,18 +321,65 @@ terminar las animaciones antes de salir a buscar el problema en el CSS.
 
 ---
 
-## 4. Dos cosas que aplican a todo y es barato hacer bien de entrada
+## 4. Dos cosas que aplican a todo — **hecho**
 
-**`vh` en móvil.** El proyecto usa `vh` en todos lados para presupuestar altura contra la
-ventana — la franja, los items de galería (`Projects.css:821`), el padding de sección. En
-móvil `100vh` incluye la barra de URL, así que el valor cambia al scrollear y el layout
-salta. Migrar esos `vh` a `dvh` **adentro de los media queries**, no en las reglas base.
+### 4.1 `vh` en móvil — **no se hace, y el plan estaba al revés**
 
-**Hover en pantalla táctil.** Todo el hover del sitio —la tarjeta que se inclina, la tapa
-que se agranda, el marco que brilla— se dispara al tocar y se queda pegado. Envolver en
-`@media (hover: hover) and (pointer: fine)`. Esto **sí** toca reglas base, y es la
-excepción justificada: en escritorio la condición da verdadero y el render no se mueve.
-Aun así, verificar con las medidas del punto 0.
+Lo que decía este punto: que `100vh` incluye la barra de URL, que el valor cambia al
+scrollear y que había que migrar a `dvh`. Las dos mitades están mal.
+
+`vh` se resuelve contra el viewport **grande** y **no** cambia al scrollear: el que cambia
+mientras la barra se retrae es justamente `dvh`. Así que la migración habría *introducido*
+el salto que este punto quería sacar, y encima sobre padding y gaps, donde se nota más que
+sobre el alto de una sección.
+
+Y donde el problema sí existe —los `100vh` de pantalla completa— **ya estaba resuelto**:
+los tres del proyecto (`App.css`, `Hero.css`, `Navbar.css`) son `dvh` desde antes, con la
+nota de por qué en `App.css`.
+
+Los 18 `vh` que quedan son todos budgets chicos dentro de un `clamp()` o un `min()` con
+tope duro en px o rem: el más grande es `min(58vh, 470px)`. Ninguno se acerca al alto de
+la ventana, así que no hay nada que recortar ni que saltar. Se quedan como están.
+
+### 4.2 Hover en pantalla táctil — **hecho**
+
+**47 de 49** reglas `:hover` quedaron dentro de `@media (hover: hover) and (pointer: fine)`.
+Se hizo con un transformador que envuelve cada regla **en el lugar**: envolver no cambia ni
+la especificidad ni la posición en la cascada, así que en escritorio —donde la condición da
+verdadero— el resultado tiene que ser idéntico. Las corridas de reglas `:hover` seguidas
+comparten un solo `@media`, y el comentario que documenta la primera se va adentro con ella.
+
+**Cinco reglas no se podían envolver enteras** y se separaron a mano, porque su lista de
+selectores era mixta: solo una parte llevaba `:hover` y la otra no tiene nada que ver con
+el puntero. Envolverlas habría apagado en táctil cosas que no son hover:
+
+- `.nav-link.active .nav-figure` — el link de la sección en la que estás.
+- `…:focus-within .fono-volumen` — el camino por teclado del control de volumen.
+- `[data-hover-section=…] #journey .wire` y su gemela de tema claro — las pone el JS del
+  navbar, no el puntero.
+
+**Las dos que quedaron sin gatear son a propósito:** `::-webkit-scrollbar-thumb:hover`, que
+en táctil no existe, y el `.scroll-indicator:hover` de `prefers-reduced-motion`, que lo
+único que hace es devolver el `transform` al valor base — aplicarlo siempre no cambia nada.
+
+#### Cómo se verificó que el escritorio no se movió
+
+Este era el punto que tocaba reglas base, así que en vez de las medidas del punto 0 se hizo
+algo más fuerte: una **huella de estilo computado de las 1415 elementos de la página** —
+todas las propiedades de cada uno, más su caja— antes y después, a 1920×857.
+
+**Cero diferencias**, y se repitió en tema claro (1407 elementos, también cero) porque una
+de las reglas separadas a mano era de `[data-theme="light"]`.
+
+Después, con el mouse de verdad sobre un link del navbar: el color pasa de
+`rgb(160,160,160)` a `rgb(0,230,118)`, la figura chica sube a opacidad 1, el `.active`
+sigue en 1 sin depender del hover, y el resaltado de sección por `data-hover-section` sigue
+encendiendo el `--wire-tint` y el `scale(1.06)` de su figura grande. Las dos mitades de
+cada regla separada funcionan.
+
+Una trampa más, la misma de siempre: la primera lectura de la figura dio `0.6` en vez de
+`1` y parecía que la separación había roto algo. Era la transición congelada otra vez —
+`getAnimations().finish()` sobre **la figura**, no solo sobre el link, y da 1.
 
 ---
 

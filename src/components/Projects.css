@@ -156,36 +156,38 @@
     min-height: 0;
 }
 
-/* ── Hover: la tarjeta se inclina y el marco se pone brilloso ──────────────
-   Como en la referencia. Ahí el efecto son **dos SVG intercambiados**
-   —`GridWindow_Default` y `GridWindow_Hover`—; acá el marco está dibujado con CSS,
-   así que se reproduce con CSS.
+@media (hover: hover) and (pointer: fine) {
+    /* ── Hover: la tarjeta se inclina y el marco se pone brilloso ──────────────
+       Como en la referencia. Ahí el efecto son **dos SVG intercambiados**
+       —`GridWindow_Default` y `GridWindow_Hover`—; acá el marco está dibujado con CSS,
+       así que se reproduce con CSS.
 
-   El brillo es un degradado del propio acento, no el tornasol de la referencia:
-   su paleta es violeta y admite un arcoíris, la nuestra es de un solo verde y un
-   arcoíris se leería como un error. La sensación de brillo la da la banda clara
-   cruzando en diagonal. */
-.project-card:not(.expanded):hover {
-    transform: rotate(-1.8deg) scale(1.03);
-}
+       El brillo es un degradado del propio acento, no el tornasol de la referencia:
+       su paleta es violeta y admite un arcoíris, la nuestra es de un solo verde y un
+       arcoíris se leería como un error. La sensación de brillo la da la banda clara
+       cruzando en diagonal. */
+    .project-card:not(.expanded):hover {
+        transform: rotate(-1.8deg) scale(1.03);
+    }
 
-.project-card:not(.expanded):hover .project-marco {
-    /* Borde con degradado: el truco de dos fondos, uno recortado a la caja de
-       relleno y otro a la del borde. Un `border-color` no puede llevar degradado. */
-    border-color: transparent;
-    background:
-        linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
-        var(--brillo) border-box;
-    box-shadow: 0 14px 44px rgb(var(--sombra-rgb) / 0.35),
-        0 0 26px var(--accent-glow-raw);
-}
+    .project-card:not(.expanded):hover .project-marco {
+        /* Borde con degradado: el truco de dos fondos, uno recortado a la caja de
+           relleno y otro a la del borde. Un `border-color` no puede llevar degradado. */
+        border-color: transparent;
+        background:
+            linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+            var(--brillo) border-box;
+        box-shadow: 0 14px 44px rgb(var(--sombra-rgb) / 0.35),
+            0 0 26px var(--accent-glow-raw);
+    }
 
-.project-card:not(.expanded):hover .project-barra {
-    background: var(--brillo);
-}
+    .project-card:not(.expanded):hover .project-barra {
+        background: var(--brillo);
+    }
 
-.project-card:not(.expanded):hover .project-notch {
-    border-color: var(--accent);
+    .project-card:not(.expanded):hover .project-notch {
+        border-color: var(--accent);
+    }
 }
 
 /* ── La ventana (larson) ──────────────────────────────────────────────────
@@ -614,42 +616,44 @@
         object-fit 0s 0.4s;
 }
 
-/* La ampliación al pasar el mouse es para las capturas, que están muy recortadas y
-   no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
-   entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
-.project-card.expanded .project-media:not(.con-marca):hover:has(.es-animada) {
-    overflow: hidden;
-}
+@media (hover: hover) and (pointer: fine) {
+    /* La ampliación al pasar el mouse es para las capturas, que están muy recortadas y
+       no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
+       entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
+    .project-card.expanded .project-media:not(.con-marca):hover:has(.es-animada) {
+        overflow: hidden;
+    }
 
-.project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-oscuro,
-.project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-claro,
-.project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-animada {
-    width: 100%;
-    height: 100%;
-    box-shadow: none;
-}
+    .project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-oscuro,
+    .project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-claro,
+    .project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-animada {
+        width: 100%;
+        height: 100%;
+        box-shadow: none;
+    }
 
-/* Acotado a las franjas que muestran una captura. Donde la franja muestra un logo
-   —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
-   mejor: un logo ya se ve entero, y agrandarlo al pasar el mouse es movimiento sin
-   información. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
-/* Al agrandarse con el mouse la franja recupera un alto propio, así que ahí tiene que
-   dejar de estirarse: si no, `flex-grow` la devolvería al alto del hueco y el alto de
-   abajo no se vería. */
-.project-card.expanded .project-media:not(.con-marca):hover {
-    flex: none;
-    /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
-    overflow: visible;
-}
+    /* Acotado a las franjas que muestran una captura. Donde la franja muestra un logo
+       —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
+       mejor: un logo ya se ve entero, y agrandarlo al pasar el mouse es movimiento sin
+       información. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
+    /* Al agrandarse con el mouse la franja recupera un alto propio, así que ahí tiene que
+       dejar de estirarse: si no, `flex-grow` la devolvería al alto del hueco y el alto de
+       abajo no se vería. */
+    .project-card.expanded .project-media:not(.con-marca):hover {
+        flex: none;
+        /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
+        overflow: visible;
+    }
 
-.project-card.expanded .project-media:not(.con-marca):hover .project-cover {
-    height: min(58vh, 470px);
-    /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
-       bandas laterales que deja `contain`. */
-    object-fit: contain;
-    background: var(--bg-primary);
-    box-shadow: 0 26px 60px rgb(var(--sombra-rgb) / 0.55);
-    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
+    .project-card.expanded .project-media:not(.con-marca):hover .project-cover {
+        height: min(58vh, 470px);
+        /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
+           bandas laterales que deja `contain`. */
+        object-fit: contain;
+        background: var(--bg-primary);
+        box-shadow: 0 26px 60px rgb(var(--sombra-rgb) / 0.55);
+        transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
+    }
 }
 
 .project-img-placeholder {
@@ -723,8 +727,10 @@
     transition: color 0.2s ease;
 }
 
-.project-title-btn:hover {
-    color: var(--accent-text);
+@media (hover: hover) and (pointer: fine) {
+    .project-title-btn:hover {
+        color: var(--accent-text);
+    }
 }
 
 .project-tags {
@@ -750,8 +756,10 @@
     transition: color 0.2s ease;
 }
 
-.project-link:hover {
-    color: var(--accent-text);
+@media (hover: hover) and (pointer: fine) {
+    .project-link:hover {
+        color: var(--accent-text);
+    }
 }
 
 /* Sin `.project-toggle`: el botón "Más información" se fue y ahora el control es
@@ -1272,13 +1280,24 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:hover .fono-volumen,
+/* `:focus-within` va aparte del `:hover`: es el camino por teclado, y tiene que
+   seguir funcionando donde no hay puntero fino. */
 .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:focus-within .fono-volumen {
     opacity: 1;
     pointer-events: auto;
     /* El desplazamiento va **después** del giro, así que corre a lo largo del control:
        sube. */
     transform: translateX(-50%) rotate(-90deg) translateX(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:hover .fono-volumen {
+        opacity: 1;
+        pointer-events: auto;
+        /* El desplazamiento va **después** del giro, así que corre a lo largo del control:
+           sube. */
+        transform: translateX(-50%) rotate(-90deg) translateX(0);
+}
 }
 
 /* Sin el deslizamiento, pero igual accesible: aparece y desaparece sin moverse. */
@@ -1442,9 +1461,11 @@
         transform 0.12s ease;
 }
 
-.fono-boton:hover {
-    color: var(--accent-text);
-    border-color: var(--accent);
+@media (hover: hover) and (pointer: fine) {
+    .fono-boton:hover {
+        color: var(--accent-text);
+        border-color: var(--accent);
+    }
 }
 
 /* Respuesta al apretar. Sin esto el botón se siente muerto entre el click y el
@@ -1531,9 +1552,11 @@
     transition: color 0.2s ease, background 0.2s ease, transform 0.12s ease;
 }
 
-.fono-icono:hover {
-    color: var(--accent-text);
-    background: color-mix(in srgb, var(--accent) 16%, transparent);
+@media (hover: hover) and (pointer: fine) {
+    .fono-icono:hover {
+        color: var(--accent-text);
+        background: color-mix(in srgb, var(--accent) 16%, transparent);
+    }
 }
 
 .fono-icono:active {
@@ -1549,8 +1572,10 @@
     background: color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
-.fono-play:hover {
-    background: color-mix(in srgb, var(--accent) 32%, transparent);
+@media (hover: hover) and (pointer: fine) {
+    .fono-play:hover {
+        background: color-mix(in srgb, var(--accent) 32%, transparent);
+    }
 }
 
 /* Tiempos: el transcurrido manda, el total acompaña. */

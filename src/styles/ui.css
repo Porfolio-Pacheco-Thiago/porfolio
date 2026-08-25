@@ -343,9 +343,11 @@
     color: var(--btn-primary-fg);
 }
 
-.btn-primary:hover {
-    box-shadow: 0 0 30px var(--accent-glow-raw);
-    transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+        box-shadow: 0 0 30px var(--accent-glow-raw);
+        transform: translateY(-2px);
+    }
 }
 
 .btn-outline {
@@ -354,9 +356,11 @@
     border: 1px solid var(--accent);
 }
 
-.btn-outline:hover {
-    background: var(--accent-glow);
-    transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+    .btn-outline:hover {
+        background: var(--accent-glow);
+        transform: translateY(-2px);
+    }
 }
 
 
@@ -459,27 +463,29 @@
     pointer-events: auto;
 }
 
-.wire-decor:hover,
-.hero-fig:hover {
-    opacity: 0.95;
-    --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
-    --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
-}
+@media (hover: hover) and (pointer: fine) {
+    .wire-decor:hover,
+    .hero-fig:hover {
+        opacity: 0.95;
+        --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+    }
 
-[data-theme="light"] .wire-decor:hover,
-[data-theme="light"] .hero-fig:hover {
-    --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
-    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
-}
+    [data-theme="light"] .wire-decor:hover,
+    [data-theme="light"] .hero-fig:hover {
+        --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+    }
 
-/* Las chicas crecen más: con el mismo porcentaje que las grandes el cambio
-   no se notaría. */
-.wire-decor:hover {
-    transform: scale(1.06);
-}
+    /* Las chicas crecen más: con el mismo porcentaje que las grandes el cambio
+       no se notaría. */
+    .wire-decor:hover {
+        transform: scale(1.06);
+    }
 
-.hero-fig:hover {
-    transform: scale(1.18);
+    .hero-fig:hover {
+        transform: scale(1.18);
+    }
 }
 
 /* ── Resaltado desde el navbar ────────────────────────────────────────────
@@ -494,20 +500,35 @@
     transform: scale(1.06);
 }
 
+/* La mitad de `:hover` se separó del resto: lo demás lo dispara
+   `data-hover-section`, que lo pone el JS del navbar, y apagarlo en táctil no
+   tendría nada que ver con el puntero. Los valores son los mismos. */
 [data-hover-section="journey"] #journey .wire,
 [data-hover-section="projects"] #projects .wire,
-[data-hover-section="skills"] #skills .wire,
-.nav-link:hover .nav-figure {
+[data-hover-section="skills"] #skills .wire {
     --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
     --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
 }
 
+@media (hover: hover) and (pointer: fine) {
+    .nav-link:hover .nav-figure {
+        --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+}
+
 [data-theme="light"][data-hover-section="journey"] #journey .wire,
 [data-theme="light"][data-hover-section="projects"] #projects .wire,
-[data-theme="light"][data-hover-section="skills"] #skills .wire,
-[data-theme="light"] .nav-link:hover .nav-figure {
+[data-theme="light"][data-hover-section="skills"] #skills .wire {
     --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
     --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    [data-theme="light"] .nav-link:hover .nav-figure {
+        --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+    }
 }
 
 /* Las figuras del hero también responden: son las mismas cuatro formas en
@@ -538,10 +559,12 @@
     --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
 }
 
-/* La figura chica también gira mientras el mouse está sobre su link, no solo
-   cuando la sección está activa. */
-.nav-link:hover .nav-figure .wire-spin {
-    animation-play-state: running;
+@media (hover: hover) and (pointer: fine) {
+    /* La figura chica también gira mientras el mouse está sobre su link, no solo
+       cuando la sección está activa. */
+    .nav-link:hover .nav-figure .wire-spin {
+        animation-play-state: running;
+    }
 }
 
 /* El color también acompaña, no solo el tamaño */
@@ -844,9 +867,11 @@
     justify-self: center;
 }
 
-.riel-link:hover {
-    color: var(--accent-text);
-    background: var(--accent-glow);
+@media (hover: hover) and (pointer: fine) {
+    .riel-link:hover {
+        color: var(--accent-text);
+        background: var(--accent-glow);
+    }
 }
 
 .riel-link:active {

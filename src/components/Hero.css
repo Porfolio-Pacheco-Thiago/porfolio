@@ -327,8 +327,10 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.scroll-indicator:hover {
-    transform: translateX(-50%) translateY(3px);
+@media (hover: hover) and (pointer: fine) {
+    .scroll-indicator:hover {
+        transform: translateX(-50%) translateY(3px);
+    }
 }
 
 .scroll-indicator:focus-visible {
