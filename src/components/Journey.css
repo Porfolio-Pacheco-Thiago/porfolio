@@ -1255,9 +1255,13 @@
         margin: 0;
     }
 
-    .timeline-card-image {
-        height: 80px;
-    }
+    /* El recuadro de la foto **no** lleva alto propio: se lo da el `stretch` del
+       bloque, igual que en ancho. Tenía uno fijo de 80px de antes del rediseño, y
+       ahí se veía: en ancho la fila mide `--foto` y el recuadro sale cuadrado, pero
+       acá la ventana crece —el título se parte en más renglones— y el recuadro se
+       quedaba en 80 contra 158 o 230 de ventana. Quedaba un cuadrado flotando arriba,
+       y debajo la ventana sin borde de ese lado: el borde compartido lo dibuja la
+       foto, así que donde la foto no llega no hay borde. */
 
     /* Los tags se parten en varias filas. En ancho la ventana da de sobra y van en una
        sola —`nowrap`—, pero en una columna de 356px los de Toyota se salían 342px por la

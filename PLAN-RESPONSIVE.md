@@ -241,6 +241,18 @@ Cuatro cosas, en orden de gravedad:
   quedó con el layout de teléfono hasta que el usuario lo vio. El truco es útil pero es
   una granada sin seguro: restaurarlo va en el mismo paso que ponerlo, no al final.
 
+**Un quinto defecto, encontrado después.** El recuadro de la foto llevaba
+`height: 80px` dentro de este mismo bloque de 768, de antes del rediseño. En ancho la
+fila mide `--foto` y el recuadro sale cuadrado (105×105); acá la ventana crece porque el
+título se parte en más renglones, y el recuadro se quedaba en 80 contra 158 o 230 de
+ventana. Quedaba un cuadrado flotando arriba y, debajo, la ventana **sin borde de ese
+lado**: el borde compartido lo dibuja la foto, así que donde la foto no llega no hay
+borde. Se borra la regla y el alto vuelve a salir del `stretch` del bloque, igual que en
+ancho. Las seis filas quedan con foto y ventana del mismo alto y el mismo tope.
+
+Es el mismo patrón que los otros cuatro: el bloque de 768 se escribió para una estructura
+que el rediseño cambió, y nunca se volvió a mirar.
+
 ### 3.3 Hero — **hecho**
 
 El layout estaba bien: a 390 y a 768 no hay desborde y la columna apilada entra. Los dos
@@ -404,9 +416,14 @@ unidades de viewport ven 390 de verdad. Dos detalles al usarlo:
 - `resize_window` puede informar éxito y no redimensionar nada. Confirmar siempre contra
   `innerWidth` antes de creerle a una medición, y desconfiar de dos mediciones seguidas
   sin recargar: el cambio de tamaño llega tarde y se lee un ancho viejo.
-- En este sitio `<html>` lleva `overflow: clip visible`, así que `window.scrollTo` queda
-  clavado y no llega a donde se le pide. Para ver el pie del hero conviene agrandar el
-  iframe hasta que entre entero y escalarlo con `transform: scale()`, en vez de scrollear.
+- `<html>` lleva **`scroll-behavior: smooth`**, así que `scrollTo` no salta: anima. Toda
+  lectura inmediata después de pedirlo devuelve la posición vieja, y dos pedidos seguidos
+  se pisan — parece que el scroll "está clavado" cuando en realidad está viajando. Poner
+  `documentElement.style.scrollBehavior = 'auto'` antes de mover, y recién ahí medir.
+  (Esto fue lo que se leyó mal como "`overflow: clip` impide scrollear": `<html>` es el
+  scroller y sí se mueve.) Tampoco sirve trasladar el `<body>` con un `transform` para
+  esquivarlo: el `overflow-x: clip` de `<html>` recorta lo que se salga de la caja
+  original.
 
 Anchos a probar, alineados con los breakpoints que ya existen: **1920, 1400, 900, 768, 390**.
 En cada uno: desborde 0 en las ocho tarjetas, abiertas y cerradas, en los dos idiomas y en
