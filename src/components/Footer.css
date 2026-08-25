@@ -50,6 +50,17 @@
     opacity: 0.6;
 }
 
+/* El umbral es 900 y no 768 porque es el del riel: ahí deja de ser una columna
+   sobre el borde izquierdo y pasa a ser una barra fija abajo. Al ser `fixed` no
+   ocupa lugar en el flujo, así que le tapaba los últimos 7px al pie —el único
+   lugar del documento que no se puede scrollear para descubrirlo—. El relleno
+   de siempre queda igual, pero medido desde la barra y no desde el borde. */
+@media (max-width: 900px) {
+    .footer {
+        padding-bottom: calc(3rem + var(--riel-alto));
+    }
+}
+
 @media (max-width: 768px) {
     .footer-top {
         flex-direction: column;

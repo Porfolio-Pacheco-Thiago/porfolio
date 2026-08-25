@@ -281,9 +281,43 @@ elige no pedirlos.
   de referencia— no pasa, y el ícono está centrado en su caja de 64px, así que es roce de
   bounding box y no algo que se vea. Queda anotado y no se toca: es escritorio.
 
-### 3.4 Habilidades, Navbar, Footer
+### 3.4 Habilidades, Navbar, Footer — **hecho**
 
-Los tres ya tienen su breakpoint y son grillas simples. Es verificación, no trabajo.
+Dos de los tres eran verificación, como decía el plan. El tercero tenía un agujero real.
+
+**Habilidades.** Limpio en los tres anchos: dos columnas a 900, una a 768 y a 390, cero
+desborde del documento, ningún chip saliéndose de su categoría y ninguna `.skills-list`
+con desborde propio. No se tocó nada.
+
+**Navbar.** El cajón se abre y entra: panel de 267px pegado al borde derecho, alto
+completo, los cuatro links entre 80 y 300, la X y los botones de idioma y tema encima del
+panel, y el riel queda tapado detrás —`.navbar` hace contexto de apilamiento con
+`z-index: 200` y el riel es 100—. Cero desborde. No se tocó nada.
+
+**Pie.** Acá sí: debajo de 900px el riel deja de ser una columna sobre el borde izquierdo
+y pasa a ser una barra fija abajo de 55px. Al ser `fixed` no ocupa lugar en el flujo, y el
+final del documento es justamente el único lugar que no se puede scrollear para
+descubrirlo: al pie le quedaban 48px de aire y la barra le comía los últimos 7 —el logo de
+React de "Hecho con React" entraba 2px debajo—. Se le reserva el alto con
+`padding-bottom: calc(3rem + var(--riel-alto))` dentro de un `@media (max-width: 900px)`,
+con `--riel-alto: 55px` declarado al lado de `--riel-ancho`, que ya era una constante
+medida a mano por el mismo motivo. Queda el relleno de siempre, pero contado desde la
+barra en vez de desde el borde: la holgura pasa de 48 a 103px, contra 55 de barra.
+
+El umbral es 900 y no 768 a propósito: el que manda es el del riel, no el del pie.
+
+**Escritorio, otra vez idéntico** a la línea base: hero 1912×872, grilla 1136×695, sección
+1200×890, habilidades 1200×660, las ocho tarjetas 363×208/231, y el `padding` del pie
+sigue siendo `48px 32px`.
+
+#### Una trampa más para el punto 5
+
+El cajón del navbar **medía cerrado con la clase `open` puesta**: `getComputedStyle`
+devolvía `right: -382px` en vez de `0`. Es la trampa nº1 del punto 5 otra vez, pero
+disfrazada — no es que el contenido midiera 0, es que devolvía la posición *previa* y
+parecía un bug de CSS. Un `getAnimations().forEach(a => a.finish())` sobre el panel lo
+destrabó y dio `right: 0`. Ante cualquier medida que parezca "la regla no se aplica",
+terminar las animaciones antes de salir a buscar el problema en el CSS.
 
 ---
 

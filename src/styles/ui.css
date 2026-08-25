@@ -726,6 +726,14 @@
    documento, que es la condición para que animar tamaño sea aceptable. */
 :root {
     --riel-ancho: 64px;
+    /* Acostado abajo (ver el media query de más adelante) el riel es una barra
+       fija de 55px, y como es `fixed` no le saca lugar a nadie: se le monta
+       encima al final del documento, que es lo único que no se puede scrollear
+       para sacárselo de encima. Ese es el alto que el pie tiene que reservarse.
+       Igual que `--riel-ancho`, es una medida tomada a mano y no la que dibuja
+       el riel: si le cambia el relleno o el tamaño de los íconos, hay que
+       volver a medirla. */
+    --riel-alto: 55px;
 }
 
 .riel {
