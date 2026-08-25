@@ -1272,6 +1272,72 @@
     .timeline-tags {
         flex-wrap: wrap;
     }
+
+    /* ── Las otras entradas no se esconden ───────────────────────────────
+       En ancho, abrir una tarjeta pone en `opacity: 0` a las otras cinco **dejándoles
+       la fila**: la abierta flota por encima en `absolute`, así que esas filas son el
+       lugar que ocupa, y la línea de tiempo queda entera con sus seis marcas.
+
+       Acá no hay nada flotando: los bloques están en el flujo, así que esas cinco filas
+       invisibles se vuelven ~930px de vacío entre la tarjeta abierta y Proyectos. El
+       mecanismo que justificaba esconderlas no existe en esta columna, así que se
+       revierte y la lista se comporta como lo que parece: un acordeón que crece en su
+       lugar y deja el resto donde estaba. */
+    .experience[data-abierto] .timeline-item:not(.expanded) .timeline-bloque {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* ── La tarjeta abierta no puede pasar de una pantalla ────────────────
+       En ancho el bloque abierto va en `absolute`: **flota** sobre la línea de tiempo y
+       la sección no crece ni un píxel —queda en 680px con la tarjeta adentro, acotada
+       por el `max-height` de más arriba—. Acá el bloque está en el flujo, que es lo que
+       lo hizo funcionar, y entonces empuja todo lo de abajo: Lovelytics abierta medía
+       1868px de tarjeta y dejaba la línea de tiempo en 2926 contra 1217 cerrada.
+
+       Y no es que sobre espacio: la tarjeta mide exactamente su contenido. En una
+       columna de 250px de texto las tres fichas de cliente pasan de 443px a 1412.
+
+       Así que se traduce la misma invariante que ya cumple el escritorio —una entrada
+       abierta nunca supera el alto disponible— y lo que sobra se scrollea adentro.
+       `overscroll-behavior: contain` evita que ese scroll se contagie a la página, que
+       es lo que vuelve molesto un scroll anidado en un teléfono.
+
+       `svh` y no `dvh`: `dvh` crece cuando se retrae la barra de direcciones, así que el
+       techo cambiaría mientras se scrollea y la tarjeta se reacomodaría sola. `svh` es el
+       viewport chico, que no se mueve. */
+    .timeline-item.expanded .timeline-card {
+        max-height: 78svh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    /* El logo del cliente y sus etiquetas dejan de compartir renglón. En ancho el
+       renglón mide 835px y el reparto funciona; acá mide 220 y se rompía de las dos
+       puntas: el logo saca su alto de `flex: 0 0 34%` más un `aspect-ratio` apaisado, o
+       sea 75px de ancho por **8 de alto**, y a las etiquetas les quedaban 132px, menos
+       que el chip más largo —que se salía de la ventana—. Apilados, el logo queda en
+       212x23 y las etiquetas usan la columna entera. */
+    .nested-medios {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* En columna el `flex-basis: 34%` pasaría a ser el **alto**, así que se suelta y el
+       ancho lo da la columna. */
+    .nested-banner {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    /* El `max-height: 1400px` que abre el acordeón se eligió contra el contenido en
+       ancho, donde lo más alto son 443px. Acá el mismo contenido mide 1413 y se pasaba
+       por 13px: no se ve recortado —al terminar de abrir el `overflow` es `visible`—
+       pero la caja quedaba más corta que su contenido, y con un renglón más de texto
+       eso se rompe. El número sube; quien acota ahora es la ventana de acá arriba. */
+    .timeline-item.expanded .timeline-extra {
+        max-height: 4000px;
+    }
 }
 /* ── Lo que no se muestra en reposo ───────────────────────────────────────
    Esto vivía tras un `is-compact` que alternaba con un botón "Ver todo". Ese botón
