@@ -425,6 +425,29 @@ unidades de viewport ven 390 de verdad. Dos detalles al usarlo:
   esquivarlo: el `overflow-x: clip` de `<html>` recorta lo que se salga de la caja
   original.
 
+### Auditar que una regla de angosto **se aplique**, no solo que exista
+
+Tres bugs de esta tanda fueron el mismo: una regla escrita para angosto que nunca llegaba
+a aplicarse. `.fono-bloque { grid-template-columns: 1fr }` perdía contra
+`.fono-bloque:has(.fono.es-monitor)`, dos clases contra una, así que todo proyecto con
+monitor seguía en dos columnas. `.timeline-banner` perdía por **orden de aparición**: su
+regla base está más abajo en el archivo y con la misma especificidad gana la última.
+
+Mirar el CSS no alcanza para verlo, y mirar la página tampoco cuando el efecto es sutil.
+Lo que sí lo caza es preguntarle al navegador **qué regla gana cada propiedad**: recorrer
+`document.styleSheets`, quedarse con las que matchean el elemento y cuyo `@media` está
+activo, ordenarlas por `!important` → especificidad → orden, y ver cuál queda última.
+
+Aplicado a los bloques de 900 y 768 de `Projects.css`: **26 declaraciones sobre 11
+selectores, todas ganan**. Las seis que no se pudieron medir son las de
+`is-reproduciendo`, que solo existen mientras corre un video; forzando la clase a mano
+—que es válido, porque lo que se audita es la cascada y no si el video arranca— también
+ganan las cinco cuyo elemento existe. La sexta, `.fono-barra`, solo se monta durante la
+reproducción real.
+
+Conviene correrlo después de cada tanda: es barato y es la única forma de distinguir "esta
+regla no hace falta" de "esta regla no se está aplicando".
+
 Anchos a probar, alineados con los breakpoints que ya existen: **1920, 1400, 900, 768, 390**.
 En cada uno: desborde 0 en las ocho tarjetas, abiertas y cerradas, en los dos idiomas y en
 los dos temas. El español es el caso que aprieta —sus textos son más largos que los
