@@ -1299,29 +1299,17 @@
         min-height: var(--marca-sola);
     }
 
-    /* ── La tarjeta abierta no puede pasar de una pantalla ────────────────
-       En ancho el bloque abierto va en `absolute`: **flota** sobre la línea de tiempo y
-       la sección no crece ni un píxel —queda en 680px con la tarjeta adentro, acotada
-       por el `max-height` de más arriba—. Acá el bloque está en el flujo, que es lo que
-       lo hizo funcionar, y entonces empuja todo lo de abajo: Lovelytics abierta medía
-       1868px de tarjeta y dejaba la línea de tiempo en 2926 contra 1217 cerrada.
+    /* ── La tarjeta abierta se muestra entera, sin scroll propio ──────────
+       Acá hubo un techo de `78svh` con `overflow-y: auto`, que traducía la invariante
+       del escritorio —una entrada abierta nunca supera el alto disponible— a costa de
+       un scroll anidado. Con la tarjeta en 1868px era el único modo de que la sección
+       fuera navegable.
 
-       Y no es que sobre espacio: la tarjeta mide exactamente su contenido. En una
-       columna de 250px de texto las tres fichas de cliente pasan de 443px a 1412.
-
-       Así que se traduce la misma invariante que ya cumple el escritorio —una entrada
-       abierta nunca supera el alto disponible— y lo que sobra se scrollea adentro.
-       `overscroll-behavior: contain` evita que ese scroll se contagie a la página, que
-       es lo que vuelve molesto un scroll anidado en un teléfono.
-
-       `svh` y no `dvh`: `dvh` crece cuando se retrae la barra de direcciones, así que el
-       techo cambiaría mientras se scrollea y la tarjeta se reacomodaría sola. `svh` es el
-       viewport chico, que no se mueve. */
-    .timeline-item.expanded .timeline-card {
-        max-height: 78svh;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-    }
+       Ya no hace falta: entre esconder la galería, dejar un solo logo, quedarse con la
+       descripción del punto más reciente y sacar el renglón de medios de cada cliente,
+       Lovelytics —la más larga— pasó de 1868px a poco más de mil. Un scroll adentro de
+       otro scroll en un teléfono se paga caro, así que con el contenido ya recortado
+       conviene mostrarla entera y que la página scrollee una sola vez. */
 
     /* ── El renglón de medios de cada cliente se va entero ─────────────────
        `.nested-medios` es el logo del cliente más sus etiquetas, uno al lado del otro.
