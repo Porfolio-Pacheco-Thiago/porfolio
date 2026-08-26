@@ -1323,22 +1323,25 @@
         overscroll-behavior: contain;
     }
 
-    /* El logo del cliente y sus etiquetas dejan de compartir renglón. En ancho el
-       renglón mide 835px y el reparto funciona; acá mide 220 y se rompía de las dos
-       puntas: el logo saca su alto de `flex: 0 0 34%` más un `aspect-ratio` apaisado, o
-       sea 75px de ancho por **8 de alto**, y a las etiquetas les quedaban 132px, menos
-       que el chip más largo —que se salía de la ventana—. Apilados, el logo queda en
-       212x23 y las etiquetas usan la columna entera. */
+    /* ── Un solo logo por tarjeta ─────────────────────────────────────────
+       Abierta, una entrada podía mostrar cuatro: el suyo —`.timeline-banner`, entre el
+       renglón verde y el título— más uno por cliente. En ancho el renglón de cada punto
+       mide 835px y los de cliente entran como una marca chica al lado de las etiquetas;
+       en 220px no entran de ninguna manera. El logo saca su alto de `flex: 0 0 34%` más
+       un `aspect-ratio` apaisado, así que acá daba 75px de ancho por **8 de alto**, y a
+       las etiquetas les dejaba 132px, menos que el chip más largo —que se salía de la
+       ventana—.
+
+       Se van los de cliente y queda el de la entrada, que es el que la identifica. */
+    .nested-banner {
+        display: none;
+    }
+
+    /* Sin el logo al lado, las etiquetas se quedan con la columna entera. Sigue siendo
+       una columna y no un renglón porque el contenedor puede traer otras piezas. */
     .nested-medios {
         flex-direction: column;
         align-items: stretch;
-    }
-
-    /* En columna el `flex-basis: 34%` pasaría a ser el **alto**, así que se suelta y el
-       ancho lo da la columna. */
-    .nested-banner {
-        flex: 0 0 auto;
-        width: 100%;
     }
 
     /* El `max-height: 1400px` que abre el acordeón se eligió contra el contenido en
