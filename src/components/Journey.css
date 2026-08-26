@@ -1344,6 +1344,15 @@
         align-items: stretch;
     }
 
+    /* Y por el mismo motivo se va la galería. Son tres fotos en fila dentro de la
+       ventana: en ancho miden 265x165 y se pueden mirar, acá caen a 74x46 —del tamaño de
+       una etiqueta— y no muestran nada, pero le suman la única imagen que la tarjeta ya
+       tenía por cuatro. Con esto FIUBAtón, recibida, Pellegrini y docencia quedan en una
+       sola imagen, igual que Lovelytics y la Olimpiada. */
+    .timeline-gallery {
+        display: none;
+    }
+
     /* El `max-height: 1400px` que abre el acordeón se eligió contra el contenido en
        ancho, donde lo más alto son 443px. Acá el mismo contenido mide 1413 y se pasaba
        por 13px: no se ve recortado —al terminar de abrir el `overflow` es `visible`—
