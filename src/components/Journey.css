@@ -1430,6 +1430,33 @@
     border: var(--trazo) solid var(--proy-marco);
 }
 
+/* Este media query va acá y no con el resto de los de 768 porque la regla base que
+   pisa está más abajo en el archivo: con la misma especificidad gana la última que
+   aparece, y desde allá arriba no pasaba nada.
+
+   En ancho la caja lleva `aspect-ratio` fijo para que las seis entradas muestren su
+   logo del mismo tamaño: los archivos van de 2,8 a 7,5 de relación y sueltos daban de
+   125 a 330px de alto. El precio es que un logo angosto entra **por la altura** y lo
+   que sobra se rellena a los costados.
+
+   En una columna de 236px ese precio deja de ser relleno y pasa a ser tamaño: la
+   relación 7,5 deja la caja en 31px de alto, así que un logo de relación 2,8 terminaba
+   dibujado en 81x29 dentro de un recuadro de 220. Se conserva la idea —una caja igual
+   para las seis— pero mucho menos apaisada, y se le saca el sangrado, que existe para
+   alinear con el aire de la foto de al lado y con la tarjeta abierta esa foto no está.
+
+   La caja **no** se suelta a `aspect-ratio: auto`, que sería lo obvio: el banner es
+   `loading="lazy"` y arranca en `display: none`, así que sin caja no tiene tamaño
+   intrínseco, nunca entra en viewport y nunca se carga — queda en 236x4 con
+   `naturalWidth` en 0. La caja es lo que lo hace cargar. */
+@media (max-width: 768px) {
+    .timeline-banner {
+        aspect-ratio: 4 / 1;
+        margin-inline: 0;
+        width: 100%;
+    }
+}
+
 /* Al expandir una entrada vuelve todo su contenido */
 .timeline-item.expanded .timeline-desc {
     display: block;
