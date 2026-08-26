@@ -235,15 +235,15 @@
       },
       {
         "id": "distributed-systems",
-        "title": "Money Laundering Analysis",
-        "shortDesc": "A fault-tolerant distributed pipeline for analysing massive bank statements in parallel.",
-        "fullDesc": "A fault-tolerant distributed pipeline built to ingest and analyse massive bank statements in parallel. It implements the Bully algorithm for leader election and guarantees exactly-once processing semantics through atomic checkpoints and sequence-number deduplication. It scales dynamically through hash-partitioned routing over RabbitMQ, recovering from node failures automatically without losing state.",
+        "title": "Fault-Tolerant Data Pipeline",
+        "shortDesc": "A highly resilient distributed pipeline for concurrent analytical queries over continuous data streams.",
+        "fullDesc": "A highly resilient distributed processing pipeline designed to run concurrent analytical queries over continuous data streams. The real value of the system lies in its fault-tolerant design: it guarantees correct computations under exactly-once processing semantics, so the cluster detects abrupt failures, recovers nodes autonomously and resumes execution from the last valid state without losing or duplicating information.\n\nArchitecturally, processing scales horizontally through hash-partitioned distribution over RabbitMQ, which isolates the state of each instance. Failure orchestration is handled with application-level heartbeats, leader election among replicated monitors using the Bully algorithm, and atomic checkpoints. The whole mechanism for detecting and restarting instances runs natively through Docker-in-Docker.",
         "tags": [
-          "Distributed Systems",
-          "RabbitMQ",
           "Python",
-          "Fault Tolerance",
-          "Docker"
+          "RabbitMQ",
+          "Bully Algorithm",
+          "Docker-in-Docker",
+          "Distributed Systems"
         ]
       },
       {

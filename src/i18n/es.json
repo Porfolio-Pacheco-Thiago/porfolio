@@ -235,15 +235,15 @@
       },
       {
         "id": "distributed-systems",
-        "title": "Money Laundering Analysis",
-        "shortDesc": "Pipeline distribuido y tolerante a fallos para el análisis en paralelo de extractos bancarios masivos.",
-        "fullDesc": "Pipeline distribuido y tolerante a fallos diseñado para la ingesta y análisis en paralelo de extractos bancarios masivos. Implementa el algoritmo Bully para la elección de líder y garantiza un procesamiento de semántica exactly-once mediante checkpoints atómicos y deduplicación por número de secuencia. Escala dinámicamente mediante ruteo particionado por hash sobre RabbitMQ, recuperándose automáticamente de caídas de nodos sin perder estado.",
+        "title": "Fault-Tolerant Data Pipeline",
+        "shortDesc": "Pipeline distribuido de alta resiliencia para consultas analíticas concurrentes sobre flujos continuos de datos.",
+        "fullDesc": "Un pipeline de procesamiento distribuido de alta resiliencia diseñado para ejecutar consultas analíticas concurrentes sobre flujos continuos de datos. El verdadero valor del sistema radica en su diseño tolerante a fallos: garantiza cálculos correctos bajo una semántica de procesamiento exactly-once, logrando que el clúster detecte caídas abruptas, recupere nodos autónomamente y retome la ejecución desde el último estado válido sin pérdida ni duplicación de información.\n\nA nivel arquitectónico, el procesamiento escala horizontalmente mediante un reparto particionado por hash sobre RabbitMQ, lo que aísla el estado de cada instancia. La orquestación de fallos se maneja mediante latidos de aplicación (heartbeats), elección de líder entre monitores replicados utilizando el algoritmo Bully y checkpoints atómicos. Todo el mecanismo de detección y reinicio de instancias opera nativamente a través de Docker-in-Docker.",
         "tags": [
-          "Sistemas Distribuidos",
-          "RabbitMQ",
           "Python",
-          "Tolerancia a Fallos",
-          "Docker"
+          "RabbitMQ",
+          "Bully Algorithm",
+          "Docker-in-Docker",
+          "Sistemas Distribuidos"
         ]
       },
       {
