@@ -1353,6 +1353,22 @@
         display: none;
     }
 
+    /* ── De la lista anidada, solo se lee el punto más reciente ────────────
+       Lovelytics tiene tres clientes y docencia tres materias, y cada uno trae su
+       párrafo. En ancho los tres suman 443px sobre una tarjeta de 747; acá, en una
+       columna de 250px de texto, los mismos tres suman 1412 y son la mitad larga de
+       todo lo que hay que scrollear.
+
+       Se queda la descripción del primero —la lista va de más reciente a más antiguo—
+       y de los otros dos queda su rótulo y su período, que es lo que los nombra. La
+       lista sigue completa: lo que se va es el desarrollo, no el punto.
+
+       El selector le gana por especificidad a la regla base (3 clases contra 1), así
+       que no depende de dónde caiga en el archivo. */
+    .nested-item:not(:first-child) .nested-desc {
+        display: none;
+    }
+
     /* El `max-height: 1400px` que abre el acordeón se eligió contra el contenido en
        ancho, donde lo más alto son 443px. Acá el mismo contenido mide 1413 y se pasaba
        por 13px: no se ve recortado —al terminar de abrir el `overflow` es `visible`—
