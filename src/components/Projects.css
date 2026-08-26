@@ -1825,8 +1825,16 @@
 }
 
 @media (max-width: 768px) {
-    /* El aparato y su columna de al lado se apilan. */
-    .fono-bloque {
+    /* El aparato y su columna de al lado se apilan, con el aparato arriba: en el DOM
+       `.fono-escena` va primero, así que en una sola columna queda encima solo.
+
+       Las dos ramas del selector no son decorativas. Los proyectos con monitor
+       redefinen el reparto en `.fono-bloque:has(.fono.es-monitor)` —dos clases contra
+       una—, así que con el selector corto la regla se aplicaba únicamente a los de
+       celular y todos los del monitor seguían en dos columnas: a 390 daba 138px para el
+       aparato y 132 para el texto. */
+    .fono-bloque,
+    .fono-bloque:has(.fono.es-monitor) {
         grid-template-columns: 1fr;
     }
 
