@@ -7,7 +7,12 @@
     align-items: center;
     padding: 8rem 2rem 4rem;
     position: relative;
-    overflow: hidden;
+    /* `clip` y no `hidden`: recorta igual —el resplandor y las figuras sangran a
+       propósito— pero no convierte al hero en un contenedor de scroll. Con `hidden` lo
+       era, y con 221px de desborde horizontal para scrollear: una pantalla entera de
+       superficie donde la rueda tenía a quién apuntar que no fuera la página. Es la
+       misma corrección que ya llevaban `html` y ahora `body`. */
+    overflow: clip;
 }
 
 .hero-bg-glow {

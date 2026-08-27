@@ -373,7 +373,14 @@ body {
      View Transition en ThemeProvider, que es un solo crossfade compuesto. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* `clip` y no `hidden`, por lo mismo que en `html`: `hidden` convierte al elemento
+     en un contenedor de scroll, y como el otro eje queda en `visible` el navegador lo
+     computa a `auto`. O sea que el `<body>` era un segundo scrollport apilado sobre el
+     del documento, con 582px de desborde horizontal para scrollear —el carrusel de
+     marcas y las figuras de alambre, que sangran a propósito—. Encima de ese desborde
+     la rueda tenía a quién apuntar que no fuera la página. `clip` recorta igual y no
+     crea scrollport. */
+  overflow-x: clip;
 }
 
 /* Sol verde detrás de todo el sitio.
