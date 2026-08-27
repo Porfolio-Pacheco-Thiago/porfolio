@@ -6,6 +6,7 @@ import { projectMeta } from '../data/projects';
 import Gallery from './ui/Gallery';
 import DemoDispositivo from './ui/DemoDispositivo';
 import LogoBucle from './ui/LogoBucle';
+import LogoFila from './ui/LogoFila';
 import { getCover, getPortada, getVideos, getImagenes, getMarca } from '../lib/media';
 import WireFigure from './ui/WireFigure';
 import './Projects.css';
@@ -252,7 +253,14 @@ export default function Projects() {
                                         dos huecos tienen proporciones muy distintas —2.3:1
                                         cerrada contra más de 5:1 abierta— y una sola pieza
                                         no sirve para los dos. */}
-                                    {marca.grande && (
+                                    {marca.videos.length > 0 ? (
+                                        // Con videos de marca no hay archivo apaisado que
+                                        // poner: la marca **son** ellos. En el hueco chico
+                                        // se turnan —`LogoBucle`—, pero acá la franja da
+                                        // para los tres en fila, y turnarlos escondería dos
+                                        // tercios de la pieza sin ganar nada.
+                                        <LogoFila className="project-marca-grande es-fila" videos={marca.videos} />
+                                    ) : marca.grande && (
                                         <img className={`project-marca-grande ${marca.grandeClaro ? 'es-oscuro' : ''}`} src={marca.grande} alt="" loading="lazy" decoding="async" />
                                     )}
                                     {marca.grandeClaro && (

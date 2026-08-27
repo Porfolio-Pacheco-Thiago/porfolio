@@ -27,7 +27,7 @@ export const projectMeta = {
     // RabbitMQ y no un ícono genérico de red: el middleware es lo que define al
     // proyecto —los latidos, la elección de líder y el reparto por hash van todos
     // por ahí—, igual que Cassandra define al de al lado.
-    'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems' },
+    'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems', pantalla: 'monitor' },
     specforge: { Icon: FaMicroscope, repo: '#' },
     'predictive-models': { Icon: FaBrain, repo: 'https://github.com/Porfolio-Pacheco-Thiago/machine-learning' },
     // `bucle`: en vez de una botonera con una demo para elegir, el video queda puesto en

@@ -473,6 +473,30 @@
     opacity: 1;
 }
 
+/* La variante en fila: no es una imagen sino la caja que contiene los tres videos de
+   marca, así que hereda la ubicación y la placa de la regla de arriba —el mismo hueco,
+   el mismo aire, el mismo fondo— y solo agrega el reparto.
+
+   `object-fit` no le sirve a un contenedor: lo que se acomoda es cada pieza, y el
+   `contain` va en ellas. */
+.project-marca-grande.es-fila {
+    display: flex;
+    align-items: center;
+    /* El hueco entre piezas sale del reparto, no de un `gap`: son iconos con aire
+       propio en su lienzo, y sumarles separación encima los dejaba chicos. */
+    gap: 0;
+}
+
+.logo-fila-pieza {
+    /* Un tercio cada uno, sin que el ancho intrínseco del archivo mande: el mínimo
+       automático de un ítem flex es su tamaño intrínseco, y estos son lienzos de
+       1500px. Es el mismo caso que el `min-width: 0` del banner de Trayectoria. */
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    object-fit: contain;
+}
+
 /* Abierta: la marca se corre y deja ver la captura que tiene detrás. El retardo la
    deja irse recién cuando la ventana terminó de crecer, para que no se cruce el
    cambio de imagen con el cambio de alto. */
