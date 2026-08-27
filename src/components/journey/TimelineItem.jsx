@@ -44,6 +44,7 @@ export default function TimelineItem({
     // punteados ahí se leen como que algo falló y no como "todavía sin subir".
     const galeria = fotos.length > 0 && (
         <Gallery
+            ampliable
             className="timeline-gallery"
             carpeta={carpeta}
             medios={fotos}

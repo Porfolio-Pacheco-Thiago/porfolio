@@ -17,6 +17,10 @@ export default function Projects() {
     // Qué proyecto está reproduciendo una demo. Mientras lo haga, su foto se
     // contrae y el celular se queda con ese espacio.
     const [reproduciendoId, setReproduciendoId] = useState(null);
+    // Qué tapa está ampliada, por id de proyecto. Antes esto era un `:hover`: alcanzaba
+    // con que el puntero cruzara la franja para que la captura se abriera sola encima
+    // del título y del aparato. Ahora se abre y se cierra con click.
+    const [tapaAmpliada, setTapaAmpliada] = useState(null);
     const activaRef = useRef(null);
     const grillaRef = useRef(null);
     const items = getList('projects.items');
@@ -57,6 +61,7 @@ export default function Projects() {
     };
 
     const toggle = (id) => {
+        setTapaAmpliada(null);
         const cerrando = expandedId === id;
         // Se le clava el alto a la grilla antes de tocar nada. Las tarjetas que no se
         // abren quedan ocultas **pero en su lugar** (ver Projects.css), pero la que sí
@@ -230,7 +235,30 @@ export default function Projects() {
                                     ícono queda como respaldo para los que todavía no tienen.
                                     `alt` vacío a propósito: el título está al lado, así que
                                     nombrarla otra vez solo repite. */}
-                                <div className={`project-media ${hayMarca ? 'con-marca' : ''}`}>
+                                <div
+                                    className={`project-media ${hayMarca ? 'con-marca' : ''} ${tapaAmpliada === item.id ? 'is-ampliada' : ''}`}
+                                    // Solo donde hay algo que ver mejor: la franja que
+                                    // muestra un logo ya se ve entera. Es el mismo
+                                    // recorte que tenía la regla de `:hover`.
+                                    {...(isExpanded && !hayMarca ? {
+                                        role: 'button',
+                                        tabIndex: 0,
+                                        'aria-pressed': tapaAmpliada === item.id,
+                                        // `stopPropagation` porque la tarjeta entera
+                                        // lleva un `onClick` que la cierra: sin esto,
+                                        // ampliar la tapa la plegaría en el mismo gesto.
+                                        onClick: e => {
+                                            e.stopPropagation();
+                                            setTapaAmpliada(a => (a === item.id ? null : item.id));
+                                        },
+                                        onKeyDown: e => {
+                                            if (e.key !== 'Enter' && e.key !== ' ') return;
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setTapaAmpliada(a => (a === item.id ? null : item.id));
+                                        },
+                                    } : {})}
+                                >
                                     {/* La marca va primero y en absoluto, encima de la
                                         tapa. Las dos conviven en el DOM y el CSS decide
                                         cuál se ve según la tarjeta esté abierta o

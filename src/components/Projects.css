@@ -612,9 +612,9 @@
     opacity: 0;
 }
 
-/* ── La tapa ampliada al pasar el mouse (solo en la tarjeta abierta) ───────
+/* ── La tapa ampliada al hacerle click (solo en la tarjeta abierta) ────────
    La tapa está muy recortada: el mockup es 1600×1132 y el hueco, apaisado y bajo.
-   Al pasar el mouse se ve completa y más grande.
+   Al hacerle click se ve completa y más grande.
 
    **Crece como capa, no en el flujo.** Completa y a ancho de tarjeta serían 781px
    de alto: la tarjeta abierta dejaría de entrar en una pantalla, que es
@@ -640,44 +640,45 @@
         object-fit 0s 0.4s;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    /* La ampliación al pasar el mouse es para las capturas, que están muy recortadas y
-       no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
-       entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
-    .project-card.expanded .project-media:not(.con-marca):hover:has(.es-animada) {
-        overflow: hidden;
-    }
+/* Se abre con click y no al pasar el mouse: con `:hover` alcanzaba con que el puntero
+   cruzara la franja para que la captura se abriera sola encima del título y del aparato.
+   El estado lo pone `Projects.jsx` —solo en la tarjeta abierta y solo donde la franja
+   muestra una captura— y lo que se ve lo define esto. */
+/* La ampliación **al hacerle click** es para las capturas, que están muy recortadas y
+   no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
+   entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
+.project-card.expanded .project-media:not(.con-marca).is-ampliada:has(.es-animada) {
+    overflow: hidden;
+}
 
-    .project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-oscuro,
-    .project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-claro,
-    .project-card.expanded .project-media:not(.con-marca):hover .project-cover.es-animada {
-        width: 100%;
-        height: 100%;
-        box-shadow: none;
-    }
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover.es-oscuro,
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover.es-claro,
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover.es-animada {
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+}
 
-    /* Acotado a las franjas que muestran una captura. Donde la franja muestra un logo
-       —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
-       mejor: un logo ya se ve entero, y agrandarlo al pasar el mouse es movimiento sin
-       información. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
-    /* Al agrandarse con el mouse la franja recupera un alto propio, así que ahí tiene que
-       dejar de estirarse: si no, `flex-grow` la devolvería al alto del hueco y el alto de
-       abajo no se vería. */
-    .project-card.expanded .project-media:not(.con-marca):hover {
-        flex: none;
-        /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
-        overflow: visible;
-    }
+/* Acotado a las franjas que muestran una captura. Donde la franja muestra un logo
+   —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
+   mejor: un logo ya se ve entero, así que ahí el click no hace nada. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
+/* Al agrandarse la franja recupera un alto propio, así que ahí tiene que
+   dejar de estirarse: si no, `flex-grow` la devolvería al alto del hueco y el alto de
+   abajo no se vería. */
+.project-card.expanded .project-media:not(.con-marca).is-ampliada {
+    flex: none;
+    /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
+    overflow: visible;
+}
 
-    .project-card.expanded .project-media:not(.con-marca):hover .project-cover {
-        height: min(58vh, 470px);
-        /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
-           bandas laterales que deja `contain`. */
-        object-fit: contain;
-        background: var(--bg-primary);
-        box-shadow: 0 26px 60px rgb(var(--sombra-rgb) / 0.55);
-        transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
-    }
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover {
+    height: min(58vh, 470px);
+    /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
+       bandas laterales que deja `contain`. */
+    object-fit: contain;
+    background: var(--bg-primary);
+    box-shadow: 0 26px 60px rgb(var(--sombra-rgb) / 0.55);
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
 }
 
 .project-img-placeholder {

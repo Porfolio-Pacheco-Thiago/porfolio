@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLang } from '../../context/lang-context';
 import { getMedia } from '../../lib/media';
 import GalleryPlaceholder from './GalleryPlaceholder';
@@ -19,6 +20,11 @@ import GalleryPlaceholder from './GalleryPlaceholder';
  * @param {string} props.className        Clase del contenedor.
  * @param {string} [props.itemClassName]  Clase de cada hueco. Por defecto, `${className}-item`.
  * @param {number} [props.count=3]        Huecos del marcador, si la carpeta está vacía.
+ * @param {boolean} [props.ampliable]     Si las imágenes se agrandan al hacerles click.
+ *                                        Lo que se ve al ampliarlas lo define el CSS de
+ *                                        quien la usa; acá solo se marca cuál está
+ *                                        abierta. Los videos quedan afuera: ya traen su
+ *                                        propia botonera y el click es para reproducir.
  *
  * @remarks
  * - `preload="none"` + `poster`: sin esto, cada video empezaría a bajarse con la
@@ -28,8 +34,11 @@ import GalleryPlaceholder from './GalleryPlaceholder';
  *   apaisadas, así que cada hueco se marca con `is-video` para que el CSS
  *   decida cómo acomodar cada cosa.
  */
-export default function Gallery({ carpeta, medios: propios, label, className, itemClassName, count = 3, ...props }) {
+export default function Gallery({ carpeta, medios: propios, label, className, itemClassName, count = 3, ampliable = false, ...props }) {
     const { t } = useLang();
+    // Cuál está ampliada, por nombre de archivo. Una sola a la vez: dos abiertas se
+    // pisarían, porque al crecer cada una se sale de su hueco.
+    const [ampliada, setAmpliada] = useState(null);
     const medios = propios ?? getMedia(carpeta);
     const claseHueco = itemClassName ?? `${className}-item`;
 
@@ -52,7 +61,31 @@ export default function Gallery({ carpeta, medios: propios, label, className, it
             {medios.map((medio, i) => (
                 <li
                     key={medio.nombre}
-                    className={`${claseHueco} is-media ${medio.tipo === 'video' ? 'is-video' : ''}`}
+                    className={`${claseHueco} is-media ${medio.tipo === 'video' ? 'is-video' : ''} ${ampliada === medio.nombre ? 'is-ampliada' : ''}`}
+                    // Sin envolver la imagen en un `<button>`: el CSS la posiciona en
+                    // absoluto contra este `li`, y meter un elemento en el medio le
+                    // cambiaría el bloque contenedor. Con el rol y el `tabIndex` acá, la
+                    // estructura no se mueve y el control sigue siendo alcanzable por
+                    // teclado. No hay botón adentro con el que competir.
+                    {...(ampliable && medio.tipo !== 'video' ? {
+                        role: 'button',
+                        tabIndex: 0,
+                        'aria-pressed': ampliada === medio.nombre,
+                        // `stopPropagation` porque la tarjeta que la contiene lleva su
+                        // propio click para plegarse: sin esto, ampliar una foto cerraba
+                        // la entrada en el mismo gesto y la galería se iba con ella.
+                        onClick: e => {
+                            e.stopPropagation();
+                            setAmpliada(a => (a === medio.nombre ? null : medio.nombre));
+                        },
+                        onKeyDown: e => {
+                            if (e.key !== 'Enter' && e.key !== ' ') return;
+                            // El espacio scrollea la página si no se lo frena.
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setAmpliada(a => (a === medio.nombre ? null : medio.nombre));
+                        },
+                    } : {})}
                 >
                     {medio.tipo === 'video' ? (
                         // No hay archivo de subtítulos para estas grabaciones. Un

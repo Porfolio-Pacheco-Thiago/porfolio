@@ -864,10 +864,10 @@
     font-size: 1.2rem;
 }
 
-/* ── La foto ampliada al pasar el mouse ───────────────────────────────────
+/* ── La foto ampliada al hacerle click ────────────────────────────────────
    Lo mismo que hace la tapa de un proyecto en Melodía. La foto está muy recortada
-   —el hueco es apaisado y bajo, y `cover` se come lo que sobra— así que al pasar el
-   mouse se ve entera y más grande.
+   —el hueco es apaisado y bajo, y `cover` se come lo que sobra— así que al hacerle
+   click se ve entera y más grande.
 
    **Crece como capa, no en el flujo**: posicionada en absoluto no mueve nada de lo
    que tiene alrededor, que acá importa el doble porque la ventana abierta ya está
@@ -910,42 +910,46 @@
         translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s 0.4s;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    /* Un lugar de la grilla de corrimiento: la de la izquierda va hacia la derecha, la de
-       la derecha hacia la izquierda, y la del medio ya está centrada. Un lugar es un
-       tercio del ancho de la galería más su parte del hueco. */
-    .timeline-gallery-item.is-media:nth-child(1):hover img {
-        --desvio: calc(33.333cqw + 0.1667rem);
-    }
+/* Ampliada: se abre al hacerle **click**, no al pasar el mouse. Antes era `:hover`, y
+   con el puntero encima la foto crecía sola: se comía el texto de al lado sin que nadie
+   se lo pidiera, y bastaba cruzar la galería para dispararlo tres veces. Con click se
+   abre la que se quiere ver y se cierra volviéndole a hacer click.
 
-    .timeline-gallery-item.is-media:nth-child(3):hover img {
-        --desvio: calc(-33.333cqw - 0.1667rem);
-    }
+   El estado lo marca `Gallery` con `is-ampliada`; lo que se ve lo define esto. */
+/* Un lugar de la grilla de corrimiento: la de la izquierda va hacia la derecha, la de
+   la derecha hacia la izquierda, y la del medio ya está centrada. Un lugar es un
+   tercio del ancho de la galería más su parte del hueco. */
+.timeline-gallery-item.is-media:nth-child(1).is-ampliada img {
+    --desvio: calc(33.333cqw + 0.1667rem);
+}
 
-    /* Deja salir la imagen del hueco; el marco de la ventana sigue recortando. */
-    .timeline-gallery-item.is-media:hover {
-        overflow: visible;
-        z-index: 3;
-    }
+.timeline-gallery-item.is-media:nth-child(3).is-ampliada img {
+    --desvio: calc(-33.333cqw - 0.1667rem);
+}
 
-    .timeline-gallery-item.is-media:hover img {
-        /* Casi el ancho de la ventana —que mide ~1000— dejando márgenes anchos a los dos
-           costados. Acotada en `vw`/`vh` para que en una pantalla chica no se pase de la
-           ventana del navegador. */
-        width: min(58vw, 780px);
-        height: min(46vh, 430px);
-        /* El `img { max-width: 100% }` global la volvía a dejar del ancho de su hueco:
-           crecía a lo alto y nada a lo ancho. Es el mismo caso del logo apaisado. */
-        max-width: none;
-        /* Entera, sin recortar. El fondo opaco tapa lo que queda atrás en las bandas
-           que deja `contain`. */
-        object-fit: contain;
-        background: var(--bg-primary);
-        border-radius: 8px;
-        box-shadow: 0 20px 48px rgb(var(--sombra-rgb) / 0.55);
-        transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-            height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
-    }
+/* Deja salir la imagen del hueco; el marco de la ventana sigue recortando. */
+.timeline-gallery-item.is-media.is-ampliada {
+    overflow: visible;
+    z-index: 3;
+}
+
+.timeline-gallery-item.is-media.is-ampliada img {
+    /* Casi el ancho de la ventana —que mide ~1000— dejando márgenes anchos a los dos
+       costados. Acotada en `vw`/`vh` para que en una pantalla chica no se pase de la
+       ventana del navegador. */
+    width: min(58vw, 780px);
+    height: min(46vh, 430px);
+    /* El `img { max-width: 100% }` global la volvía a dejar del ancho de su hueco:
+       crecía a lo alto y nada a lo ancho. Es el mismo caso del logo apaisado. */
+    max-width: none;
+    /* Entera, sin recortar. El fondo opaco tapa lo que queda atrás en las bandas
+       que deja `contain`. */
+    object-fit: contain;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    box-shadow: 0 20px 48px rgb(var(--sombra-rgb) / 0.55);
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
 }
 
 /* La galería vive dentro del bloque que se despliega, que recorta para poder animar
@@ -953,10 +957,11 @@
    comería la foto ampliada. El retardo espera a que termine de abrirse: sin él, el
    contenido asomaría entero desde el primer fotograma. */
 .timeline-item.expanded .timeline-extra {
-    overflow: visible;
-    transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease,
-        overflow 0s 0.45s;
+overflow: visible;
+transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease,
+    overflow 0s 0.45s;
 }
+
 
 @media (prefers-reduced-motion: reduce) {
     .timeline-gallery-item.is-media img {
