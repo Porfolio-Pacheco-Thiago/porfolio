@@ -29,7 +29,7 @@ export const projectMeta = {
     // por ahí—, igual que Cassandra define al de al lado.
     'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems', pantalla: 'monitor' },
     specforge: { Icon: FaMicroscope, repo: '#' },
-    'predictive-models': { Icon: FaBrain, repo: 'https://github.com/Porfolio-Pacheco-Thiago/machine-learning' },
+    'predictive-models': { Icon: FaBrain, repo: 'https://github.com/Porfolio-Pacheco-Thiago/machine-learning', pantalla: 'monitor', carrusel: true },
     // `bucle`: en vez de una botonera con una demo para elegir, el video queda puesto en
     // el monitor desde el principio, mudo y repitiéndose. El aparato se planta de frente
     // como con `carrusel`, y sin nada que controlar tampoco va la barra del reproductor.

@@ -261,14 +261,15 @@
       {
         "id": "predictive-models",
         "title": "Modelos Predictivos y Análisis con IA",
-        "shortDesc": "Una suite de modelos avanzados de machine learning para análisis predictivo, clustering y clasificación de sentimientos con PNL.",
-        "fullDesc": "Portafolio integral de Machine Learning y PLN aplicado a cinco datasets complejos. Abarca desde la ingesta de big data y detección multivariada de anomalías con Isolation Forest, hasta clasificadores por ensamble (XGBoost, Random Forest, Stacking). Destaca un pipeline de análisis de sentimientos que evalúa desde regresión logística sobre TF-IDF hasta redes neuronales Bi-LSTM en Keras, manejando negaciones y lematización en español.",
+        "shortDesc": "Colección de pipelines de Machine Learning e IA sobre problemas analíticos complejos, del dato crudo al lenguaje natural.",
+        "fullDesc": "Colección integral de pipelines de Machine Learning e Inteligencia Artificial enfocada en la resolución de problemas analíticos complejos. Este portafolio demuestra versatilidad para extraer valor real de datos crudos, abarcando desde el análisis geoespacial de millones de registros urbanos y la predicción de precios inmobiliarios, hasta el procesamiento profundo de lenguaje natural, cubriendo así el ciclo de vida completo del dato.\n\nA nivel técnico, el procesamiento incluye imputación avanzada y detección multivariada de anomalías mediante Isolation Forest. Los motores predictivos implementan algoritmos de ensamble (XGBoost, Random Forest, Stacking) con hiperparámetros optimizados. En el área de PLN, destaca un pipeline robusto que maneja lematización y negaciones en español, evaluando desde modelos clásicos sobre TF-IDF hasta arquitecturas de aprendizaje profundo con redes neuronales Bi-LSTM en TensorFlow/Keras.",
         "tags": [
           "Machine Learning",
-          "Python",
-          "PLN",
+          "Scikit-Learn",
           "XGBoost",
-          "TensorFlow"
+          "TensorFlow",
+          "PLN",
+          "Python"
         ]
       },
       {

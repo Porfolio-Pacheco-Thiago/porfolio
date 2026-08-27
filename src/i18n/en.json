@@ -261,14 +261,15 @@
       {
         "id": "predictive-models",
         "title": "Predictive Models & AI Analysis",
-        "shortDesc": "A suite of advanced machine learning models for predictive analytics, clustering, and NLP sentiment classification.",
-        "fullDesc": "A comprehensive Machine Learning and NLP portfolio applied to five complex datasets. It spans big-data ingestion and multivariate anomaly detection with Isolation Forest through to ensemble classifiers (XGBoost, Random Forest, Stacking). It is anchored by a sentiment analysis pipeline that evaluates everything from logistic regression over TF-IDF to Bi-LSTM neural networks in Keras, handling negation and lemmatisation in Spanish.",
+        "shortDesc": "A collection of machine learning and AI pipelines over complex analytical problems, from raw data to natural language.",
+        "fullDesc": "A comprehensive collection of machine learning and artificial intelligence pipelines aimed at solving complex analytical problems. The portfolio shows the range it takes to pull real value out of raw data, from geospatial analysis of millions of urban records and real-estate price prediction through to deep natural language processing, covering the full life cycle of the data.\n\nOn the technical side, processing includes advanced imputation and multivariate anomaly detection with Isolation Forest. The predictive engines implement ensemble algorithms (XGBoost, Random Forest, Stacking) with tuned hyperparameters. In NLP, the standout is a robust pipeline that handles lemmatisation and negation in Spanish, evaluating everything from classical models over TF-IDF to deep learning architectures with Bi-LSTM neural networks in TensorFlow/Keras.",
         "tags": [
           "Machine Learning",
-          "Python",
-          "NLP",
+          "Scikit-Learn",
           "XGBoost",
-          "TensorFlow"
+          "TensorFlow",
+          "NLP",
+          "Python"
         ]
       },
       {
