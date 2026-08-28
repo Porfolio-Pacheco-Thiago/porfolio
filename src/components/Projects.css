@@ -486,7 +486,7 @@
 
    **Los dos números están atados.** El alto que dibuja el logo es `ancho / relación`, así
    que para bajarlo más hay que ensanchar el archivo con margen a los costados —arriba y
-   abajo va al ras— y traer esa nueva relación acá. Hoy `logo-grande.png` es 724x145.
+   abajo va al ras— y traer esa nueva relación acá. Hoy `logo-grande.png` es 888x145.
    Referencia rápida sobre los 1104px de ancho que mide la franja: 4.42 → 250px de alto,
    5.00 → 221, 5.52 → 200, 6.13 → 180. */
 [data-proyecto="specforge"].expanded .project-marco {
@@ -496,7 +496,7 @@
 [data-proyecto="specforge"].expanded .project-media {
     flex: none;
     height: auto;
-    aspect-ratio: 724 / 145;
+    aspect-ratio: 888 / 145;
 }
 
 /* La variante en fila: no es una imagen sino la caja que contiene los tres videos de
