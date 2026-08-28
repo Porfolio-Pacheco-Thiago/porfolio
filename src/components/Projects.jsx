@@ -398,19 +398,19 @@ export default function Projects() {
                                         aparte
                                     )}
 
-                                    {/* Con aparato, la galería solo aparece si quedan
-                                        imágenes que él no se haya llevado; sin aparato
-                                        sigue siendo la de siempre, marcador incluido.
-                                        En un monitor no queda ninguna, porque se lleva
-                                        las capturas además de los videos. */}
-                                    {medios.length === 0 ? (
-                                        <Gallery
-                                            className="project-gallery"
-                                            carpeta={carpeta}
-                                            medios={imagenes}
-                                            label={item.title}
-                                        />
-                                    ) : imagenes.length > 0 && pantalla !== 'monitor' && (
+                                    {/* La galería aparece **solo si hay imágenes que
+                                        mostrar**. Antes, sin aparato, se renderizaba
+                                        igual y `Gallery` caía en su marcador: SpecForge,
+                                        cuyo único archivo es el logo, terminaba con tres
+                                        recuadros punteados vacíos colgando abajo, que se
+                                        leen como que algo falló y no como "todavía sin
+                                        subir". Es la misma decisión que ya había tomado
+                                        Trayectoria para la Olimpiada.
+
+                                        Con monitor tampoco va: ese aparato se lleva las
+                                        capturas además de los videos, así que no queda
+                                        ninguna y repetirlas sería mostrarlas dos veces. */}
+                                    {imagenes.length > 0 && pantalla !== 'monitor' && (
                                         <Gallery
                                             className="project-gallery"
                                             carpeta={carpeta}
