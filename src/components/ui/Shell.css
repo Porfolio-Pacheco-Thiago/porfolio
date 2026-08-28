@@ -1,0 +1,200 @@
+/* ── La terminal flotando ─────────────────────────────────────────────────
+   El chasis de SpecForge. Mismo lugar en la tarjeta que el celular de Melodía o el
+   monitor de VibeTrip —columna izquierda del bloque expandido, texto a la derecha— y
+   mismo reparto de responsabilidades: la perspectiva vive en la escena y la ventana es
+   un único elemento plano que se mueve entero.
+
+   Se dibuja acá y no en `Projects.css` porque es el CSS de un componente, como
+   `Logo.css` o `Marcas.css`; lo del celular vive allá por herencia, no por convención. */
+.shell-bloque {
+    display: grid;
+    /* La ventana se lleva bastante más que el texto, más incluso que el monitor. No es
+       gusto: adentro hay una captura de 640px de ancho con texto de terminal a 8px, y
+       cada punto que se la achica lo paga la legibilidad de eso. En la columna que le
+       daba el reparto del monitor la captura se dibujaba al 76% y el texto se empastaba;
+       acá llega al 90%. Lo que la otra columna pierde es aire, no palabras: la
+       descripción entra igual, con renglones más cortos. */
+    grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: center;
+}
+
+/* El aire de arriba y abajo no es decorativo: al girar y flotar, la caja de la ventana
+   crece. Medido a 1920 de ancho: plana ocupa 564x347 y en el peor fotograma del ciclo
+   567x368, o sea 10px por lado, más los 7px del flote. `.project-extra` lleva
+   `overflow: hidden` para poder animar su despliegue, así que sin este margen recortaba
+   las puntas; con los 28.8px que da el 1.8rem el desborde es 0 en todo el ciclo. */
+.shell-escena {
+    display: grid;
+    place-items: center;
+    padding: 1.8rem 0;
+}
+
+.shell {
+    position: relative;
+    /* Lo que manda es el 94% de la columna; el literal y el `vh` están para que en
+       pantallas muy anchas o muy bajas la ventana no se salga de la tarjeta. El tope de
+       600px es el del archivo (640) menos un poco: agrandarla más allá de su propio
+       tamaño solo interpola píxeles. */
+    width: min(600px, 94%, 66vh);
+    border-radius: 10px;
+    /* El marco de la ventana, en el gris del monitor: son dos chasis de la misma
+       sección y conviene que se lean como de la misma familia. En tema claro queda
+       casi blanco, que es como se ve una ventana clara alrededor de una terminal
+       oscura. */
+    background: linear-gradient(160deg,
+        var(--aparato-luz) 0%,
+        var(--aparato-medio) 45%,
+        var(--aparato-hondo) 100%);
+    border: 1px solid var(--aparato-canto);
+    /* Sin canto sólido desplazado, a diferencia del celular y del monitor: una ventana
+       no es un objeto con volumen, es una lámina. Lo que la despega del fondo es la
+       sombra, y va más difusa y más caída que la de los aparatos justamente para que
+       se lea como algo suspendido y no como algo apoyado. */
+    box-shadow:
+        0 2px 6px rgb(var(--sombra-rgb) / 0.25),
+        0 34px 70px rgb(var(--sombra-rgb) / 0.55);
+    overflow: hidden;
+    /* La pose de reposo es el fotograma 0% del giro: así el arranque de la animación no
+       da un salto. La `perspective` va acá adentro y no en la escena porque el flote
+       ocupa `translate`, que se aplica antes que `transform` — ver la nota del .jsx. */
+    transform: perspective(1400px) rotateZ(-2.5deg) rotateY(-13deg);
+    animation:
+        shell-girar 19s ease-in-out infinite,
+        shell-flotar 7.5s ease-in-out infinite;
+}
+
+@keyframes shell-girar {
+    0% { transform: perspective(1400px) rotateZ(-2.5deg) rotateY(-13deg); }
+    50% { transform: perspective(1400px) rotateZ(1.5deg) rotateY(11deg); }
+    100% { transform: perspective(1400px) rotateZ(-2.5deg) rotateY(-13deg); }
+}
+
+/* El flote, en `translate` y no en `transform`: son dos animaciones sobre el mismo
+   elemento y necesitan propiedades distintas para no pisarse. */
+@keyframes shell-flotar {
+    0% { translate: 0 -7px; }
+    50% { translate: 0 7px; }
+    100% { translate: 0 -7px; }
+}
+
+/* ── La barra de título ───────────────────────────────────────────────────
+   Los tres botones son ornamento: no hacen nada, y por eso el renglón entero va con
+   `aria-hidden` desde el JSX. */
+.shell-barra {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.7rem;
+    border-bottom: 1px solid var(--aparato-canto);
+    /* Fondo propio y no el del cuerpo. Es lo que hace una ventana de verdad —la barra
+       es una pieza aparte— y además vuelve predecible el contraste del título: dejándolo
+       al gradiente de `.shell`, el color exacto detrás del texto dependía de dónde
+       cayera la barra dentro de un degradado a 160° que cruza todo el chasis. */
+    background: linear-gradient(var(--aparato-luz), var(--aparato-brillo));
+}
+
+.shell-boton {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    /* Estos tres no son colores de marca ni siguen al acento, así que no van como
+       tokens de tema en `index.css`: son los mismos en claro y en oscuro, porque los
+       botones de una ventana también lo son. */
+    flex: none;
+}
+
+.shell-boton.es-cerrar { background: #ff5f57; }
+.shell-boton.es-minimizar { background: #febc2e; }
+.shell-boton.es-agrandar { background: #28c840; }
+
+.shell-titulo {
+    /* Centrado en la barra entera y no después de los botones: es donde lo pone
+       cualquier ventana, y con `absolute` el título no empuja a los botones cuando el
+       nombre es largo. */
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    /* Tinta propia, que se invierte con el chasis y no con la página: el marco es
+       plateado cuando el sitio está oscuro y oscuro cuando el sitio está claro, así que
+       usar acá el gris del texto normal dejaba el nombre en 2.2:1 contra la barra. Ver
+       `--shell-tinta` en `index.css`. */
+    color: var(--shell-tinta);
+    pointer-events: none;
+}
+
+/* ── La pantalla ──────────────────────────────────────────────────────────
+   La proporción es la del archivo (640x360), así que la captura entra exacta y no hay
+   franjas de relleno ni recorte. */
+.shell-pantalla {
+    position: relative;
+    aspect-ratio: 640 / 360;
+    /* El morado de fondo de la propia terminal: mientras la captura no terminó de
+       bajar, el hueco es del color que va a tener después y no un rectángulo blanco. */
+    background: #300a24;
+}
+
+.shell-captura {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    /* Un fundido y no un desplazamiento: las dos capturas son la misma terminal en dos
+       momentos, y verlas cruzarse de costado las convertiría en dos cosas distintas. */
+    transition: opacity 0.7s ease;
+}
+
+.shell-captura.is-actual {
+    opacity: 1;
+}
+
+/* Con la tarjeta cerrada la ventana sigue maquetada —`.project-extra` la tapa con
+   `max-height: 0`, no la desmonta—, así que sin esto el giro seguiría corriendo en la
+   GPU sobre algo que nadie ve. Es la misma precaución que toma `.fono`. */
+.project-card:not(.expanded) .shell {
+    animation: none;
+}
+
+/* Una columna: la ventana arriba y el texto abajo, igual que el monitor. Debajo de los
+   900 la tarjeta ya ocupa la fila entera, y partir ese ancho en dos deja la captura
+   ilegible. */
+@media (max-width: 900px) {
+    .shell-bloque {
+        grid-template-columns: 1fr;
+    }
+
+    .shell-escena {
+        padding: 1.2rem 0;
+    }
+
+    /* Sin giro: apilada, la ventana usa todo el ancho de la tarjeta y el escorzo de los
+       13 grados se lleva justo la columna de texto de la captura. Se queda de frente,
+       flotando, que es lo único que en este ancho se sigue leyendo. */
+    .shell {
+        width: min(485px, 100%);
+        animation: shell-flotar 7.5s ease-in-out infinite;
+        transform: none;
+    }
+}
+
+/* El giro y el flote son decoración: sin ellos la ventana muestra exactamente lo
+   mismo. Y el relevo de capturas ya se apaga desde el JSX.
+
+   Va último del archivo a propósito: tiene la misma especificidad que la regla del
+   bloque de 900 —las dos son `.shell` a secas— y entre iguales gana la que va después.
+   Puesto antes, en un celular con la preferencia activada el flote volvía a encenderse. */
+@media (prefers-reduced-motion: reduce) {
+    .shell {
+        animation: none;
+        transform: none;
+        translate: none;
+    }
+}

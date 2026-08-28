@@ -499,6 +499,15 @@
     aspect-ratio: 888 / 145;
 }
 
+/* Y el alto que la franja deja de reclamar se lo lleva lo de abajo. En las demás
+   tarjetas ese sobrante se lo come el marco, que es `flex: 1 1 auto`; acá se lo acaban
+   de sacar, y sin decir quién lo hereda el reparto termina antes de llegar al borde:
+   quedaban 77px muertos entre los tags y el fondo de la tarjeta. Con esto los toma el
+   bloque de la terminal, que la centra en el aire que gana. */
+[data-proyecto="specforge"].expanded .project-info {
+    flex: 1 1 auto;
+}
+
 /* La variante en fila: no es una imagen sino la caja que contiene los tres videos de
    marca, así que hereda la ubicación y la placa de la regla de arriba —el mismo hueco,
    el mismo aire, el mismo fondo— y solo agrega el reparto.

@@ -196,6 +196,13 @@
   --aparato-canto-claro: #c6c6d1;
   --aparato-detalle: #adadb8;
 
+  /* La tinta de la barra de título de la terminal (`ui/Shell.css`). Es su propio token
+     y no `--text-secondary` porque el chasis va al revés que la página: acá el marco es
+     plateado, así que el título tiene que ser tinta oscura. Con el gris del texto normal
+     —#a0a0a0 sobre #f2f2f5— el contraste era 2.2:1 y el nombre no se leía. Este da
+     5.1:1 contra la parte más oscura de la barra, sobrado para 4.5:1 en texto chico. */
+  --shell-tinta: #5a5a66;
+
   /* Color de la marca. No sigue al acento a propósito: es el verde del logo tal
      como estaba en los PNG originales (#43ec67 en oscuro, #018c1e en claro), y
      una marca no tiene por qué moverse cuando se retoca la paleta. */
@@ -281,6 +288,10 @@
   --aparato-canto: #1b1b20;
   --aparato-canto-claro: #2f2f36;
   --aparato-detalle: #3d3d45;
+
+  /* Y con la página clara el marco es oscuro, así que el título se invierte con él, con
+     el mismo margen: 5.6:1 y 6.9:1 sobre las dos paradas de la barra. */
+  --shell-tinta: #b6b6c2;
 
   /* En claro el contorno del nombre es más grueso: ver la nota del tema oscuro. */
   --borde-nombre-svg: 220;

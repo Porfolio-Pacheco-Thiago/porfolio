@@ -7,6 +7,7 @@ import Gallery from './ui/Gallery';
 import DemoDispositivo from './ui/DemoDispositivo';
 import LogoBucle from './ui/LogoBucle';
 import LogoFila from './ui/LogoFila';
+import Shell from './ui/Shell';
 import { getCover, getPortada, getVideos, getImagenes, getMarca } from '../lib/media';
 import WireFigure from './ui/WireFigure';
 import './Projects.css';
@@ -152,7 +153,7 @@ export default function Projects() {
                     // capturas del programa, y dejarlas afuera le sacaba al monitor
                     // justo la principal. Lo que sí se saca es la tapa explícita
                     // (`cover.*`), que no es una captura sino la pieza de portada.
-                    const medios = pantalla === 'monitor'
+                    const medios = pantalla === 'monitor' || pantalla === 'shell'
                         ? [
                             ...getImagenes(carpeta).filter(m => !/^cover\./i.test(m.nombre)),
                             ...videos,
@@ -372,7 +373,16 @@ export default function Projects() {
                                         columna derecha; sin celular, uno debajo del otro. En los
                                         dos casos viven dentro del bloque expandible, así que en
                                         la vista chica no existen ni reciben foco. */}
-                                    {medios.length > 0 ? (
+                                    {pantalla === 'shell' ? (
+                                        // La terminal es su propio chasis: no tiene demo
+                                        // que elegir ni video que reproducir, así que no
+                                        // pasa por `DemoDispositivo` —ver la nota de
+                                        // `ui/Shell.jsx`—. El título es el directorio del
+                                        // proyecto, como en una terminal de verdad.
+                                        <Shell medios={medios} titulo={`~/${item.id}`} label={item.title}>
+                                            {aparte}
+                                        </Shell>
+                                    ) : medios.length > 0 ? (
                                         // `key` atado a si está abierta: al cerrar, el
                                         // componente se **remonta** y vuelve solo a su
                                         // estado inicial —sin demo elegida, aparato
@@ -407,10 +417,11 @@ export default function Projects() {
                                         subir". Es la misma decisión que ya había tomado
                                         Trayectoria para la Olimpiada.
 
-                                        Con monitor tampoco va: ese aparato se lleva las
-                                        capturas además de los videos, así que no queda
-                                        ninguna y repetirlas sería mostrarlas dos veces. */}
-                                    {imagenes.length > 0 && pantalla !== 'monitor' && (
+                                        Con monitor tampoco va, ni con la terminal: esos
+                                        dos chasis se llevan las capturas además de los
+                                        videos, así que no queda ninguna y repetirlas
+                                        sería mostrarlas dos veces. */}
+                                    {imagenes.length > 0 && pantalla !== 'monitor' && pantalla !== 'shell' && (
                                         <Gallery
                                             className="project-gallery"
                                             carpeta={carpeta}

@@ -5,10 +5,12 @@ import { SiApachecassandra, SiRabbitmq } from 'react-icons/si';
 // Metadata no traducible de cada proyecto, indexada por el mismo `id` que projects.items
 // en los archivos de i18n. `repo: '#'` = todavía sin repositorio público.
 //
-// `pantalla` elige el chasis del aparato que muestra los medios (ver
-// `ui/DemoDispositivo.jsx`), y se decide por la forma de lo que hay que mostrar, no por
-// gusto: `'monitor'` para lo apaisado —capturas de escritorio y de web—, y el celular
+// `pantalla` elige el chasis que muestra los medios, y se decide por la forma de lo que
+// hay que mostrar, no por gusto: `'monitor'` para lo apaisado —capturas de escritorio y
+// de web—, `'shell'` para una CLI —una terminal flotando, `ui/Shell.jsx`— y el celular
 // por defecto, que es lo que le sirve a Melodía porque sus grabaciones son verticales.
+// Los dos primeros salen de `ui/DemoDispositivo.jsx`; el tercero es componente aparte,
+// porque una ventana no tiene botonera ni reproductor que compartir.
 // Sin medios que mostrar no aparece ningún aparato.
 export const projectMeta = {
     // Melodía se desarrolló en equipo, en su propia organización: el link va a
@@ -28,7 +30,11 @@ export const projectMeta = {
     // proyecto —los latidos, la elección de líder y el reparto por hash van todos
     // por ahí—, igual que Cassandra define al de al lado.
     'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems', pantalla: 'monitor' },
-    specforge: { Icon: FaMicroscope, repo: '#' },
+    // `'shell'` es el tercer chasis (ver `ui/Shell.jsx`): una terminal flotando con el
+    // proyecto corriendo adentro. Le toca porque SpecForge es una CLI —no tiene interfaz
+    // que meter en un monitor, tiene una sesión— y una captura de terminal suelta en la
+    // galería se lee como un archivo adjunto y no como el programa andando.
+    specforge: { Icon: FaMicroscope, repo: '#', pantalla: 'shell' },
     'predictive-models': { Icon: FaBrain, repo: 'https://github.com/Porfolio-Pacheco-Thiago/machine-learning', pantalla: 'monitor', carrusel: true },
     // `bucle`: en vez de una botonera con una demo para elegir, el video queda puesto en
     // el monitor desde el principio, mudo y repitiéndose. El aparato se planta de frente
