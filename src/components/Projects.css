@@ -473,6 +473,32 @@
     opacity: 1;
 }
 
+/* ── La franja se ajusta al logo, en vez de al revés ──────────────────────
+   Por defecto la franja de la tarjeta abierta se estira para tomar el alto que sobra
+   (`flex: 1 1 auto`), y lo que haya adentro se acomoda como puede. Para un logo apaisado
+   eso está al revés: el logo tiene que cruzarla de lado a lado —es una banda, no una
+   foto— y entonces su alto no lo elige la tarjeta sino la proporción del archivo.
+
+   Con `aspect-ratio` igual a la del archivo, la franja mide exactamente lo que el logo
+   dibuja: cruza de lado a lado y queda al ras arriba y abajo, sin una banda de relleno.
+   Y como deja de estirarse, lo que sobra se lo lleva el texto: la franja pasó de 276px a
+   221, o sea del 40% de la tarjeta al 32%.
+
+   **Los dos números están atados.** El alto que dibuja el logo es `ancho / relación`, así
+   que para bajarlo más hay que ensanchar el archivo con margen a los costados —arriba y
+   abajo va al ras— y traer esa nueva relación acá. Hoy `logo-grande.png` es 724x145.
+   Referencia rápida sobre los 1104px de ancho que mide la franja: 4.42 → 250px de alto,
+   5.00 → 221, 5.52 → 200, 6.13 → 180. */
+[data-proyecto="specforge"].expanded .project-marco {
+    flex: none;
+}
+
+[data-proyecto="specforge"].expanded .project-media {
+    flex: none;
+    height: auto;
+    aspect-ratio: 724 / 145;
+}
+
 /* La variante en fila: no es una imagen sino la caja que contiene los tres videos de
    marca, así que hereda la ubicación y la placa de la regla de arriba —el mismo hueco,
    el mismo aire, el mismo fondo— y solo agrega el reparto.
