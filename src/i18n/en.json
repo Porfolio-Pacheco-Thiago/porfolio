@@ -249,13 +249,15 @@
       {
         "id": "specforge",
         "title": "SpecForge",
-        "shortDesc": "An AI-driven CLI platform for automated Property-Based Testing (PBT) and API vulnerability detection.",
-        "fullDesc": "My degree thesis: a sophisticated CLI platform designed for language-agnostic Property-Based Testing (PBT) of APIs. It integrates large language models (LLMs) with advanced Abstract Syntax Tree (AST) parsing and deep code logic extraction. By leveraging a proprietary schema synthesis engine, SpecForge autonomously generates comprehensive test suites to expose edge cases, unearth security vulnerabilities, and stress-test volume limits across any API endpoint.",
+        "shortDesc": "A language-agnostic CLI platform that automates Property-Based Testing on APIs and writes the test suites on its own.",
+        "fullDesc": "A language-agnostic CLI platform built to automate Property-Based Testing (PBT) on APIs (thesis project). The tool surfaces edge cases, uncovers security vulnerabilities and stress-tests any endpoint by generating test suites completely on its own, with no manual writing involved.\n\nArchitecturally, it pairs large language models (LLMs) with an advanced static-analysis engine that extracts Abstract Syntax Trees (AST) to map the routing logic and the source code in depth. It uses a schema-synthesis algorithm that reads the project's structure on the fly and orchestrates the test runs, working as an intelligent validation agent.",
         "tags": [
+          "AST Parsing",
+          "LLMs",
+          "Property-Based Testing",
+          "Static Analysis",
           "CLI",
-          "AI/LLM",
-          "Testing",
-          "Thesis"
+          "Python"
         ]
       },
       {
