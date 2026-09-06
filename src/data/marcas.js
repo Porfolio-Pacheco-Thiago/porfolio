@@ -11,7 +11,10 @@
 //  - PNG con alfa (Lovelytics, Toyota, Grupo Petersen): se usa el alfa que ya traen.
 //  - WebP rojo sobre blanco (CDW): el canal verde ya es la distancia al fondo
 //    invertida —255 en el blanco, 0 en el centro del trazo—, así que el alfa sale de
-//    `255 - G` y los bordes conservan su antialias sin inventar un umbral.
+//    `255 - G` y los bordes conservan su antialias sin inventar un umbral. El original a
+//    color queda en `assets/marcas/cdw23-logo-no-tag-88x48.webp`, que de la máscara no se
+//    puede recuperar. Va acá y no en `assets/media/`, que es lo que recorre el índice de
+//    medios: ahí adentro se colaba como la foto de la galería de Lovelytics.
 //  - JPEG con fondo plano (FIUBA, FIUBAtón): alfa por distancia al color de fondo,
 //    con borde suave para que no queden dentados.
 //  - Escudo lleno (la Olimpiada): siluetearlo daba una elipse maciza, así que el alfa
