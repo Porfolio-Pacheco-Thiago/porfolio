@@ -8,9 +8,9 @@ import { FiMail, FiFileText } from 'react-icons/fi';
 // `href: null` significa "todavía no hay a dónde apuntar": esas entradas no se
 // renderizan, para no repetir lo de los repos, que apuntaban todos a '#'.
 export const socials = [
-    { id: 'github', label: 'GitHub', href: 'https://github.com/', Icon: SiGithub },
-    { id: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com/', Icon: FaLinkedin },
-    { id: 'email', label: 'Email', href: 'mailto:thiago@example.com', Icon: FiMail },
+    { id: 'github', label: 'GitHub', href: 'https://github.com/thiagopservian', Icon: SiGithub },
+    { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/thiago--pacheco/', Icon: FaLinkedin },
+    { id: 'email', label: 'Email', href: 'mailto:thiagopacheco2305@gmail.com', Icon: FiMail },
     // El PDF vive en `public/`, así que la ruta se arma con `BASE_URL` y no a mano:
     // el sitio se sirve desde el subpath '/porfolio/' y un '/cv...' absoluto
     // apuntaría a la raíz del dominio.
