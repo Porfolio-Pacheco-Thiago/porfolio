@@ -29,7 +29,12 @@ export const projectMeta = {
     // RabbitMQ y no un ícono genérico de red: el middleware es lo que define al
     // proyecto —los latidos, la elección de líder y el reparto por hash van todos
     // por ahí—, igual que Cassandra define al de al lado.
-    'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems', pantalla: 'monitor' },
+    // Con `carrusel` la botonera se queda **solo con los videos** y las capturas pasan a
+    // turnarse en la pantalla. Acá hay una sola captura —el tablero— así que no se turna
+    // con nadie: se queda puesta de fondo, que es lo que se quiere, y la botonera queda
+    // con el único botón que importa, el de la demo. Sin esto, la captura se sumaba como
+    // un botón más al lado del video.
+    'distributed-systems': { Icon: SiRabbitmq, repo: 'https://github.com/Porfolio-Pacheco-Thiago/distributed-systems', pantalla: 'monitor', carrusel: true },
     // `'shell'` es el tercer chasis (ver `ui/Shell.jsx`): una terminal flotando con el
     // proyecto corriendo adentro. Le toca porque SpecForge es una CLI —no tiene interfaz
     // que meter en un monitor, tiene una sesión— y una captura de terminal suelta en la

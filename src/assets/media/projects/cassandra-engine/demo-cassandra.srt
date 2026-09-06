@@ -1,0 +1,227 @@
+1
+00:00:00,360 --> 00:00:02,669
+Buenas, esta es una demo de la simulación
+
+2
+00:00:02,669 --> 00:00:04,112
+que armamos para testear nuestra
+
+3
+00:00:04,112 --> 00:00:06,133
+implementación del motor de la base de
+
+4
+00:00:06,133 --> 00:00:07,864
+datos cassandra, que desarrolle junto al
+
+5
+00:00:07,864 --> 00:00:09,308
+ingeniero Matías Bartellone y el
+
+6
+00:00:09,308 --> 00:00:11,039
+ingeniero Iván maximoff. Lo que hacemos
+
+7
+00:00:11,039 --> 00:00:13,926
+es simular un uso, un caso de uso real
+
+8
+00:00:13,926 --> 00:00:15,369
+mediante una imitación propia de
+
+9
+00:00:15,369 --> 00:00:16,523
+flight radar. Levantamos cuatro nodos
+
+10
+00:00:16,523 --> 00:00:18,255
+distribuidos para nuestra base de datos,
+
+11
+00:00:18,255 --> 00:00:20,564
+la cargamos con datos de aeropuertos y de
+
+12
+00:00:20,564 --> 00:00:22,873
+los vuelos que van a iniciarse y luego
+
+13
+00:00:22,873 --> 00:00:25,182
+cada avión va a funcionar como un cliente
+
+14
+00:00:25,182 --> 00:00:26,914
+que actualiza su propia información. Esta
+
+15
+00:00:26,914 --> 00:00:29,223
+aplicación que vamos a ver ahora es otro
+
+16
+00:00:29,223 --> 00:00:31,244
+cliente, pero que solo consulta los datos
+
+17
+00:00:31,244 --> 00:00:32,975
+para visualizarlos y mostrarlos en el
+
+18
+00:00:32,975 --> 00:00:35,459
+mapa que estamos viendo. Podemos ver como
+
+19
+00:00:35,459 --> 00:00:37,602
+los aviones se mueven, eso quiere decir
+
+20
+00:00:37,602 --> 00:00:40,052
+que o sea, cada movimiento es que el
+
+21
+00:00:40,052 --> 00:00:42,196
+avión se está actualizando su posición y
+
+22
+00:00:42,196 --> 00:00:44,340
+otros datos como la altura o el
+
+23
+00:00:44,340 --> 00:00:46,177
+combustible. Con esto lo que logramos
+
+24
+00:00:46,177 --> 00:00:48,321
+mostrar es que el motor que implementamos
+
+25
+00:00:48,321 --> 00:00:50,464
+es capaz de atender múltiples clientes en
+
+26
+00:00:50,464 --> 00:00:52,914
+simultáneo, los cuales no le hablan a un
+
+27
+00:00:52,914 --> 00:00:55,058
+único nodo, sino que cada avión se
+
+28
+00:00:55,058 --> 00:00:56,895
+conecta con su nodo más cercano
+
+29
+00:00:56,895 --> 00:00:58,120
+geográficamente. Nosotros por nuestro
+
+30
+00:00:58,120 --> 00:01:00,264
+lado estamos conectados a un solo nodo.
+
+31
+00:01:00,264 --> 00:01:02,714
+Eso quiere decir que el avión puede estar
+
+32
+00:01:02,714 --> 00:01:04,551
+modificando la información de un modo
+
+33
+00:01:04,551 --> 00:01:07,053
+distinto al nuestro. Y aún así, nosotros
+
+34
+00:01:07,053 --> 00:01:09,023
+accedemos a los datos actualizados de
+
+35
+00:01:09,023 --> 00:01:11,323
+esta manera. Demostramos las propiedades
+
+36
+00:01:11,323 --> 00:01:12,945
+del teorema cap. Primero tenemos
+
+37
+00:01:12,945 --> 00:01:15,216
+tolerancia a particiones, ya que la base
+
+38
+00:01:15,216 --> 00:01:17,163
+de datos está distribuida y repicada
+
+39
+00:01:17,163 --> 00:01:19,759
+entre los cuatro nodos y el sistema sigue
+
+40
+00:01:19,759 --> 00:01:21,705
+operando, aunque los nodos trabajen de
+
+41
+00:01:21,705 --> 00:01:23,003
+forma independiente, tenemos alta
+
+42
+00:01:23,003 --> 00:01:25,274
+consistencia, ya que la propagación de la
+
+43
+00:01:25,274 --> 00:01:26,896
+información entre nodos ocurre en
+
+44
+00:01:26,896 --> 00:01:28,194
+milisegundos y cuando consultamos
+
+45
+00:01:28,194 --> 00:01:29,816
+obtenemos datos actualizados y logramos
+
+46
+00:01:29,816 --> 00:01:31,763
+una alta disponibilidad media alta. En
+
+47
+00:01:31,763 --> 00:01:33,385
+realidad, porque el sistema responde
+
+48
+00:01:33,385 --> 00:01:35,656
+siempre a los clientes, aunque en algún
+
+49
+00:01:35,656 --> 00:01:37,927
+caso puntual podamos ver con un retraso
+
+50
+00:01:37,927 --> 00:01:40,198
+de apenas milisegundos. Sabemos que las 3
+
+51
+00:01:40,198 --> 00:01:42,584
+propiedades conforman el teorema cap. De
+
+52
+00:01:42,584 --> 00:01:45,408
+los sistemas distribuidos , que establece
+
+53
+00:01:45,408 --> 00:01:47,919
+que no es posible garantizar los 3 al
+
+54
+00:01:47,919 --> 00:01:49,802
+100% de forma simultánea. Nuestro caso,
+
+55
+00:01:49,802 --> 00:01:51,685
+como dije, priorizamos una tolerancia a
+
+56
+00:01:51,685 --> 00:01:53,255
+particiones sólidas, alta consistencia y
+
+57
+00:01:53,255 --> 00:01:54,510
+una disponibilidad media alta.

@@ -11,10 +11,27 @@ import Cursor from './components/ui/Cursor';
 import SideBar from './components/SideBar';
 import './App.css';
 
+// Debajo de este ancho no hay riel de contacto: sus enlaces se mudan al final del pie.
+// Es el mismo umbral con el que el riel dejaba de ser una columna lateral, y está
+// también en `Footer.css` — si se mueve, se mueven los dos.
+const ANGOSTO = '(max-width: 900px)';
+
 function App() {
   const [loading, setLoading] = useState(true);
   // Vive acá y no en SideBar porque el botón "Contactame" del hero también lo abre
   const [contactoAbierto, setContactoAbierto] = useState(false);
+  // Y acá porque decide tres cosas a la vez que están en ramas distintas del árbol: si
+  // el riel se monta, qué hace el botón del hero y si el pie muestra el bloque de
+  // contacto. Se escucha el cambio —a diferencia del `angosto` del hero, que se decide
+  // una sola vez— porque acá no hay nada que cortar al recalcularlo: son tres piezas que
+  // se montan o no, y girar el teléfono tiene que dejar la página coherente.
+  const [angosto, setAngosto] = useState(() => window.matchMedia(ANGOSTO).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(ANGOSTO);
+    const alCambiar = e => setAngosto(e.matches);
+    mq.addEventListener('change', alCambiar);
+    return () => mq.removeEventListener('change', alCambiar);
+  }, []);
 
   // Ocultar el loader cuando la página terminó de cargar (con un mínimo y un tope).
   //
@@ -89,16 +106,18 @@ function App() {
       <Cursor />
       <Loader hidden={!loading} />
       <Navbar />
-      <SideBar abierto={contactoAbierto} onCambio={setContactoAbierto} />
+      {/* Solo en ancho. En angosto el riel era una barra fija abajo que tapaba
+          contenido y no se podía cerrar; sus enlaces viven ahora al final del pie. */}
+      {!angosto && <SideBar abierto={contactoAbierto} onCambio={setContactoAbierto} />}
       <main>
         {/* El hero necesita saber cuándo terminó la carga: el texto animado del
             rol arranca al montarse, y detrás del loader no se vería. */}
-        <Hero loading={loading} contactoAbierto={contactoAbierto} onContacto={setContactoAbierto} />
+        <Hero loading={loading} sinRiel={angosto} contactoAbierto={contactoAbierto} onContacto={setContactoAbierto} />
         <Journey />
         <Projects />
         <Skills />
       </main>
-      <Footer contactoAbierto={contactoAbierto} onContacto={setContactoAbierto} />
+      <Footer sinRiel={angosto} contactoAbierto={contactoAbierto} onContacto={setContactoAbierto} />
     </div>
   );
 }

@@ -749,14 +749,6 @@
    documento, que es la condición para que animar tamaño sea aceptable. */
 :root {
     --riel-ancho: 64px;
-    /* Acostado abajo (ver el media query de más adelante) el riel es una barra
-       fija de 55px, y como es `fixed` no le saca lugar a nadie: se le monta
-       encima al final del documento, que es lo único que no se puede scrollear
-       para sacárselo de encima. Ese es el alto que el pie tiene que reservarse.
-       Igual que `--riel-ancho`, es una medida tomada a mano y no la que dibuja
-       el riel: si le cambia el relleno o el tamaño de los íconos, hay que
-       volver a medirla. */
-    --riel-alto: 55px;
 }
 
 .riel {
@@ -928,48 +920,18 @@
     }
 }
 
-/* En móvil no hay margen lateral que ocupar: baja, se acuesta y no se
-   despliega — los nombres no entrarían. */
-@media (max-width: 900px) {
-    .riel {
-        top: auto;
-        bottom: 0;
-        left: 50%;
-        translate: -50% 0;
-    }
-
-    .riel-caja,
-    .riel-lista {
-        flex-direction: row;
-    }
-
-    .riel-caja {
-        border: 1px solid var(--border);
-        border-bottom: none;
-        border-radius: 14px 14px 0 0;
-    }
-
-    .riel-lista::after,
-    .riel-perfil {
-        display: none;
-    }
-
-    .riel-link,
-    .riel.is-abierto .riel-link {
-        grid-template-columns: 38px;
-    }
-
-    .riel-nombre,
-    .riel-toggle {
-        display: none;
-    }
-}
+/* Acá había un bloque de 900 que acostaba el riel abajo como barra fija. Ya no existe
+   ese caso: debajo de ese ancho `App` directamente no monta el riel, y la foto con los
+   enlaces está al final del pie —ver `Footer.jsx`—. La barra era `fixed`, así que se le
+   montaba encima al último tramo del documento, que es el único que no se puede
+   scrollear para sacárselo de encima, y no se podía cerrar. */
 
 /* ── El riel ocupa el margen izquierdo: las figuras de ese lado se corren ── */
 .wire-decor.at-left {
     left: calc(-1 * var(--wire-size) / 2.6 + var(--riel-ancho));
 }
 
+/* Y debajo de 900 el riel no está, así que esa franja vuelve a ser de las figuras. */
 @media (max-width: 900px) {
     .wire-decor.at-left {
         left: calc(-1 * var(--wire-size) / 2.6);

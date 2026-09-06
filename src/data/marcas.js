@@ -9,24 +9,30 @@
 //
 // Cómo se sacaron, por si hay que sumar uno:
 //  - PNG con alfa (Lovelytics, Toyota, Grupo Petersen): se usa el alfa que ya traen.
+//  - WebP rojo sobre blanco (CDW): el canal verde ya es la distancia al fondo
+//    invertida —255 en el blanco, 0 en el centro del trazo—, así que el alfa sale de
+//    `255 - G` y los bordes conservan su antialias sin inventar un umbral.
 //  - JPEG con fondo plano (FIUBA, FIUBAtón): alfa por distancia al color de fondo,
 //    con borde suave para que no queden dentados.
-//  - La Olimpiada es un caso aparte: su logo es un escudo lleno, y siluetearlo daba
-//    una elipse maciza. Ahí el alfa sale de la **luminancia** —tinta donde el
-//    original es oscuro— así se recuperan el aro con el texto y el monograma.
+//  - Escudo lleno (la Olimpiada): siluetearlo daba una elipse maciza, así que el alfa
+//    sale de la **luminancia** —tinta donde el original es oscuro— y así se recuperan el
+//    aro con el texto y el monograma. Ese logo ya no está en la fila, pero el archivo
+//    sigue en `assets/marcas/olimpiada.png` por si vuelve.
 import lovelytics from '../assets/marcas/lovelytics.png';
+import cdw from '../assets/marcas/cdw.png';
 import toyota from '../assets/marcas/toyota.png';
 import grupoPetersen from '../assets/marcas/grupo-petersen.png';
 import fiuba from '../assets/marcas/fiuba.png';
 import fiubaton from '../assets/marcas/fiubaton.png';
-import olimpiada from '../assets/marcas/olimpiada.png';
 
 /** @type {Array<{id: string, nombre: string, src: string}>} */
 export const marcas = [
-    { id: 'lovelytics', nombre: 'Lovelytics', src: lovelytics },
+    { id: 'lovelytics', nombre: 'Lovelytics (a CDW company)', src: lovelytics },
+    // Va pegado a Lovelytics y no en otro lugar de la fila: es la casa matriz que la
+    // compró, y separados se leen como dos respaldos que no tienen nada que ver.
+    { id: 'cdw', nombre: 'CDW', src: cdw },
     { id: 'toyota', nombre: 'Toyota', src: toyota },
     { id: 'grupo-petersen', nombre: 'Grupo Petersen', src: grupoPetersen },
     { id: 'fiuba', nombre: 'Universidad de Buenos Aires — FIUBA', src: fiuba },
     { id: 'fiubaton', nombre: 'FIUBAtón', src: fiubaton },
-    { id: 'olimpiada', nombre: 'Olimpiada Informática Argentina', src: olimpiada },
 ];

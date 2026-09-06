@@ -6,7 +6,7 @@
 // reescribe la URL con el base '/porfolio/', que es justamente lo que no
 // queremos escribir a mano.
 const archivos = import.meta.glob(
-    '../assets/media/**/*.{png,jpg,jpeg,webp,gif,svg,mp4,webm}',
+    '../assets/media/**/*.{png,jpg,jpeg,webp,gif,svg,mp4,webm,vtt}',
     { eager: true, query: '?url', import: 'default' },
 );
 
@@ -15,6 +15,10 @@ const VIDEO = /\.(mp4|webm)$/i;
 // `x-poster.webp` no es un elemento de la galería: es la portada de `x.mp4`.
 // Sin portada, un `<video preload="none">` se dibuja como un rectángulo negro.
 const POSTER = /-poster\.webp$/i;
+// `x.<idioma>.vtt` tampoco es un elemento de la galería: es una pista de subtítulos de
+// `x.mp4`. Se emparejan por nombre igual que las portadas, así que subir un archivo
+// nuevo alcanza para que aparezca —no hay ninguna lista que actualizar a mano—.
+const SUBTITULO = /\.([a-z]{2})\.vtt$/i;
 // El logo de la institución, frente a las fotos del evento. Se distingue por el
 // nombre porque es lo único que se sabe de un archivo sin cargarlo.
 const ES_LOGO = /^logo/i;
@@ -57,7 +61,8 @@ for (const [ruta, url] of Object.entries(archivos)) {
  *
  * @param {string} carpeta  Ruta relativa a `assets/media`, sin barras a los
  *                          costados. Ej.: `'projects/melodia'`.
- * @returns {Array<{nombre: string, tipo: 'video'|'imagen', src: string, poster?: string}>}
+ * @returns {Array<{nombre: string, tipo: 'video'|'imagen', src: string, poster?: string,
+ *                   subtitulos?: Record<string, string>}>}
  *          Vacío si la carpeta no existe o no tiene archivos, que es lo que
  *          hace que la galería caiga en el marcador de posición.
  */
@@ -66,7 +71,7 @@ export function getMedia(carpeta) {
     if (!contenido) return [];
 
     return [...contenido.entries()]
-        .filter(([nombre]) => !POSTER.test(nombre))
+        .filter(([nombre]) => !POSTER.test(nombre) && !SUBTITULO.test(nombre))
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([nombre, src]) => {
             const esVideo = VIDEO.test(nombre);
@@ -77,8 +82,31 @@ export function getMedia(carpeta) {
                 poster: esVideo
                     ? contenido.get(nombre.replace(VIDEO, '-poster.webp'))
                     : undefined,
+                subtitulos: esVideo ? subtitulosDe(contenido, nombre) : undefined,
             };
         });
+}
+
+/**
+ * Las pistas de subtítulos de un video, por idioma: `demo.es.vtt` y `demo.en.vtt` al
+ * lado de `demo.mp4` dan `{ es: <url>, en: <url> }`.
+ *
+ * Devuelve un objeto y no un arreglo porque quien las usa las pide por idioma —el de la
+ * página— y no las recorre.
+ *
+ * @param {Map<string, string>} contenido  Los archivos de la carpeta, por nombre.
+ * @param {string} video                   Nombre del archivo de video.
+ * @returns {Record<string, string>} Vacío si el video no tiene ninguna.
+ */
+function subtitulosDe(contenido, video) {
+    const base = video.replace(VIDEO, '');
+    const pistas = {};
+    for (const [nombre, url] of contenido) {
+        if (!nombre.startsWith(`${base}.`)) continue;
+        const idioma = SUBTITULO.exec(nombre)?.[1];
+        if (idioma) pistas[idioma.toLowerCase()] = url;
+    }
+    return pistas;
 }
 
 /**

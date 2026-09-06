@@ -1,0 +1,230 @@
+WEBVTT
+
+1
+00:00:00.360 --> 00:00:02.669
+Hi — this is a demo of the simulation
+
+2
+00:00:02.669 --> 00:00:04.112
+we put together to test our
+
+3
+00:00:04.112 --> 00:00:06.133
+implementation of the Cassandra database
+
+4
+00:00:06.133 --> 00:00:07.864
+engine, which I built together with
+
+5
+00:00:07.864 --> 00:00:09.308
+engineer Matías Bartellone and
+
+6
+00:00:09.308 --> 00:00:11.039
+engineer Iván Maximoff. What we do
+
+7
+00:00:11.039 --> 00:00:13.926
+is simulate a real use case
+
+8
+00:00:13.926 --> 00:00:15.369
+through our own imitation of
+
+9
+00:00:15.369 --> 00:00:16.523
+Flightradar. We bring up four
+
+10
+00:00:16.523 --> 00:00:18.255
+distributed nodes for our database,
+
+11
+00:00:18.255 --> 00:00:20.564
+load it with airport data and with
+
+12
+00:00:20.564 --> 00:00:22.873
+the flights that are about to start, and then
+
+13
+00:00:22.873 --> 00:00:25.182
+each plane acts as a client
+
+14
+00:00:25.182 --> 00:00:26.914
+updating its own data. This
+
+15
+00:00:26.914 --> 00:00:29.223
+application we're about to see is another
+
+16
+00:00:29.223 --> 00:00:31.244
+client, but one that only reads the data
+
+17
+00:00:31.244 --> 00:00:32.975
+to visualise it and show it on the
+
+18
+00:00:32.975 --> 00:00:35.459
+map we're looking at. We can see how
+
+19
+00:00:35.459 --> 00:00:37.602
+the planes move, which means
+
+20
+00:00:37.602 --> 00:00:40.052
+that every movement is the
+
+21
+00:00:40.052 --> 00:00:42.196
+plane updating its position and
+
+22
+00:00:42.196 --> 00:00:44.340
+other data, such as altitude or
+
+23
+00:00:44.340 --> 00:00:46.177
+fuel. What this lets us
+
+24
+00:00:46.177 --> 00:00:48.321
+show is that the engine we implemented
+
+25
+00:00:48.321 --> 00:00:50.464
+can serve multiple clients at
+
+26
+00:00:50.464 --> 00:00:52.914
+the same time, and they don't talk to a
+
+27
+00:00:52.914 --> 00:00:55.058
+single node — each plane
+
+28
+00:00:55.058 --> 00:00:56.895
+connects to its geographically
+
+29
+00:00:56.895 --> 00:00:58.120
+closest node. We, on our
+
+30
+00:00:58.120 --> 00:01:00.264
+side, are connected to a single node.
+
+31
+00:01:00.264 --> 00:01:02.714
+That means the plane may be
+
+32
+00:01:02.714 --> 00:01:04.551
+modifying the data on a node
+
+33
+00:01:04.551 --> 00:01:07.053
+different from ours. And even so, we
+
+34
+00:01:07.053 --> 00:01:09.023
+get the updated data. This is how
+
+35
+00:01:09.023 --> 00:01:11.323
+we demonstrate the properties
+
+36
+00:01:11.323 --> 00:01:12.945
+of the CAP theorem. First we have
+
+37
+00:01:12.945 --> 00:01:15.216
+partition tolerance, since the
+
+38
+00:01:15.216 --> 00:01:17.163
+database is distributed and replicated
+
+39
+00:01:17.163 --> 00:01:19.759
+across the four nodes, and the system keeps
+
+40
+00:01:19.759 --> 00:01:21.705
+running even when the nodes work
+
+41
+00:01:21.705 --> 00:01:23.003
+independently. We have strong
+
+42
+00:01:23.003 --> 00:01:25.274
+consistency, since data propagates
+
+43
+00:01:25.274 --> 00:01:26.896
+between nodes within
+
+44
+00:01:26.896 --> 00:01:28.194
+milliseconds, and when we query
+
+45
+00:01:28.194 --> 00:01:29.816
+we get up-to-date data. And we achieve
+
+46
+00:01:29.816 --> 00:01:31.763
+a medium-high availability —
+
+47
+00:01:31.763 --> 00:01:33.385
+because the system always answers
+
+48
+00:01:33.385 --> 00:01:35.656
+its clients, even if in some
+
+49
+00:01:35.656 --> 00:01:37.927
+particular case we may see it with a delay
+
+50
+00:01:37.927 --> 00:01:40.198
+of just milliseconds. We know the three
+
+51
+00:01:40.198 --> 00:01:42.584
+properties make up the CAP theorem of
+
+52
+00:01:42.584 --> 00:01:45.408
+distributed systems, which states
+
+53
+00:01:45.408 --> 00:01:47.919
+that you can't guarantee all three at
+
+54
+00:01:47.919 --> 00:01:49.802
+100% at the same time. In our case,
+
+55
+00:01:49.802 --> 00:01:51.685
+as I said, we prioritised solid
+
+56
+00:01:51.685 --> 00:01:53.255
+partition tolerance, strong consistency and
+
+57
+00:01:53.255 --> 00:01:54.510
+medium-high availability.
+

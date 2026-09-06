@@ -1,9 +1,13 @@
 /* El nombre trazado. La caja sale del `viewBox`; basta fijarle el ancho en `em` y
    el alto lo saca de la relación. El `em` viene del `font-size` que le pone
-   `.hero-name`, así que el nombre sigue escalando con el mismo `clamp()` de antes. */
+   `.hero-name`, así que el nombre sigue escalando con el mismo `clamp()` de antes.
+
+   El ancho lo pone el propio componente en `--ancho-nombre`, porque depende del aire
+   entre letras (`TRACKING`) y los dos números tienen que salir del mismo lugar: escrito
+   a mano acá, tocar el interletrado deformaba el nombre. El literal es el respaldo. */
 .nombre-trazado {
     display: block;
-    width: 5.006em;
+    width: var(--ancho-nombre, 5.006em);
     max-width: 100%;
     height: auto;
     overflow: visible;

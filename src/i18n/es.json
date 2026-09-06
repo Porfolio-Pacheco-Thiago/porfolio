@@ -22,7 +22,7 @@
     "items": [
       {
         "id": "lovelytics",
-        "title": "Lovelytics",
+        "title": "Lovelytics (a CDW company)",
         "subtitle": "Ingeniero de Datos Junior",
         "period": "Diciembre 2025 — Presente",
         "location": "EE. UU. (Remoto)",
@@ -32,12 +32,15 @@
             "id": "toyota",
             "label": "Cliente: Toyota",
             "period": "Julio 2026 — Presente",
-            "desc": "Desarrollo y mantenimiento de arquitecturas de datos robustas para el sector automotriz. El proyecto se centra en la construcción de sistemas de procesamiento de alto rendimiento y el despliegue de soluciones analíticas escalables para impulsar la toma de decisiones.",
+            "desc": "Desarrollo del pipeline de telemetría vehicular (500 GB/semana). Me encargo de corregir anomalías métricas de sensores físicos heredados (V1) y escalar la arquitectura de ingesta para soportar el alto volumen del nuevo hardware automotriz (V2).",
             "tags": [
-              "Arquitectura de Datos",
-              "Alto Rendimiento",
-              "Analítica Escalable",
-              "Automotriz"
+              "Azure",
+              "Databricks",
+              "AWS Kinesis",
+              "Apache Spark",
+              "Python",
+              "DynamoDB",
+              "ADLS Gen2"
             ]
           },
           {
@@ -143,15 +146,16 @@
   },
   "hero": {
     "name": "Thiago Pacheco",
-    "role": "Ingeniero de Software",
+    "role": "Data & AI Engineer | Software Engineer (UBA)",
     "marcas": "Con la confianza y el respaldo de",
     "marcasPrev": "Marcas anteriores",
     "marcasNext": "Marcas siguientes",
     "bio": [
-      "Ingeniero de Software (UBA).",
-      "Graduado en tiempo récord a los 21 años — un hito histórico desde 1938.",
-      "Actualmente Data Engineer en Lovelytics.",
-      "Especializado en arquitecturas robustas, sistemas distribuidos complejos e integraciones de inteligencia artificial."
+      "Ingeniero de Software (UBA). Graduado a los 21 años — hito histórico desde 1938.",
+      "Data Engineer en Lovelytics (a CDW company).",
+      "Catedrático de grado en Aprendizaje Automático (UBA).",
+      "Estudios avanzados en Aprendizaje Profundo (UBA).",
+      "Desarrollo sistemas distribuidos y arquitecturas de software, datos e inteligencia artificial."
     ],
     "cta": "Ver Mi Trabajo",
     "scroll": "Ir a Trayectoria",
@@ -174,6 +178,12 @@
       "pause": "Pausar",
       "mute": "Silenciar",
       "unmute": "Activar sonido",
+      "captionsOn": "Activar subtítulos",
+      "captionsOff": "Desactivar subtítulos",
+      "captionsIn": {
+        "es": "Español",
+        "en": "Inglés"
+      },
       "volume": "Volumen",
       "seek": "Posición del video",
       "fullscreen": "Pantalla completa"

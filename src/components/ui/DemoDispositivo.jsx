@@ -2,6 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     FiFastForward, FiImage, FiMaximize, FiPause, FiPlay, FiRewind, FiVolume2, FiVolumeX,
 } from 'react-icons/fi';
+// Feather no trae ícono de subtítulos; el de Material es el que todo el mundo
+// reconoce. Relleno cuando están puestos y contorneado cuando no, que dice el
+// estado sin depender solo del color.
+import { MdClosedCaption, MdOutlineClosedCaption } from 'react-icons/md';
 import { useLang } from '../../context/lang-context';
 
 /**
@@ -101,7 +105,7 @@ export default function DemoDispositivo({
     corte = false, bucle = null, label, children, onPlayingChange,
     conTransicion, className = '', ...props
 }) {
-    const { t } = useLang();
+    const { t, lang } = useLang();
     // En modo `auto` los medios se parten en dos roles distintos: las capturas pasan
     // solas en la pantalla y los videos son lo único que se puede elegir. Sin `auto`
     // todo es elegible, que es como funcionaba antes.
@@ -133,6 +137,10 @@ export default function DemoDispositivo({
     const [duracion, setDuracion] = useState(0);
     const [volumen, setVolumen] = useState(1);
     const [mudo, setMudo] = useState(false);
+    // Si los subtítulos están puestos. Es del reproductor y no del video: se conserva al
+    // cambiar de demo y al cambiar de idioma —lo que cambia ahí es **qué** pista se
+    // muestra, no si se muestran—, que es lo que uno espera de un interruptor de CC.
+    const [subtitulos, setSubtitulos] = useState(false);
 
     // Quieto y de frente: porque se eligió una demo, o —con carrusel y nada que
     // elegir— porque no hay ningún motivo para que gire. Lo primero es VibeTrip, que
@@ -140,6 +148,11 @@ export default function DemoDispositivo({
     // mientras sus capturas se turnan en la pantalla.
     const enDemo = activa !== null || enBucle || (auto && elegibles.length === 0);
     const medio = activa !== null ? elegibles[activa] : videoEnBucle;
+    // Las pistas del video puesto, por idioma. Vacío si no tiene ninguna: ahí el botón
+    // de CC directamente no se dibuja, porque no habría nada que prender.
+    const pistas = medio?.subtitulos ?? {};
+    const idiomasPista = Object.keys(pistas);
+
     // Solo un video trae reproductor. Una imagen se pone de frente y ya está: no hay
     // aguja que mover ni volumen que bajar.
     const video = medio?.tipo === 'video' ? medio : undefined;
@@ -179,6 +192,24 @@ export default function DemoDispositivo({
         }, segundos * 1000);
         return () => window.clearInterval(id);
     }, [auto, piezas.length, activa, segundos, corte]);
+
+    // Qué pista de subtítulos se ve. **Todas** las que tiene el video están montadas y
+    // acá se decide cuál se muestra: así cambiar de idioma es tocar una propiedad del
+    // elemento y no montar y desmontar `<track>`, que reinicia la carga de la pista y la
+    // haría parpadear —o desaparecer un rato— con el video andando.
+    //
+    // `disabled` y no `hidden` para las otras: `hidden` sigue cargando el archivo y
+    // emitiendo eventos de cue por una pista que nadie mira.
+    //
+    // Depende del nombre del video porque el `<video>` lleva `key`, o sea que cambiar de
+    // demo lo remonta con sus pistas nuevas y hay que volver a elegir.
+    useEffect(() => {
+        const v = videoRef.current;
+        if (!v) return;
+        for (const pista of v.textTracks) {
+            pista.mode = subtitulos && pista.language === lang ? 'showing' : 'disabled';
+        }
+    }, [subtitulos, lang, medio?.nombre]);
 
     // Arranca la demo al elegirla. Va acá y no en el atributo `autoplay` porque
     // con audio los navegadores lo bloquean salvo que haya un gesto del usuario
@@ -369,6 +400,10 @@ export default function DemoDispositivo({
                             // Leerlo cubre los dos casos, incluido el que motivó el
                             // `false`: al reabrir la tarjeta el elemento está pausado de
                             // verdad, así que sigue dando "Reproducir".
+                            // El `disable` sigue siendo necesario aunque ya haya
+                            // subtítulos: los tienen las demos con narración, no los
+                            // videos mudos —los de marca, el bucle de Monopoly—, y la
+                            // regla no distingue.
                             // eslint-disable-next-line jsx-a11y/media-has-caption
                             <video
                                 key={video.nombre}
@@ -394,7 +429,21 @@ export default function DemoDispositivo({
                                     setVolumen(e.currentTarget.volume);
                                     setMudo(e.currentTarget.muted);
                                 }}
-                            />
+                            >
+                                {/* Van las dos, y el efecto de más arriba elige cuál se
+                                    ve. Sin `default`: dejar que el navegador prenda una
+                                    haría que los subtítulos aparecieran solos, y acá los
+                                    prende el botón. */}
+                                {idiomasPista.map(idioma => (
+                                    <track
+                                        key={idioma}
+                                        kind="subtitles"
+                                        srcLang={idioma}
+                                        src={pistas[idioma]}
+                                        label={t(`projects.player.captionsIn.${idioma}`)}
+                                    />
+                                ))}
+                            </video>
                         ) : medio ? (
                             // Una imagen elegida a mano: se pone de frente y ya está, sin
                             // barra debajo. `alt` vacío porque el botón que la puso ya la
@@ -539,6 +588,25 @@ export default function DemoDispositivo({
                             >
                                 {mudo || volumen === 0 ? <FiVolumeX size={15} /> : <FiVolume2 size={15} />}
                             </button>
+
+                            {/* Solo si el video trae pistas. Va pegado al de silencio
+                                porque son los dos interruptores de la barra, y como los
+                                dos dice su estado con `aria-pressed` además del ícono. */}
+                            {idiomasPista.length > 0 && (
+                                <button
+                                    type="button"
+                                    className={`fono-icono ${subtitulos ? 'is-activo' : ''}`}
+                                    onClick={e => { e.stopPropagation(); setSubtitulos(x => !x); }}
+                                    aria-pressed={subtitulos}
+                                    aria-label={subtitulos
+                                        ? t('projects.player.captionsOff')
+                                        : t('projects.player.captionsOn')}
+                                >
+                                    {subtitulos
+                                        ? <MdClosedCaption size={17} />
+                                        : <MdOutlineClosedCaption size={17} />}
+                                </button>
+                            )}
 
                             <input
                                 className="fono-rango fono-volumen"

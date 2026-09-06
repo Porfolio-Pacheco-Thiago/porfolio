@@ -41,7 +41,11 @@ export default function AnimatedText({ text, as: Tag = 'p', className, stagger =
                         {/* Cada palabra es una unidad que no se parte al envolver */}
                         <span className="animated-text-word" aria-hidden="true">
                             {Array.from(word, (ch, c) => (
-                                <span key={c} style={{ animationDelay: `${(desde + c) * stagger}ms` }}>
+                                // `data-ch` es lo que le permite al CSS llegar a una letra
+                                // suelta: no hay selector para "el span que contiene &", y
+                                // el rol del hero necesita cambiarle la tipografía a ese
+                                // carácter solo. Ver `.hero-role [data-ch="&"]`.
+                                <span key={c} data-ch={ch} style={{ animationDelay: `${(desde + c) * stagger}ms` }}>
                                     {ch}
                                 </span>
                             ))}

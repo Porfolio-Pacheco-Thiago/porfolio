@@ -1,0 +1,415 @@
+1
+00:00:00,400 --> 00:00:02,391
+¿Bueno buenas como va? Esta es una
+
+2
+00:00:02,391 --> 00:00:04,381
+pequeña demo de lo que fue nuestro
+
+3
+00:00:04,381 --> 00:00:05,803
+sistema distribuido, el cual implementé
+
+4
+00:00:05,803 --> 00:00:08,321
+con el ingeniero Matías Bartellone. Esto
+
+5
+00:00:08,321 --> 00:00:10,823
+es un tablero que refleja el estado en
+
+6
+00:00:10,823 --> 00:00:12,700
+vivo de nuestro pipeline distribuido que
+
+7
+00:00:12,700 --> 00:00:13,951
+nosotros utilizamos para analizar
+
+8
+00:00:13,951 --> 00:00:16,141
+patrones de lavado de dinero, dado un
+
+9
+00:00:16,141 --> 00:00:18,330
+montón de transacciones, un data set de
+
+10
+00:00:18,330 --> 00:00:20,207
+transacciones gigantes, lo que hace es
+
+11
+00:00:20,207 --> 00:00:21,145
+detectar aquellas transacciones
+
+12
+00:00:21,145 --> 00:00:22,709
+fraudulentas y también devolver cuáles
+
+13
+00:00:22,709 --> 00:00:24,899
+son las cuentas que están involucradas en
+
+14
+00:00:24,899 --> 00:00:26,150
+todas estas transacciones fraudulentas.
+
+15
+00:00:27,850 --> 00:00:30,844
+Vamos a empezar no corriendo un data set
+
+16
+00:00:30,844 --> 00:00:33,826
+de tamaño mediano. Hi-medium de 3
+
+17
+00:00:33,826 --> 00:00:35,803
+gigas para mostrar cómo se ve
+
+18
+00:00:35,803 --> 00:00:37,122
+visualmente, esto mientras sigue
+
+19
+00:00:37,122 --> 00:00:38,769
+explicando cómo funciona. Nosotros lo
+
+20
+00:00:38,769 --> 00:00:40,746
+diseñamos bajo una arquitectura de capas
+
+21
+00:00:40,746 --> 00:00:42,394
+que está enfocada principalmente en
+
+22
+00:00:42,394 --> 00:00:44,041
+optimizar la distribución. Aca vemos como
+
+23
+00:00:44,041 --> 00:00:47,007
+empiezan a surgir los datos y a moverse a
+
+24
+00:00:47,007 --> 00:00:49,540
+través del pipeline, ¿no?Bueno, pero
+
+25
+00:00:49,540 --> 00:00:51,484
+hicimos una arquitectura basada en capas,
+
+26
+00:00:51,484 --> 00:00:53,428
+enfocado en optimizar la distribución de
+
+27
+00:00:53,428 --> 00:00:55,372
+la carga y garantizar el menor
+
+28
+00:00:55,372 --> 00:00:56,668
+reprocesamiento posible. Toda la
+
+29
+00:00:56,668 --> 00:00:58,288
+comunicación y enrutamiento, es decir,
+
+30
+00:00:58,288 --> 00:01:00,232
+cómo se comunican entre los contenedores
+
+31
+00:01:00,232 --> 00:01:02,176
+y las diferentes entre entidades está
+
+32
+00:01:02,176 --> 00:01:03,796
+hecho mediante queues y exchanges,
+
+33
+00:01:03,796 --> 00:01:05,416
+implementado todos mediante RabbitMQ.
+
+34
+00:01:05,416 --> 00:01:08,008
+Esto es lo que nos permite es escalar
+
+35
+00:01:08,008 --> 00:01:09,629
+horizontalmente cada etapa de forma
+
+36
+00:01:09,629 --> 00:01:11,573
+independiente, entonces no hay una etapa
+
+37
+00:01:11,573 --> 00:01:14,417
+que sea un cuello de botella. Porque si
+
+38
+00:01:14,417 --> 00:01:17,154
+hay una etapa que es más lenta que el
+
+39
+00:01:17,154 --> 00:01:19,283
+resto y todos estamos esperando que esa
+
+40
+00:01:19,283 --> 00:01:21,413
+etapa termine esa etapa se puede escalar,
+
+41
+00:01:21,413 --> 00:01:23,238
+se escala, aumenta su velocidad, entonces
+
+42
+00:01:23,238 --> 00:01:24,758
+nadie nunca está esperando. Todos
+
+43
+00:01:24,758 --> 00:01:26,279
+funcionan de manera constante, de
+
+44
+00:01:26,279 --> 00:01:28,701
+consistente y paralelas entre sí. Ahora
+
+45
+00:01:28,701 --> 00:01:30,459
+no solamente es escalable y performante,
+
+46
+00:01:30,459 --> 00:01:32,509
+sino que también asumimos que los nodos
+
+47
+00:01:32,509 --> 00:01:34,560
+van a fallar. Por ende lo hicimos
+
+48
+00:01:34,560 --> 00:01:36,317
+tolerante a fallos para poder garantizar
+
+49
+00:01:36,317 --> 00:01:38,075
+alta disponibilidad, lo que hicimos fue
+
+50
+00:01:38,075 --> 00:01:39,832
+implementar un servicio médico, el cual
+
+51
+00:01:39,832 --> 00:01:41,883
+vemos acá en la esquina. Este servicio
+
+52
+00:01:41,883 --> 00:01:44,226
+médico son un clúster de de médicos, los
+
+53
+00:01:44,226 --> 00:01:46,276
+cuales.  Mediante un algoritmo bully van
+
+54
+00:01:46,276 --> 00:01:48,620
+a elegir un líder consiste en que este
+
+55
+00:01:48,620 --> 00:01:51,256
+líder de lo que se encarga es de mandar
+
+56
+00:01:51,256 --> 00:01:54,242
+Hearts . A los nodos y en caso de
+
+57
+00:01:54,242 --> 00:01:56,256
+que un nodo no le responda, va a asumir
+
+58
+00:01:56,256 --> 00:01:58,270
+que está caído o muerto y como médico va
+
+59
+00:01:58,270 --> 00:01:59,837
+a tomar acciones para poder volver a
+
+60
+00:01:59,837 --> 00:02:01,627
+levantar y revivir. ¿Por qué más de un
+
+61
+00:02:01,627 --> 00:02:03,417
+líder, más de un médico digo? Porque en
+
+62
+00:02:03,417 --> 00:02:05,655
+caso de ser solo 1, si se nos muere el
+
+63
+00:02:05,655 --> 00:02:07,222
+médico, ya no hay quien pueda resucitar
+
+64
+00:02:07,222 --> 00:02:08,789
+caídas de otros nodos. Por ende tenemos
+
+65
+00:02:08,789 --> 00:02:11,027
+más de un médico y no hay un punto único
+
+66
+00:02:11,027 --> 00:02:13,041
+de Falla si se cae un médico, los otros
+
+67
+00:02:13,041 --> 00:02:14,831
+que están pueden tomar su lugar de líder
+
+68
+00:02:14,831 --> 00:02:15,950
+mediante este algoritmo, bully para
+
+69
+00:02:15,950 --> 00:02:18,150
+decidir quién va a ser el líder. Y
+
+70
+00:02:18,150 --> 00:02:19,958
+suplantar su tarea hasta que éste se
+
+71
+00:02:19,958 --> 00:02:22,671
+vuelva a levantar. En en este
+
+72
+00:02:22,671 --> 00:02:24,742
+panel lo que hicimos también fue armar
+
+73
+00:02:24,742 --> 00:02:27,108
+acá el caos, entonces lo que hace es
+
+74
+00:02:27,108 --> 00:02:29,414
+empezar a matar nodos. De manera
+
+75
+00:02:29,414 --> 00:02:31,138
+dinámica y aleatoria para que el médico
+
+76
+00:02:31,138 --> 00:02:32,645
+los vaya levantando. Entonces yo ahora lo
+
+77
+00:02:32,645 --> 00:02:35,214
+acabo de activar. ¿Y después a nivel
+
+78
+00:02:35,214 --> 00:02:36,450
+performance, cuáles fueron los resultados
+
+79
+00:02:36,450 --> 00:02:39,048
+que obtuvimos? No?. nosotros lo probamos
+
+80
+00:02:39,048 --> 00:02:40,782
+en un hardware donde solamente teníamos
+
+81
+00:02:40,782 --> 00:02:43,384
+un consumo de 6 núcleos y 12 hilos, lo
+
+82
+00:02:43,384 --> 00:02:45,408
+cual es extremadamente poco y en las
+
+83
+00:02:45,408 --> 00:02:48,403
+pruebas que hicimos. la carga máxima
+
+84
+00:02:48,403 --> 00:02:51,175
+que llevamos a testear fue 16 gigas que
+
+85
+00:02:51,175 --> 00:02:52,562
+serían 180 millones de transacciones
+
+86
+00:02:52,562 --> 00:02:54,988
+financieras y lo puede procesar en menos
+
+87
+00:02:54,988 --> 00:02:57,760
+de 4 minutos. Eso equivale a 240 gigas
+
+88
+00:02:57,760 --> 00:03:00,533
+por hora, 5 teras por día, lo que
+
+89
+00:03:00,533 --> 00:03:03,305
+son 170 teras por mes, que eso es
+
+90
+00:03:03,305 --> 00:03:06,078
+mucho más volumen de lo que hoy en
+
+91
+00:03:06,078 --> 00:03:08,157
+día en la industria. Algunas empresas
+
+92
+00:03:08,157 --> 00:03:10,858
+están manejando. recién se vio
+
+93
+00:03:10,858 --> 00:03:12,636
+visualmente como hubo 1 que se cayó.
+
+94
+00:03:12,636 --> 00:03:14,414
+Inclusive se puso en recuperación y se
+
+95
+00:03:14,414 --> 00:03:16,192
+levantó. No está en rojo cuando está
+
+96
+00:03:16,192 --> 00:03:17,970
+caído, está en amarillo cuando se está
+
+97
+00:03:17,970 --> 00:03:19,748
+levantando y está en verde. Cuando está
+
+98
+00:03:19,748 --> 00:03:21,780
+gritando vemos acá voy a volver en 3
+
+99
+00:03:21,780 --> 00:03:24,286
+segundos este cero. Se va a poner en
+
+100
+00:03:24,286 --> 00:03:26,090
+verde nuevamente y va a empezar a trabajar
+
+101
+00:03:26,090 --> 00:03:27,442
+ Recuperando su procesamiento habitual y
+
+102
+00:03:27,442 --> 00:03:28,795
+ahí se recuperó completamente. Bueno, eso
+
+103
+00:03:28,795 --> 00:03:30,599
+es todo lo que hay para la demo. Gracias
+
+104
+00:03:30,599 --> 00:03:31,050
+por ver.

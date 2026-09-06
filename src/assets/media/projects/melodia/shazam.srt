@@ -1,0 +1,25 @@
+1
+00:00:00,258 --> 00:00:02,010
+Bueno, acá vamos a probar shazam, tenemos
+
+2
+00:00:02,010 --> 00:00:04,262
+el icono acá arriba a la derecha que lo
+
+3
+00:00:04,262 --> 00:00:06,014
+que hacemos esponer una canción para
+
+4
+00:00:06,014 --> 00:00:08,267
+que la busque con el audio de la
+
+5
+00:00:08,267 --> 00:00:09,268
+canción. Ponemos el audio.
+
+6
+00:00:14,918 --> 00:00:16,928
+Ahí vemos, la está buscando y la encuentra.
+
+

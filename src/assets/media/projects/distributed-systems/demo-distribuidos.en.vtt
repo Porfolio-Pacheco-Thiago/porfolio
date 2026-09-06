@@ -1,0 +1,418 @@
+WEBVTT
+
+1
+00:00:00.400 --> 00:00:02.391
+Hi there, how's it going? This is a
+
+2
+00:00:02.391 --> 00:00:04.381
+short demo of our
+
+3
+00:00:04.381 --> 00:00:05.803
+distributed system, which I built
+
+4
+00:00:05.803 --> 00:00:08.321
+with engineer Matías Bartellone. This
+
+5
+00:00:08.321 --> 00:00:10.823
+is a dashboard showing the live state
+
+6
+00:00:10.823 --> 00:00:12.700
+of our distributed pipeline, which
+
+7
+00:00:12.700 --> 00:00:13.951
+we use to analyse
+
+8
+00:00:13.951 --> 00:00:16.141
+money-laundering patterns. Given a
+
+9
+00:00:16.141 --> 00:00:18.330
+pile of transactions — a gigantic
+
+10
+00:00:18.330 --> 00:00:20.207
+transaction dataset — what it does is
+
+11
+00:00:20.207 --> 00:00:21.145
+detect the fraudulent
+
+12
+00:00:21.145 --> 00:00:22.709
+transactions, and also return which
+
+13
+00:00:22.709 --> 00:00:24.899
+accounts are involved in
+
+14
+00:00:24.899 --> 00:00:26.150
+all those fraudulent transactions.
+
+15
+00:00:27.850 --> 00:00:30.844
+Let's start by running a medium-sized
+
+16
+00:00:30.844 --> 00:00:33.826
+dataset, HI-Medium, three
+
+17
+00:00:33.826 --> 00:00:35.803
+gigabytes, to show how it looks
+
+18
+00:00:35.803 --> 00:00:37.122
+visually, while I keep
+
+19
+00:00:37.122 --> 00:00:38.769
+explaining how it works. We
+
+20
+00:00:38.769 --> 00:00:40.746
+designed it as a layered architecture
+
+21
+00:00:40.746 --> 00:00:42.394
+focused mainly on
+
+22
+00:00:42.394 --> 00:00:44.041
+optimising distribution. Here we see how
+
+23
+00:00:44.041 --> 00:00:47.007
+the data starts coming in and moving
+
+24
+00:00:47.007 --> 00:00:49.540
+through the pipeline. So,
+
+25
+00:00:49.540 --> 00:00:51.484
+we built a layered architecture,
+
+26
+00:00:51.484 --> 00:00:53.428
+focused on optimising load
+
+27
+00:00:53.428 --> 00:00:55.372
+distribution and guaranteeing the least
+
+28
+00:00:55.372 --> 00:00:56.668
+reprocessing possible. All the
+
+29
+00:00:56.668 --> 00:00:58.288
+communication and routing — that is,
+
+30
+00:00:58.288 --> 00:01:00.232
+how the containers and the different
+
+31
+00:01:00.232 --> 00:01:02.176
+entities talk to each other — is
+
+32
+00:01:02.176 --> 00:01:03.796
+done through queues and exchanges,
+
+33
+00:01:03.796 --> 00:01:05.416
+all implemented with RabbitMQ.
+
+34
+00:01:05.416 --> 00:01:08.008
+This is what lets us scale
+
+35
+00:01:08.008 --> 00:01:09.629
+each stage horizontally and
+
+36
+00:01:09.629 --> 00:01:11.573
+independently. So there's no stage
+
+37
+00:01:11.573 --> 00:01:14.417
+that becomes a bottleneck, because if
+
+38
+00:01:14.417 --> 00:01:17.154
+one stage is slower than the
+
+39
+00:01:17.154 --> 00:01:19.283
+rest and everyone is waiting for that
+
+40
+00:01:19.283 --> 00:01:21.413
+stage to finish, that stage can be scaled:
+
+41
+00:01:21.413 --> 00:01:23.238
+you scale it, it speeds up, and then
+
+42
+00:01:23.238 --> 00:01:24.758
+nobody is ever waiting. They all
+
+43
+00:01:24.758 --> 00:01:26.279
+run steadily,
+
+44
+00:01:26.279 --> 00:01:28.701
+consistently and in parallel. Now,
+
+45
+00:01:28.701 --> 00:01:30.459
+it isn't just scalable and fast —
+
+46
+00:01:30.459 --> 00:01:32.509
+we also assume the nodes
+
+47
+00:01:32.509 --> 00:01:34.560
+are going to fail. So we made it
+
+48
+00:01:34.560 --> 00:01:36.317
+fault-tolerant, to guarantee
+
+49
+00:01:36.317 --> 00:01:38.075
+high availability. What we did was
+
+50
+00:01:38.075 --> 00:01:39.832
+implement a medic service, which
+
+51
+00:01:39.832 --> 00:01:41.883
+we see here in the corner. This
+
+52
+00:01:41.883 --> 00:01:44.226
+medic service is a cluster of medics,
+
+53
+00:01:44.226 --> 00:01:46.276
+which, using a bully algorithm,
+
+54
+00:01:46.276 --> 00:01:48.620
+elect a leader. The idea is that this
+
+55
+00:01:48.620 --> 00:01:51.256
+leader is in charge of sending
+
+56
+00:01:51.256 --> 00:01:54.242
+heartbeats to the nodes, and if
+
+57
+00:01:54.242 --> 00:01:56.256
+a node doesn't answer, it assumes
+
+58
+00:01:56.256 --> 00:01:58.270
+it's down or dead, and as a medic it
+
+59
+00:01:58.270 --> 00:01:59.837
+takes action to bring it back
+
+60
+00:01:59.837 --> 00:02:01.627
+up and revive it. Why more than one
+
+61
+00:02:01.627 --> 00:02:03.417
+leader — more than one medic, I mean? Because if
+
+62
+00:02:03.417 --> 00:02:05.655
+there were only one, and the medic
+
+63
+00:02:05.655 --> 00:02:07.222
+dies, there's nobody left to resurrect
+
+64
+00:02:07.222 --> 00:02:08.789
+the other nodes that go down. So we have
+
+65
+00:02:08.789 --> 00:02:11.027
+more than one medic, and there's no single point
+
+66
+00:02:11.027 --> 00:02:13.041
+of failure. If one medic goes down, the others
+
+67
+00:02:13.041 --> 00:02:14.831
+still up can take over as leader
+
+68
+00:02:14.831 --> 00:02:15.950
+through that bully algorithm, to
+
+69
+00:02:15.950 --> 00:02:18.150
+decide who the leader will be and
+
+70
+00:02:18.150 --> 00:02:19.958
+take over its job until it
+
+71
+00:02:19.958 --> 00:02:22.671
+comes back up. In this
+
+72
+00:02:22.671 --> 00:02:24.742
+panel we also built
+
+73
+00:02:24.742 --> 00:02:27.108
+chaos here. What it does is
+
+74
+00:02:27.108 --> 00:02:29.414
+start killing nodes
+
+75
+00:02:29.414 --> 00:02:31.138
+dynamically and at random, so the medic
+
+76
+00:02:31.138 --> 00:02:32.645
+brings them back up. I've just
+
+77
+00:02:32.645 --> 00:02:35.214
+switched it on. And then, in terms of
+
+78
+00:02:35.214 --> 00:02:36.450
+performance, what results
+
+79
+00:02:36.450 --> 00:02:39.048
+did we get? We tested it
+
+80
+00:02:39.048 --> 00:02:40.782
+on hardware where we only had
+
+81
+00:02:40.782 --> 00:02:43.384
+6 cores and 12 threads available,
+
+82
+00:02:43.384 --> 00:02:45.408
+which is extremely little. And in the
+
+83
+00:02:45.408 --> 00:02:48.403
+tests we ran, the maximum load
+
+84
+00:02:48.403 --> 00:02:51.175
+we pushed it to was 16 gigabytes, which
+
+85
+00:02:51.175 --> 00:02:52.562
+comes to 180 million financial
+
+86
+00:02:52.562 --> 00:02:54.988
+transactions, and it can process that in under
+
+87
+00:02:54.988 --> 00:02:57.760
+4 minutes. That's 240 gigabytes
+
+88
+00:02:57.760 --> 00:03:00.533
+per hour, 5 terabytes per day, which
+
+89
+00:03:00.533 --> 00:03:03.305
+is 170 terabytes per month — far
+
+90
+00:03:03.305 --> 00:03:06.078
+more volume than what some companies
+
+91
+00:03:06.078 --> 00:03:08.157
+in the industry are handling
+
+92
+00:03:08.157 --> 00:03:10.858
+today. Just now you could see
+
+93
+00:03:10.858 --> 00:03:12.636
+one of them go down.
+
+94
+00:03:12.636 --> 00:03:14.414
+It even went into recovery and came
+
+95
+00:03:14.414 --> 00:03:16.192
+back up. It's red when it's
+
+96
+00:03:16.192 --> 00:03:17.970
+down, yellow when it's coming
+
+97
+00:03:17.970 --> 00:03:19.748
+back up, and green when it's
+
+98
+00:03:19.748 --> 00:03:21.780
+working. Look here — I'll come back in 3
+
+99
+00:03:21.780 --> 00:03:24.286
+seconds. This zero will turn
+
+100
+00:03:24.286 --> 00:03:26.090
+green again and start working,
+
+101
+00:03:26.090 --> 00:03:27.442
+picking its usual processing back up. And
+
+102
+00:03:27.442 --> 00:03:28.795
+there it recovered completely. Well, that's
+
+103
+00:03:28.795 --> 00:03:30.599
+everything for the demo. Thanks
+
+104
+00:03:30.599 --> 00:03:31.050
+for watching.
+

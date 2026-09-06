@@ -20,9 +20,11 @@ import { perfil } from '../data/perfil';
  * - Lo que se despliega usa `grid-template-columns/rows` de `0fr` a `1fr`, que
  *   sí interpola —a diferencia de `width/height: auto`— y evita inventar
  *   medidas fijas que después no coincidan con el contenido.
- * - En móvil no hay margen lateral que ocupar: pasa a ser una barra horizontal
- *   abajo, sin desplegar. No puede ocultarse, porque al haber sacado los
- *   enlaces del hero y del pie sería quedarse sin forma de contacto.
+ * - Es de escritorio y nada más: debajo de 900px `App` no lo monta. Ahí no hay margen
+ *   lateral que ocupar, y la versión acostada que se probó —una barra fija abajo— se le
+ *   montaba encima al final del documento, que es el único tramo que no se puede
+ *   scrollear para sacárselo de encima, y no se podía cerrar. En ese ancho la foto y los
+ *   enlaces viven al final del pie; ver `Footer.jsx`.
  *
  * @param {boolean} abierto
  * @param {(v: boolean) => void} onCambio

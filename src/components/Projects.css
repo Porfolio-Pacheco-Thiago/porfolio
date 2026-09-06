@@ -1317,7 +1317,13 @@
 
 .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-volumen {
     position: absolute;
-    left: 50%;
+    /* Sobre el **botón de volumen**, que es el primero del grupo, y no sobre el centro
+       del grupo. Acá decía `left: 50%`, que mientras los botones en flujo fueron dos
+       —silencio y pantalla completa— caía cerca del primero por casualidad. Al sumarse
+       el de subtítulos el centro se corrió y el control apareció sobre ese, que es un
+       botón con el que no tiene nada que ver. Media medida de botón desde el borde
+       izquierdo lo deja centrado sobre el suyo, cuenten los que cuenten el resto. */
+    left: calc(var(--fono-icono) / 2);
     /* Vertical con un cuarto de vuelta, y no con `writing-mode`: el control ya está
        dibujado a mano con los pseudoelementos de la pista y el pulgar, y rotarlo los
        lleva a todos sin tocar ninguno. El giro es antihorario, así que el cero queda
@@ -1552,6 +1558,11 @@
    demo. */
 .fono-barra {
     position: relative;
+    /* Lado de los botones redondos de la barra. Va como variable porque el popup del
+       volumen se ancla **sobre uno de ellos** y necesita la mitad de esta medida; con el
+       número escrito en los dos lados, tocar el tamaño del botón dejaba el popup
+       descentrado sin que nada lo avisara. */
+    --fono-icono: 1.9rem;
     /* Explícito y no heredado: la barra es una superficie oscura y `ui.css` le invierte
        los tokens, pero lo que no pida `--text-primary` a mano heredaría el color de la
        tarjeta, que desde que perdió el fondo es el oscuro de la página. */
@@ -1601,8 +1612,8 @@
     display: grid;
     place-items: center;
     flex-shrink: 0;
-    width: 1.9rem;
-    height: 1.9rem;
+    width: var(--fono-icono, 1.9rem);
+    height: var(--fono-icono, 1.9rem);
     padding: 0;
     color: var(--text-secondary);
     background: none;
@@ -1621,6 +1632,37 @@
 
 .fono-icono:active {
     transform: scale(0.92);
+}
+
+/* El de subtítulos es el único de la barra que se queda prendido, así que necesita
+   decirlo también apagado el puntero. El ícono ya cambia de contorneado a relleno; esto
+   le suma el color del acento, porque la diferencia entre los dos glifos es sutil a
+   17px. Va después del `:hover` para que un botón prendido no se apague al pasarle el
+   mouse por encima. */
+.fono-icono.is-activo {
+    color: var(--accent-text);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ── Los subtítulos dentro de la pantalla ─────────────────────────────────
+   El navegador los dibuja con su tamaño por defecto, que es un porcentaje del alto del
+   video: en el celular —una pantalla de 215px de ancho— eso sale enorme y tapa media
+   demo. Se los baja a una medida atada a la pantalla y no al texto de la página, que es
+   lo que hace que se lean igual en el celular y en el monitor.
+
+   El fondo va semitransparente y no opaco: sobre una grabación de pantalla el bloque
+   negro macizo tapa justo la interfaz que se está mostrando. */
+.fono-pantalla video::cue {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: #fff;
+    background: rgb(0 0 0 / 0.72);
+}
+
+/* En el monitor la pantalla es mucho más grande, así que el mismo cuerpo se ve chico. */
+.fono.es-monitor .fono-pantalla video::cue {
+    font-size: 1.15rem;
 }
 
 /* El de reproducir es el principal: círculo relleno y más grande, como en la
@@ -1875,12 +1917,24 @@
         justify-self: stretch;
     }
 
-    /* Y Cassandra recupera su segundo párrafo. Se escondía porque la tarjeta abierta no
-       podía crecer y el acomodo estaba calculado para tres renglones de descripción; acá
-       la tarjeta crece, así que no hay nada que ahorrar y no hay motivo para mostrar
-       menos de lo que dice. */
-    [data-proyecto="cassandra-engine"].is-reproduciendo .project-fulldesc:not(:first-of-type) {
-        display: block;
+    /* ── Un solo párrafo, en todos ──────────────────────────────────────
+       Las descripciones vienen en dos partes: la primera dice qué es el proyecto y la
+       segunda cuenta cómo está hecho por dentro. En una columna de teléfono la segunda
+       son diez o doce renglones más de texto seguido, y la tarjeta abierta ya es lo más
+       largo de la página. Se queda la primera, que es la que hace falta para saber qué
+       se está mirando.
+
+       Acá había la regla contraria y acotada a un proyecto: Cassandra escondía su
+       segundo párrafo mientras reproducía —el acomodo del monitor estaba calculado para
+       tres renglones— y en este ancho lo recuperaba, porque apilada la tarjeta crece y
+       no había nada que ahorrar. Con la regla general esa excepción sobra: ninguno lo
+       muestra, reproduciendo o no.
+
+       Va con `display: none` y no con `visibility`, por lo mismo que en la regla de
+       Cassandra: el punto es que no ocupe alto. Y de paso sale del árbol de
+       accesibilidad, así que un lector de pantalla tampoco lo lee. */
+    .project-fulldesc:not(:first-of-type) {
+        display: none;
     }
 }
 

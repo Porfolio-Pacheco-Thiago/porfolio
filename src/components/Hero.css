@@ -42,7 +42,10 @@
 }
 
 .hero-content {
-    max-width: 1200px;
+    /* 1160 y no 1200: el rol tiene que entrar en un solo renglón y en Silkscreen a 24px
+       pide 630px de ancho útil. Con el ancho anterior la columna de texto daba 536 y la
+       línea se partía en dos. Ver `.hero-text` y `.hero-role`. */
+    max-width: 1160px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -53,7 +56,13 @@
 
 .hero-text {
     flex: 1;
-    max-width: 600px;
+    /* Justo lo que pide el rol y nada más: sus 630px de tinta, los 28 de padding a cada
+       lado del cuerpo de la ventana y los 4 del trazo, o sea 694, más 10 de colchón para
+       que un redondeo no lo parta en dos renglones.
+
+       La bio no sufre el ensanche: sus cinco frases son bloques propios y la más larga
+       mide ~560px, así que ninguna llega a usar el ancho de más. */
+    max-width: 704px;
 }
 
 /* ── La ventana del nombre ────────────────────────────────────────────────
@@ -255,15 +264,62 @@
 
 .hero-role {
     font-family: var(--font-pixel);
-    font-size: 24px;
+    /* El rol entra en un solo renglón, y para eso el tamaño sigue al ancho disponible.
+       Hasta 1340 la ventana crece con `.hero-content` y esto se queda en los 24px de
+       diseño; de ahí para abajo el tope ya no da más y lo que cede es el cuerpo.
+
+       La cuenta sale de medirlo: el ancho útil de la ventana es `vw - 583` —697px con la
+       ventana en 1280, 517 en 1100, pendiente 1— y el rol pide 630px a 24px, o sea 26.3px
+       de ancho por punto de tipografía. De ahí `(vw - 583) / 26.3`.
+
+       Va dividido por 26.9 y no por 26.3: con el valor exacto la línea queda pidiendo
+       justo lo que hay y por redondeo se parte igual. Los 0.6 de más son ~14px de
+       colchón, que no se notan en el tamaño y sí evitan el segundo renglón. En vw queda
+       `3.717vw - 21.67px`.
+
+       El `max` lo frena en 18: más abajo la línea entraría igual, pero el rol quedaría tan
+       chico al lado del nombre que deja de leerse como su subtítulo. Así que por debajo de
+       ~1170px vuelve a partirse en dos —la franja donde el hero de dos columnas ya viene
+       apretado— y a partir de 768 se apila y el problema desaparece.
+
+       Un escalón por breakpoint habría sido inventar tres o cuatro números donde el ancho
+       baja de forma lineal y alcanza con uno. */
+    font-size: max(18px, min(24px, calc(3.717vw - 21.67px)));
     color: var(--accent-text);
     /* Silkscreen solo tiene el 400: sin esto el navegador le sintetiza una negrita
        engordando los píxeles, que es justo lo que rompe una tipografía de grilla. */
     font-weight: 400;
-    /* Las mayúsculas de Silkscreen son anchas y los espacios angostos; un poco de
-       interletrado la separa del renglón de arriba sin agrandarla. */
-    letter-spacing: 0.06em;
+    /* Interletrado negativo: por debajo del ritmo propio de Silkscreen, que ya trae aire
+       de costado en cada glifo y por eso aguanta que le saquen un poco sin que las letras
+       se toquen. Venía de 0.06em —63px de aire acumulado en una línea de 44 caracteres,
+       que es lo que las hacía leerse sueltas— y pasó por 0 y por -0.03 antes de llegar
+       acá. La tinta bajó de 746px a 630, y esos 116px son los que le permiten al marco
+       cerrarse.
+
+       -0.05em son 1.2px a 24px, o sea un píxel de la grilla de la fuente. La serie medida
+       da ~10.5px de tinta por cada 0.01em: 682 sin interletrado, 651 a -0.03 y 630 acá. */
+    letter-spacing: -0.05em;
     line-height: 1.5;
+}
+
+/* El ampersand, y solo él, sale de la pila mono. En Silkscreen el `&` es un borrón de
+   píxeles del que no se reconoce la forma —es el glifo más barroco del set y a 24px no
+   le entra—, mientras que el resto de las letras son rectas y se leen perfecto. Cambiarle
+   la fuente a la línea entera perdería la marca; cambiársela a un carácter la conserva.
+
+   Llega hasta él por `data-ch`, que `AnimatedText` pone en el span de cada letra: CSS no
+   tiene forma de seleccionar "el span cuyo texto es &".
+
+   Va un punto más chico y bajado un pelo: una tipografía proporcional a la misma medida
+   que una de grilla se dibuja más alta, y sin esto el `&` sobresalía por arriba del
+   renglón de mayúsculas. */
+.hero-role [data-ch="&"] {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+    /* `inline-block` para que el desplazamiento sea posible sin sacarlo del renglón:
+       `translate` no le hace nada a una caja en línea. */
+    display: inline-block;
+    transform: translateY(0.06em);
 }
 
 .hero-bio {
@@ -286,6 +342,15 @@
 .hero-bio-frase {
     display: block;
     text-wrap: balance;
+}
+
+/* La última frase va en negrita: las cuatro de arriba son datos —título, puesto,
+   cátedra, posgrado— y esta es lo que hace, que es el remate del bloque. Se elige por
+   posición y no por una clase desde el JSX porque la bio es una lista en i18n: agregar
+   o sacar una frase no tiene que obligar a tocar el componente. */
+.hero-bio-frase:last-child {
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .hero-buttons {
@@ -551,3 +616,4 @@
         display: none;
     }
 }
+

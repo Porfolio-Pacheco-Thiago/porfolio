@@ -1,0 +1,51 @@
+1
+00:00:00,280 --> 00:00:02,299
+Bueno, ahoravamos a veruna pequeña
+
+2
+00:00:02,299 --> 00:00:04,894
+demo de loque es cover ia, que lo que
+
+3
+00:00:04,894 --> 00:00:06,625
+hace es quepuedaseleccionarcualquier
+
+4
+00:00:06,625 --> 00:00:09,220
+canción y lavoz decualquierartista y que
+
+5
+00:00:09,220 --> 00:00:10,950
+ese artistacante esacanción. Por
+
+6
+00:00:10,950 --> 00:00:13,258
+ejemplo, ahoravamos a elegiruna canción de
+
+7
+00:00:13,258 --> 00:00:14,700
+prueba quetengoespecífica que
+
+8
+00:00:14,700 --> 00:00:17,295
+es un pedacitode golden houry vamos a
+
+9
+00:00:17,295 --> 00:00:19,314
+elegir la vozde FreddieMercury, ya
+
+10
+00:00:19,314 --> 00:00:21,333
+que es unacombinaciónmuy buena y
+
+11
+00:00:21,333 --> 00:00:23,351
+escuchémoslaporque laverdad quequeda muy
+
+12
+00:00:23,351 --> 00:00:23,640
+bien.
+
+13
+00:01:08,462 --> 00:01:09,942
+Como vemos,suena muybien.

@@ -22,7 +22,7 @@
     "items": [
       {
         "id": "lovelytics",
-        "title": "Lovelytics",
+        "title": "Lovelytics (a CDW company)",
         "subtitle": "Junior Data Engineer",
         "period": "December 2025 — Present",
         "location": "U.S. (Remote)",
@@ -32,12 +32,15 @@
             "id": "toyota",
             "label": "Client: Toyota",
             "period": "July 2026 — Present",
-            "desc": "Developing and maintaining robust data architectures for the automotive sector. The project focuses on building high-performance processing systems and deploying scalable analytics solutions to drive enterprise decision-making.",
+            "desc": "Development of the vehicle telemetry pipeline (500 GB/week). I fix metric anomalies from legacy physical sensors (V1) and scale the ingestion architecture to support the high volume of the new automotive hardware (V2).",
             "tags": [
-              "Data Architecture",
-              "High Performance",
-              "Scalable Analytics",
-              "Automotive"
+              "Azure",
+              "Databricks",
+              "AWS Kinesis",
+              "Apache Spark",
+              "Python",
+              "DynamoDB",
+              "ADLS Gen2"
             ]
           },
           {
@@ -143,15 +146,16 @@
   },
   "hero": {
     "name": "Thiago Pacheco",
-    "role": "Software Engineer",
+    "role": "Data & AI Engineer | Software Engineer (UBA)",
     "marcas": "Trusted and recognized by",
     "marcasPrev": "Previous logos",
     "marcasNext": "Next logos",
     "bio": [
-      "Software Engineer (UBA).",
-      "Graduated in record time at age 21 — a historical milestone since 1938.",
-      "Currently a Data Engineer at Lovelytics.",
-      "Specializing in robust architectures, complex distributed systems, and artificial intelligence integrations."
+      "Software Engineer (UBA). Graduated at 21 — a historical milestone since 1938.",
+      "Data Engineer at Lovelytics (a CDW company).",
+      "Undergraduate lecturer in Machine Learning (UBA).",
+      "Advanced studies in Deep Learning (UBA).",
+      "I build distributed systems and software, data and artificial intelligence architectures."
     ],
     "cta": "View My Work",
     "scroll": "Go to Journey",
@@ -174,6 +178,12 @@
       "pause": "Pause",
       "mute": "Mute",
       "unmute": "Unmute",
+      "captionsOn": "Turn on subtitles",
+      "captionsOff": "Turn off subtitles",
+      "captionsIn": {
+        "es": "Spanish",
+        "en": "English"
+      },
       "volume": "Volume",
       "seek": "Video position",
       "fullscreen": "Fullscreen"

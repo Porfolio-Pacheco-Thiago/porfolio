@@ -15,7 +15,7 @@ import './Hero.css';
 // y el video se reemplaza por el póster.
 const ANGOSTO = '(max-width: 768px)';
 
-export default function Hero({ loading, contactoAbierto, onContacto }) {
+export default function Hero({ loading, sinRiel, contactoAbierto, onContacto }) {
     const { t, getList } = useLang();
     const videoRef = useRef(null);
     const flechaRef = useRef(null);
@@ -133,8 +133,13 @@ export default function Hero({ loading, contactoAbierto, onContacto }) {
                             {t('hero.cta')}
                         </button>
                         {/* Abre y cierra el riel de la izquierda, donde ahora
-                            viven los enlaces de contacto, en lugar de bajar al pie */}
-                        <ContactButton abierto={contactoAbierto} onCambio={onContacto} />
+                            viven los enlaces de contacto, en lugar de bajar al pie.
+                            En angosto no hay riel, así que vuelve a bajar al pie. */}
+                        <ContactButton
+                            abierto={contactoAbierto}
+                            onCambio={onContacto}
+                            destino={sinRiel ? 'contact' : undefined}
+                        />
                     </div>
                     {/* Debajo de los botones, en la misma columna: es el respaldo de lo
                         que dice el hero, así que se lee junto con él. Entran tres a la
