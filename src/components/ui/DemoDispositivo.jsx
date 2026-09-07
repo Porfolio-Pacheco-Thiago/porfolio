@@ -187,6 +187,12 @@ export default function DemoDispositivo({
     // relevos que nadie ve.
     useEffect(() => {
         if (!auto || piezas.length < 2 || activa !== null) return undefined;
+        // Y solo con la tarjeta abierta. Sin esto el relevo seguía corriendo en las
+        // cerradas —`.project-extra` no las desmonta, las tapa con `max-height: 0`— así
+        // que cuatro proyectos estaban cambiando de captura y animando dos imágenes cada
+        // uno, uno de ellos cada segundo, para una pantalla de alto cero. Es la misma
+        // fuga que el video en bucle, por el mismo motivo.
+        if (!visible) return undefined;
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
         const id = window.setInterval(() => {
             const viejo = indiceRef.current;
@@ -200,7 +206,7 @@ export default function DemoDispositivo({
             setPieza(proximo);
         }, segundos * 1000);
         return () => window.clearInterval(id);
-    }, [auto, piezas.length, activa, segundos, corte]);
+    }, [auto, visible, piezas.length, activa, segundos, corte]);
 
     // Qué pista de subtítulos se ve. **Todas** las que tiene el video están montadas y
     // acá se decide cuál se muestra: así cambiar de idioma es tocar una propiedad del
