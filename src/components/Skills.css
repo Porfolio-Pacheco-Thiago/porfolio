@@ -1,7 +1,11 @@
 .skills {
     /* Espaciado atado al alto de la ventana: en pantallas bajas se comprime
        solo, que es lo que hace cumplir la regla de una sección por pantalla. */
-    padding: clamp(1.5rem, 4vh, 4.5rem) 2rem;
+    /* Congelado: era `clamp(1.5rem, 4vh, 4.5rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 2.25rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -9,7 +13,11 @@
 .skills-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: clamp(0.75rem, 2vh, 2rem);
+    /* Congelado: era `clamp(0.75rem, 2vh, 2rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    gap: 1.125rem;
 }
 
 /* ── Cada categoría es una ventana ────────────────────────────────────────
@@ -54,7 +62,11 @@
     flex: 1;
     margin: var(--trazo);
     background: var(--bg-card);
-    padding: clamp(0.7rem, 1.5vh, 1.1rem) clamp(0.8rem, 1.6vh, 1.15rem);
+    /* Congelado: era `clamp(0.7rem, 1.5vh, 1.1rem) clamp(0.8rem, 1.6vh, 1.15rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 0.84rem 0.9rem;
 }
 
 @media (hover: hover) and (pointer: fine) {

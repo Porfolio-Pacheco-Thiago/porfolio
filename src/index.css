@@ -89,7 +89,12 @@
   --font-hero: 'Chakra Petch', var(--font-display);
   /* El cuerpo de los títulos de sección es un token porque hay que descontarlo
      desde fuera del título: ver el margen del encabezado en Journey.css. */
-  --titulo-fs: clamp(2rem, 4vw, 3rem);
+  /* Congelado: era `clamp(2rem, 4vw, 3rem)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+     este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+     hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+     `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+     volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+  --titulo-fs: 3rem;
   /* Para el texto de adentro de las tarjetas. Es una grotesca de caja alta y ojo
      abierto: aguanta el cuerpo chico y la negrita de las descripciones sin
      empastarse, que es justo lo que ahí hace falta. */
@@ -372,6 +377,16 @@ html {
      propósito. `clip` los recorta contra la ventana sin crear un contenedor
      de scroll, cosa que `hidden` sí haría. */
   overflow-x: clip;
+  /* El lienzo entero, escalado de una. `--escala` la pone `App.jsx` en cada `resize`:
+     ancho de la ventana sobre 1920, o 1 debajo del corte de 900, donde manda el diseño
+     adaptable. Así la página no se reacomoda según la resolución — se agranda y se
+     achica en bloque, y dos monitores distintos ven exactamente lo mismo.
+
+     `zoom` y no `transform: scale()`: el `transform` no cambia el espacio que el
+     elemento ocupa, así que la página seguiría midiendo lo de antes y el scroll se
+     iría a cualquier lado. `zoom` sí entra en el acomodo, y el alto del documento
+     acompaña solo. */
+  zoom: var(--escala, 1);
 }
 
 body {

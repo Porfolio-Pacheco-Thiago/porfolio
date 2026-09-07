@@ -4,7 +4,11 @@
    bloque: tiene que leerse si se la busca y desaparecer si no. */
 .marcas {
     /* Pegada a los botones de arriba: es su respaldo, no una sección aparte. */
-    margin-top: clamp(0.9rem, 1.8vh, 1.5rem);
+    /* Congelado: era `clamp(0.9rem, 1.8vh, 1.5rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    margin-top: 1.01rem;
 }
 
 .marcas-titulo {

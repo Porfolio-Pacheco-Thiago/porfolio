@@ -398,6 +398,7 @@ export default function Projects() {
                                             segundos={carrusel?.segundos}
                                             corte={carrusel?.corte}
                                             bucle={bucle}
+                                            visible={isExpanded}
                                             label={item.title}
                                             onPlayingChange={va => setReproduciendoId(va ? item.id : null)}
                                             conTransicion={conTransicion}

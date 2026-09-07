@@ -1,5 +1,9 @@
 .projects {
-    padding: clamp(1rem, 2.2vh, 2rem) 2rem;
+    /* Congelado: era `clamp(1rem, 2.2vh, 2rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 1.24rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -243,7 +247,11 @@
        la sección mide 944px de los 953 disponibles, y los 93px que quedan por encima del
        encabezado son el hueco que deja el navbar fijo. Subirlo más empieza a empujar la
        grilla fuera de la ventana. */
-    height: clamp(120px, 16.3vh, 168px);
+    /* Congelado: era `clamp(120px, 16.3vh, 168px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 147px;
     /* El hueco a los tres lados restantes; abajo lo pone el padding del marco. */
     margin: var(--trazo) var(--trazo) 0;
     overflow: hidden;
@@ -707,7 +715,11 @@
 }
 
 .project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover {
-    height: min(58vh, 470px);
+    /* Congelado: era `min(58vh, 470px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 470px;
     /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
        bandas laterales que deja `contain`. */
     object-fit: contain;
@@ -744,7 +756,11 @@
    arranquen en la misma vertical que el marco y el nombre. En reposo eso es 0
    —no hay caja de la que despegarse—; expandida, el mismo aire que el marco. */
 .project-info {
-    padding: clamp(0.35rem, 0.6vh, 0.55rem) var(--marco) var(--marco);
+    /* Congelado: era `clamp(0.35rem, 0.6vh, 0.55rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 0.35rem var(--marco) var(--marco);
 }
 
 /* La tipografía del nombre, que en larson es lo que más pesa de la tarjeta:
@@ -755,7 +771,12 @@
     /* Más chico que el de la referencia, pero no tanto: le da mucho peso al nombre.
        El techo lo puso la pantalla — con más que esto, los nombres que envuelven a dos
        líneas desbordan las tres filas. */
-    font-size: clamp(1.1rem, 0.95rem + 0.45vw, 1.35rem);
+    /* Congelado: era `clamp(1.1rem, 0.95rem + 0.45vw, 1.35rem)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    font-size: 1.35rem;
     font-weight: 700;
     /* Ancho e interletrado copiados de la referencia: las letras son anchas y
        **separadas**, no comprimidas. Yo había puesto interletrado negativo, que es
@@ -895,7 +916,11 @@
    se pasaba de pantalla — justamente lo que no puede pasar. El tope va en `vh`
    porque el presupuesto es la altura de la ventana, no el ancho de la tarjeta. */
 .project-gallery-item {
-    height: clamp(92px, 13vh, 140px);
+    /* Congelado: era `clamp(92px, 13vh, 140px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 117px;
     background: var(--bg-secondary);
     display: flex;
     align-items: center;
@@ -966,7 +991,11 @@
     position: relative;
     /* Acotado también por el alto disponible: la tarjeta abierta ya no crece, así que
        un celular más ancho es un celular que se sale por abajo. */
-    width: min(215px, 62%, 27vh);
+    /* Congelado: era `min(215px, 62%, 27vh)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    width: min(215px, 62%);
     /* El bisel. Fino a propósito: los marcos gordos son de un teléfono viejo, y acá
        además le comen lugar a la pantalla, que es lo que se vino a ver. El radio de
        la pantalla es este valor menos el del cuerpo, para que las dos curvas sean
@@ -1184,7 +1213,11 @@
     /* Lo que manda es el 96% de la columna; el literal y el `vh` están para que en
        pantallas muy anchas o muy bajas no se desborde. Antes el tope eran 330px, que
        dejaba 185px de columna sin usar. */
-    width: min(485px, 90%, 58vh);
+    /* Congelado: era `min(485px, 90%, 58vh)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    width: min(485px, 90%);
     padding: 4px 4px 5px;
     border-radius: 7px;
     /* Menos canto que el celular: un monitor es un panel fino, no un ladrillo. */

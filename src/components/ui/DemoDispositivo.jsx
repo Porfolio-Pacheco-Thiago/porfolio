@@ -44,6 +44,10 @@ import { useLang } from '../../context/lang-context';
  * @param {object} props
  * @param {Array<{nombre: string, tipo: 'video'|'imagen', src: string, poster?: string}>} props.medios
  * @param {'fono'|'monitor'} [props.dispositivo]  Chasis. Por defecto `fono`.
+ * @param {boolean} [props.visible]  Si la tarjeta que lo contiene está abierta. Con la
+ *                                    tarjeta cerrada el bloque sigue en el DOM —se anima
+ *                                    su despliegue— así que sin esto un video en bucle se
+ *                                    reproduce tapado y a nadie le consta.
  * @param {number} [props.segundos]  Cuánto se queda cada captura en pantalla.
  * @param {boolean} [props.corte]  Cambia de captura de golpe, sin el relevo deslizado.
  * @param {boolean} [props.auto]  Las capturas pasan solas y la botonera queda solo con
@@ -103,7 +107,7 @@ const SEGUNDOS_POR_PIEZA = 3;
 export default function DemoDispositivo({
     medios, dispositivo = 'fono', auto = false, segundos = SEGUNDOS_POR_PIEZA,
     corte = false, bucle = null, label, children, onPlayingChange,
-    conTransicion, className = '', ...props
+    conTransicion, visible = true, className = '', ...props
 }) {
     const { t, lang } = useLang();
     // En modo `auto` los medios se parten en dos roles distintos: las capturas pasan
@@ -115,7 +119,12 @@ export default function DemoDispositivo({
     const enBucle = Boolean(bucle);
     const piezas = auto ? medios.filter(m => m.tipo === 'imagen') : [];
     const elegibles = enBucle ? [] : (auto ? medios.filter(m => m.tipo === 'video') : medios);
-    const videoEnBucle = enBucle ? medios.find(m => m.tipo === 'video') : undefined;
+    // El video del bucle solo existe con la tarjeta abierta. Sin la condición de
+    // `visible` se montaba siempre: `.project-extra` no desmonta su contenido —lo tapa
+    // con `max-height: 0` para poder animarlo— así que el efecto de más abajo le hacía
+    // `play()` desde que cargaba la página y quedaba un 1080p decodificando en un
+    // elemento de alto cero, con su decoder y sus buffers vivos, que nadie veía.
+    const videoEnBucle = enBucle && visible ? medios.find(m => m.tipo === 'video') : undefined;
 
     // `null` = en reposo. Un número = esa demo, quieta y de frente.
     const [activa, setActiva] = useState(null);
@@ -231,10 +240,10 @@ export default function DemoDispositivo({
     // elemento, no del archivo, y vuelve a 1 cada vez que el navegador recarga la fuente.
     useEffect(() => {
         const el = videoRef.current;
-        if (!enBucle || !el) return;
+        if (!enBucle || !visible || !el) return;
         el.playbackRate = bucle.velocidad ?? 1;
         el.play().catch(() => { /* si lo rechazan, el póster queda a la vista */ });
-    }, [enBucle, bucle]);
+    }, [enBucle, visible, bucle]);
 
     /**
      * Tocar la demo que ya está puesta la saca; tocar otra, cambia de video.

@@ -46,11 +46,13 @@ export default function LogoFila({ videos, className }) {
                     loop={!quieto}
                     muted
                     playsInline
-                    // `auto` y no `metadata`, por lo mismo que en `LogoBucle`: con solo
-                    // la metadata bajada no hay ningún cuadro decodificado y el hueco se
-                    // queda en blanco si el autoplay queda diferido. Pesan menos de
-                    // 230 KB cada uno.
-                    preload="auto"
+                    // `metadata` y no `auto`. Los tres viven en la franja de la tarjeta
+                    // **abierta**, que existe en el DOM desde que carga la página con
+                    // `opacity: 0` — o sea que con `auto` se bajaban enteros y se les
+                    // reservaba un decoder a cada uno para algo que nadie está mirando, y
+                    // eso por cada tarjeta con videos de marca. El póster tapa el hueco
+                    // hasta que arrancan.
+                    preload="metadata"
                 />
             ))}
         </div>

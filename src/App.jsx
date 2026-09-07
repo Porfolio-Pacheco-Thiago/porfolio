@@ -16,6 +16,18 @@ import './App.css';
 // también en `Footer.css` — si se mueve, se mueven los dos.
 const ANGOSTO = '(max-width: 900px)';
 
+// Ancho del lienzo. El diseño se dibuja **siempre** a esta medida y después se escala
+// entero con `zoom`, así que dos monitores distintos ven exactamente la misma página,
+// solo que más grande o más chica. 1920 y no otro número porque es el ancho sobre el que
+// está afinado todo lo de acá —los topes de columna, los anchos de los aparatos, el
+// renglón del rol— y ponerlo de referencia deja esa vista intacta.
+//
+// Efecto de regalo: con la raíz escalada, un `vw` de adentro vale `ancho real / escala`,
+// que es siempre 1920. O sea que todas las medidas en `vw` del CSS se vuelven constantes
+// solas y no hubo que tocarlas. Los `vh` no corren esa suerte —siguen al alto de la
+// ventana, que no entra en la cuenta— y por eso están congelados en el CSS.
+const LIENZO = 1920;
+
 function App() {
   const [loading, setLoading] = useState(true);
   // Vive acá y no en SideBar porque el botón "Contactame" del hero también lo abre
@@ -31,6 +43,33 @@ function App() {
     const alCambiar = e => setAngosto(e.matches);
     mq.addEventListener('change', alCambiar);
     return () => mq.removeEventListener('change', alCambiar);
+  }, []);
+
+  // La escala del lienzo, en una variable que lee el `zoom` de `index.css`.
+  //
+  // Debajo del corte de 900 vale 1: ahí manda el diseño adaptable, que está hecho a
+  // medida de esos anchos. Escalar el de escritorio en un teléfono sería mostrarlo al
+  // 20%, con el texto en 3px.
+  useEffect(() => {
+    const aplicar = () => {
+      const raiz = document.documentElement;
+      const angosto = window.innerWidth <= 900;
+      const escala = angosto ? 1 : window.innerWidth / LIENZO;
+      raiz.style.setProperty('--escala', String(escala));
+      // El alto de una pantalla, medido **en unidades del lienzo**: escalado por `zoom`
+      // vuelve a dar la ventana entera. No se usa `100dvh` para esto porque no está claro
+      // que todos los navegadores midan un `dvh` contra el lienzo y no contra la ventana
+      // real, y de eso depende que el hero llene la pantalla o se quede al 70%.
+      //
+      // En angosto la variable se **borra**, y el CSS cae en el `100dvh` de siempre. No es
+      // un detalle: en iOS `dvh` es lo que evita el salto cuando se retrae la barra de
+      // direcciones, y un número fijo en píxeles perdería eso.
+      if (angosto) raiz.style.removeProperty('--alto-lienzo');
+      else raiz.style.setProperty('--alto-lienzo', `${window.innerHeight / escala}px`);
+    };
+    aplicar();
+    window.addEventListener('resize', aplicar);
+    return () => window.removeEventListener('resize', aplicar);
   }, []);
 
   // Ocultar el loader cuando la página terminó de cargar (con un mínimo y un tope).

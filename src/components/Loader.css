@@ -19,6 +19,11 @@
 /* Bien grande: la pantalla es el logo dibujándose y nada más, así que es lo que
    tiene que llenarla. `clamp` sobre `vw` para que en un teléfono no se salga. */
 .loader-logo {
-    width: clamp(220px, 34vw, 420px);
+    /* Congelado: era `clamp(220px, 34vw, 420px)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    width: 420px;
     height: auto;
 }

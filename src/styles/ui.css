@@ -131,16 +131,23 @@
 }
 
 /* — Modo flat: nada se mueve dentro, así que el subárbol se rasteriza una sola
-     vez; lo que gira es esta capa, en 2D. `will-change` le avisa al navegador
-     que la promueva y no la vuelva a dibujar. — */
+     vez; lo que gira es esta capa, en 2D. — */
 .spin-flat .wire-turn {
     animation: wire-plano var(--wire-seconds, 120s) linear infinite;
     animation-play-state: paused;
-    will-change: transform;
 }
 
+/* `will-change` va junto con el arranque y no en la regla de arriba. Puesto ahí era
+   permanente: la capa quedaba promovida y residente en memoria aunque la figura
+   estuviera fuera de pantalla con su animación en pausa. Y al girar, la capa que el
+   navegador tiene que reservar no es la figura sino el cuadrado que la contiene —para
+   la de 880px, unos 1245 de lado—, así que cada una cuesta varios MB de textura que se
+   multiplican por el escalado de la pantalla.
+   Es exactamente la regla que `index.css` ya documenta para `.reveal`: `will-change`
+   tiene que ser temporal, o quedan capas vivas toda la sesión. */
 .spin-flat[data-visible] .wire-turn {
     animation-play-state: running;
+    will-change: transform;
 }
 
 @keyframes wire-plano {
@@ -380,7 +387,11 @@
    solo. Ahora aplica a las dos secciones sin depender de una clase de modo. */
 .experience .section-header,
 .projects .section-header {
-    margin-bottom: clamp(0.75rem, 1.8vh, 1.5rem);
+    /* Congelado: era `clamp(0.75rem, 1.8vh, 1.5rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    margin-bottom: 1.01rem;
 }
 
 /* ── Luz coherente con el sol ─────────────────────────────────────────────

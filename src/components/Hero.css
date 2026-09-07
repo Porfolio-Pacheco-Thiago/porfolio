@@ -1,6 +1,6 @@
 .hero {
     /* Ver la nota en App.css: `dvh` evita el salto de la barra de iOS. */
-    min-height: 100dvh;
+    min-height: var(--alto-lienzo, 100dvh);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -230,7 +230,12 @@
    La máscara es un solo punto que se repite en una grilla de 2×3. */
 .hero-puntos {
     /* En `em` sobre el tamaño del nombre, así los puntos escalan con él. */
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    /* Congelado: era `clamp(2.5rem, 5vw, 4rem)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    font-size: 4rem;
     --punto: 0.085em;
     --col: 0.28em;
     --fila: 0.25em;
@@ -258,7 +263,12 @@
    y el `font-size`, que es de donde el SVG saca su `em` — así el nombre sigue
    escalando con el mismo `clamp()` de siempre. */
 .hero-name {
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    /* Congelado: era `clamp(2.5rem, 5vw, 4rem)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    font-size: 4rem;
     line-height: 0;
 }
 
@@ -284,7 +294,12 @@
 
        Un escalón por breakpoint habría sido inventar tres o cuatro números donde el ancho
        baja de forma lineal y alcanza con uno. */
-    font-size: max(18px, min(24px, calc(3.717vw - 21.67px)));
+    /* Congelado: era `max(18px, min(24px, calc(3.717vw - 21.67px)))`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    font-size: 24px;
     color: var(--accent-text);
     /* Silkscreen solo tiene el 400: sin esto el navegador le sintetiza una negrita
        engordando los píxeles, que es justo lo que rompe una tipografía de grilla. */

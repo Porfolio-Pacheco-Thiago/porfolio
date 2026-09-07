@@ -36,7 +36,11 @@
        pantallas muy anchas o muy bajas la ventana no se salga de la tarjeta. El tope de
        600px es el del archivo (640) menos un poco: agrandarla más allá de su propio
        tamaño solo interpola píxeles. */
-    width: min(600px, 94%, 66vh);
+    /* Congelado: era `min(600px, 94%, 66vh)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    width: min(600px, 94%);
     border-radius: 10px;
     /* El marco de la ventana, en el gris del monitor: son dos chasis de la misma
        sección y conviene que se lean como de la misma familia. En tema claro queda

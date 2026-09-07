@@ -1,7 +1,11 @@
 .experience {
     /* Ajustado para que la sección entre en una pantalla: ver la nota del
        presupuesto de alto, más abajo. */
-    padding: clamp(0.6rem, 1.4vh, 1.2rem) 2rem;
+    /* Congelado: era `clamp(0.6rem, 1.4vh, 1.2rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 0.79rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -122,7 +126,11 @@
    a la de `ui.css`, que fija el margen de Trayectoria y Proyectos juntas y ahí
    sigue valiendo para Proyectos. */
 .experience {
-    --rotulo-aire: clamp(1.1rem, 2.4vh, 1.8rem);
+    /* Congelado: era `clamp(1.1rem, 2.4vh, 1.8rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    --rotulo-aire: 1.35rem;
     /* Geometría del bloque (foto + ventana) y del hueco que le deja al eje. Los 4px
        de más son los que la foto le sacó a la ventana al recuperar su borde interno:
        sin ellos el título más largo —Carlos Pellegrini— se va a dos renglones y esa
@@ -137,7 +145,11 @@
        la imagen de adentro también (97x97). De paso es **el alto de la fila**: las
        seis miden lo mismo, y de eso depende toda la cuenta de la tarjeta abierta. */
     --foto: 105px;
-    --fila-aire: clamp(0.5rem, 1.1vh, 0.88rem);
+    /* Congelado: era `clamp(0.5rem, 1.1vh, 0.88rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    --fila-aire: 0.62rem;
     /* De un tope de fila al siguiente. */
     --fila-paso: calc(var(--foto) + var(--fila-aire));
     /* El alto del rótulo se fija en vez de salir del relleno y el interlineado: es lo
@@ -655,7 +667,11 @@
     background: var(--bg-card);
     font-family: var(--font-tarjeta);
     /* Con la barra de título arriba, el renglón de aire de adentro es redundante. */
-    padding: clamp(0.3rem, 0.5vh, 0.45rem) var(--aire-ventana);
+    /* Congelado: era `clamp(0.3rem, 0.5vh, 0.45rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 0.3rem var(--aire-ventana);
     text-align: left;
 }
 
@@ -937,8 +953,17 @@
     /* Casi el ancho de la ventana —que mide ~1000— dejando márgenes anchos a los dos
        costados. Acotada en `vw`/`vh` para que en una pantalla chica no se pase de la
        ventana del navegador. */
-    width: min(58vw, 780px);
-    height: min(46vh, 430px);
+    /* Congelado: era `min(58vw, 780px)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    width: 780px;
+    /* Congelado: era `min(46vh, 430px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 414px;
     /* El `img { max-width: 100% }` global la volvía a dejar del ancho de su hueco:
        crecía a lo alto y nada a lo ancho. Es el mismo caso del logo apaisado. */
     max-width: none;
