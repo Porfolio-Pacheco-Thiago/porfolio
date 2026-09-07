@@ -133,7 +133,20 @@
 /* — Modo flat: nada se mueve dentro, así que el subárbol se rasteriza una sola
      vez; lo que gira es esta capa, en 2D. — */
 .spin-flat .wire-turn {
-    animation: wire-plano var(--wire-seconds, 120s) linear infinite;
+    /* `steps` y no `linear`, y es lo que hace que estas figuras sean pagables.
+       El `preserve-3d` que necesitan para armarse en 3D impide que el subárbol se
+       aplane en una sola textura, así que el giro no es una capa compuesta: el
+       navegador vuelve a rasterizar la geometría en cada cuadro. Y la geometría es
+       cara — las tres grandes suman 22.6 megapíxeles, once pantallas de 1920x1080
+       en líneas.
+       Pero giran despacísimo: una vuelta cada 150 segundos son 0.04 grados por
+       cuadro. Son 9000 repintados por vuelta para mover cuatro centésimas de grado
+       cada vez. Con 1440 pasos el giro avanza de a 0.25 grados, que en la figura de
+       880px son 1.9px en el borde —por debajo de lo que se distingue— y el repintado
+       baja de 60 por segundo a 9.6 en la más lenta: **seis veces menos trabajo**.
+       El número sale del tamaño: 1440 es lo más grueso que se puede pisar sin que el
+       salto se note en la figura más grande. Si alguna vez crecen, hay que subirlo. */
+    animation: wire-plano var(--wire-seconds, 120s) steps(1440) infinite;
     animation-play-state: paused;
 }
 
