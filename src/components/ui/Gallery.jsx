@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { useLang } from '../../context/lang-context';
+import { useAlternable } from '../../hooks/useAlternable';
 import { getMedia } from '../../lib/media';
 import GalleryPlaceholder from './GalleryPlaceholder';
 
@@ -36,9 +36,9 @@ import GalleryPlaceholder from './GalleryPlaceholder';
  */
 export default function Gallery({ carpeta, medios: propios, label, className, itemClassName, count = 3, ampliable = false, ...props }) {
     const { t } = useLang();
-    // Cuál está ampliada, por nombre de archivo. Una sola a la vez: dos abiertas se
-    // pisarían, porque al crecer cada una se sale de su hueco.
-    const [ampliada, setAmpliada] = useState(null);
+    // Cuál está ampliada, por nombre de archivo. Ver `useAlternable` para el porqué de
+    // cada prop del juego que devuelve.
+    const { activo: ampliada, props: propsAmpliar } = useAlternable();
     const medios = propios ?? getMedia(carpeta);
     const claseHueco = itemClassName ?? `${className}-item`;
 
@@ -62,30 +62,9 @@ export default function Gallery({ carpeta, medios: propios, label, className, it
                 <li
                     key={medio.nombre}
                     className={`${claseHueco} is-media ${medio.tipo === 'video' ? 'is-video' : ''} ${ampliada === medio.nombre ? 'is-ampliada' : ''}`}
-                    // Sin envolver la imagen en un `<button>`: el CSS la posiciona en
-                    // absoluto contra este `li`, y meter un elemento en el medio le
-                    // cambiaría el bloque contenedor. Con el rol y el `tabIndex` acá, la
-                    // estructura no se mueve y el control sigue siendo alcanzable por
-                    // teclado. No hay botón adentro con el que competir.
-                    {...(ampliable && medio.tipo !== 'video' ? {
-                        role: 'button',
-                        tabIndex: 0,
-                        'aria-pressed': ampliada === medio.nombre,
-                        // `stopPropagation` porque la tarjeta que la contiene lleva su
-                        // propio click para plegarse: sin esto, ampliar una foto cerraba
-                        // la entrada en el mismo gesto y la galería se iba con ella.
-                        onClick: e => {
-                            e.stopPropagation();
-                            setAmpliada(a => (a === medio.nombre ? null : medio.nombre));
-                        },
-                        onKeyDown: e => {
-                            if (e.key !== 'Enter' && e.key !== ' ') return;
-                            // El espacio scrollea la página si no se lo frena.
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setAmpliada(a => (a === medio.nombre ? null : medio.nombre));
-                        },
-                    } : {})}
+                    // Los videos quedan afuera: ya traen su propia botonera y el click
+                    // es para reproducir.
+                    {...propsAmpliar(medio.nombre, ampliable && medio.tipo !== 'video')}
                 >
                     {medio.tipo === 'video' ? (
                         // No hay archivo de subtítulos para estas grabaciones. Un

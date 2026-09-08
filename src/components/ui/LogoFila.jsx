@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useMenosMovimiento } from '../../hooks/useMenosMovimiento';
+import './LogoFila.css';
 
 /**
  * Los videos de marca de un proyecto, **los tres a la vez y en fila**, cada uno
@@ -12,24 +13,10 @@ import { useEffect, useState } from 'react';
  * @remarks
  * - Van con `loop` y sin escuchar `ended`: acá no hay turnos que contar, así que no
  *   existe el motivo por el que `LogoBucle` tiene que prescindir del atributo.
- * - La lectura de `prefers-reduced-motion` está repetida de `LogoBucle` a propósito:
- *   sacarla a un hook compartido pide un módulo nuevo para ocho líneas, porque
- *   `react-refresh/only-export-components` no deja exportar un hook desde el archivo
- *   de un componente.
  */
 export default function LogoFila({ videos, className }) {
-    // Con movimiento reducido se muestran los tres quietos, en su portada. Se lee una
-    // vez y se escucha el cambio, porque el sistema operativo permite activarlo con la
-    // página abierta.
-    const [quieto, setQuieto] = useState(
-        () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    );
-    useEffect(() => {
-        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const alCambiar = e => setQuieto(e.matches);
-        mq.addEventListener('change', alCambiar);
-        return () => mq.removeEventListener('change', alCambiar);
-    }, []);
+    // Con movimiento reducido se muestran los tres quietos, en su portada.
+    const quieto = useMenosMovimiento();
 
     return (
         // Es ornamento: lo que nombra a la tarjeta es su título, que está al lado.

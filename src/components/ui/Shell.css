@@ -170,6 +170,7 @@
 /* Una columna: la ventana arriba y el texto abajo, igual que el monitor. Debajo de los
    900 la tarjeta ya ocupa la fila entera, y partir ese ancho en dos deja la captura
    ilegible. */
+/* corte SIN_RIEL */
 @media (max-width: 900px) {
     .shell-bloque {
         grid-template-columns: 1fr;

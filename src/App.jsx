@@ -1,32 +1,17 @@
 import { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Journey from './components/Journey';
-import Projects from './components/Projects';
-import Skills from './components/Skills';
-import Footer from './components/Footer';
-import Loader from './components/Loader';
+import Navbar from './components/layout/Navbar';
+import Hero from './components/secciones/Hero';
+import Journey from './components/secciones/Journey';
+import Projects from './components/secciones/Projects';
+import Skills from './components/secciones/Skills';
+import Footer from './components/layout/Footer';
+import Loader from './components/layout/Loader';
 import { ATRIBUTO_CARGA, EVENTO_CARGA } from './lib/carga';
+import { SIN_RIEL, LIENZO } from './lib/medidas';
+import { useMediaQuery } from './hooks/useMediaQuery';
 import Cursor from './components/ui/Cursor';
-import SideBar from './components/SideBar';
+import SideBar from './components/layout/SideBar';
 import './App.css';
-
-// Debajo de este ancho no hay riel de contacto: sus enlaces se mudan al final del pie.
-// Es el mismo umbral con el que el riel dejaba de ser una columna lateral, y está
-// también en `Footer.css` — si se mueve, se mueven los dos.
-const ANGOSTO = '(max-width: 900px)';
-
-// Ancho del lienzo. El diseño se dibuja **siempre** a esta medida y después se escala
-// entero con `zoom`, así que dos monitores distintos ven exactamente la misma página,
-// solo que más grande o más chica. 1920 y no otro número porque es el ancho sobre el que
-// está afinado todo lo de acá —los topes de columna, los anchos de los aparatos, el
-// renglón del rol— y ponerlo de referencia deja esa vista intacta.
-//
-// Efecto de regalo: con la raíz escalada, un `vw` de adentro vale `ancho real / escala`,
-// que es siempre 1920. O sea que todas las medidas en `vw` del CSS se vuelven constantes
-// solas y no hubo que tocarlas. Los `vh` no corren esa suerte —siguen al alto de la
-// ventana, que no entra en la cuenta— y por eso están congelados en el CSS.
-const LIENZO = 1920;
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -34,26 +19,23 @@ function App() {
   const [contactoAbierto, setContactoAbierto] = useState(false);
   // Y acá porque decide tres cosas a la vez que están en ramas distintas del árbol: si
   // el riel se monta, qué hace el botón del hero y si el pie muestra el bloque de
-  // contacto. Se escucha el cambio —a diferencia del `angosto` del hero, que se decide
+  // contacto. Se escucha el cambio —a diferencia del `SIN_VIDEO` del hero, que se decide
   // una sola vez— porque acá no hay nada que cortar al recalcularlo: son tres piezas que
   // se montan o no, y girar el teléfono tiene que dejar la página coherente.
-  const [angosto, setAngosto] = useState(() => window.matchMedia(ANGOSTO).matches);
-  useEffect(() => {
-    const mq = window.matchMedia(ANGOSTO);
-    const alCambiar = e => setAngosto(e.matches);
-    mq.addEventListener('change', alCambiar);
-    return () => mq.removeEventListener('change', alCambiar);
-  }, []);
+  const angosto = useMediaQuery(SIN_RIEL);
 
   // La escala del lienzo, en una variable que lee el `zoom` de `index.css`.
   //
-  // Debajo del corte de 900 vale 1: ahí manda el diseño adaptable, que está hecho a
-  // medida de esos anchos. Escalar el de escritorio en un teléfono sería mostrarlo al
+  // Debajo del corte de `SIN_RIEL` vale 1: ahí manda el diseño adaptable, que está hecho
+  // a medida de esos anchos. Escalar el de escritorio en un teléfono sería mostrarlo al
   // 20%, con el texto en 3px.
+  //
+  // Escucha `resize` en vez de leer `angosto` de arriba: no le alcanza con saber de qué
+  // lado del corte está, necesita el ancho exacto en cada cuadro del arrastre.
   useEffect(() => {
     const aplicar = () => {
       const raiz = document.documentElement;
-      const angosto = window.innerWidth <= 900;
+      const angosto = window.matchMedia(SIN_RIEL).matches;
       const escala = angosto ? 1 : window.innerWidth / LIENZO;
       raiz.style.setProperty('--escala', String(escala));
       // El alto de una pantalla, medido **en unidades del lienzo**: escalado por `zoom`

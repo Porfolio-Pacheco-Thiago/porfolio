@@ -1,0 +1,396 @@
+/* Primitivos compartidos entre secciones: lo que usa más de un componente y no es de
+   ninguno en particular —el foco, el encabezado de sección, las etiquetas, los botones,
+   los huecos de galería—.
+
+   Viven acá y no dentro del CSS de un componente para que ninguna sección dependa de que
+   otra esté montada: antes el Footer tomaba `.social-link` de `Hero.css` y `.tag` lo
+   definía el CSS del timeline.
+
+   Los tokens y el reset están en `index.css`; lo de acá se apoya en ellos.
+
+   Se llamaba `ui.css` y tenía 963 líneas: además de esto llevaba las figuras de alambre,
+   el cursor propio y el riel de contacto, que ahora viven al lado de sus componentes.
+   Queda una excepción a propósito, la regla que esconde el cursor del sistema
+   (`.tiene-cursor-propio *`): su sujeto es `*`, así que alcanza a toda la página y
+   moverla más tarde en la cascada le haría ganar empates que hoy pierde. */
+
+/* Primitivos compartidos entre secciones.
+   Viven acá y no dentro del CSS de un componente para que ninguna sección dependa
+   de que otra esté montada: antes el Footer tomaba .social-link de Hero.css y
+   .tag lo definía el CSS del timeline. */
+
+/* Oculto visualmente pero disponible para lectores de pantalla */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Texto que entra letra por letra (AnimatedText). Solo transform y opacity,
+   una sola vez: el retardo por letra lo pone el componente en línea. */
+.animated-text-word {
+    display: inline-block;
+}
+
+.animated-text-word > span {
+    display: inline-block;
+    animation: letra-entra 0.5s cubic-bezier(0.2, 0.65, 0.3, 1) both;
+}
+
+@keyframes letra-entra {
+    from {
+        opacity: 0;
+        transform: translateY(0.55em);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animated-text-word > span {
+        animation: none;
+    }
+}
+
+
+.has-decor>*:not(.wire) {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes wire-plano {
+    to {
+        rotate: 360deg;
+    }
+}
+
+/* `linear` es correcto acá: la prohibición de Emil apunta a transiciones de
+   estado. Una rotación continua con easing se vería acelerar y frenar sola. */
+@keyframes wire-gira {
+    to {
+        transform: rotateY(360deg);
+    }
+}
+
+/* Foco visible. No había ninguna regla de foco en todo el proyecto: quedaba
+   solo el anillo por defecto del navegador, que sobre botones con fondo propio
+   y `border: none` a veces casi no se distingue. `:focus-visible` lo muestra
+   al navegar con teclado pero no al hacer clic con el mouse. */
+:focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Área de toque de 44x44 sin alterar el tamaño visual del control: el
+   pseudo-elemento agranda la zona clickeable hacia afuera. */
+.toggle-btn {
+    position: relative;
+}
+
+.toggle-btn::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+}
+
+/* Encabezado de sección */
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    /* La misma que el nombre del hero: los títulos son la otra voz "de marca" de
+       la página, así que comparten familia en vez de caer en la de párrafo. */
+    font-family: var(--font-hero);
+    font-size: var(--titulo-fs);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+/* Degradado en los títulos. Va dentro de @supports porque `color: transparent`
+   sin `background-clip: text` dejaría el texto invisible; así el color plano de
+   arriba queda como fallback. Usa los tokens del tema, con lo cual sigue solo
+   al cambio de claro/oscuro. */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+    .section-title {
+        background-image: linear-gradient(160deg,
+                var(--text-primary) 35%,
+                var(--titulo-degrade-fin, var(--accent-text)) 115%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+/* ── La barra de título de una ventana ────────────────────────────────────
+   El motivo que se repite en cuatro lugares: el hero, cada tarjeta de proyecto, cada
+   categoría de habilidades y cada entrada de la trayectoria. Lo dibuja
+   `ui/BarraVentana.jsx`; acá va solo lo que los cuatro comparten.
+
+   Lo que cambia entre usos son cinco medidas y dos colores, y cada uno las pone como
+   custom properties sobre su propio contenedor. Los valores por defecto son los de la
+   ventana chica —trayectoria y habilidades—, que es el caso más frecuente.
+
+   `--barra` no lleva respaldo a propósito: es el alto de la barra y sin él la ventana no
+   tiene sentido, así que conviene que se note al faltar en vez de caer en un número
+   inventado. */
+.ventana-barra {
+    display: flex;
+    align-items: center;
+    gap: var(--barra-hueco, 3px);
+    height: var(--barra);
+    padding-inline: var(--barra-aire, 5px);
+    background: var(--barra-fondo, var(--proy-barra));
+}
+
+/* De contorno y no rellenos: rellenos se leerían como los botones de verdad de una
+   ventana. El trazo es el color de la página atenuado, que sobre el verde de la barra se
+   lee como cromo y no como un resaltador. */
+.ventana-barra > span {
+    width: var(--barra-punto, 5px);
+    height: var(--barra-punto, 5px);
+    border: 1px solid var(--barra-trazo, color-mix(in srgb, var(--bg-primary) 50%, transparent));
+}
+
+/* Etiquetas de tecnología */
+.tag {
+    /* Etiquetas de tecnología en mono */
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: var(--accent-glow);
+    color: var(--accent-text);
+    font-weight: 500;
+    border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Botones */
+.btn {
+    padding: 0.75rem 1.75rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    font-family: var(--font-sans);
+    border: none;
+}
+
+.btn-primary {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+        box-shadow: 0 0 30px var(--accent-glow-raw);
+        transform: translateY(-2px);
+    }
+}
+
+
+.btn-outline {
+    background: transparent;
+    color: var(--accent-text);
+    border: 1px solid var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .btn-outline:hover {
+        background: var(--accent-glow);
+        transform: translateY(-2px);
+    }
+}
+
+
+/* ── Regla: cada sección entra en una pantalla ────────────────────────────
+   Trayectoria medía 3,34 pantallas y Proyectos 2,23. Las dos tuvieron un botón
+   para alternar entre una vista densa y una completa; **ese botón ya no existe en
+   ninguna de las dos** —la vista densa es la única—, así que `.section-toggle` se
+   fue con él.
+
+   El encabezado achicado sí sigue: el margen de 4rem se come media pantalla por sí
+   solo. Ahora aplica a las dos secciones sin depender de una clase de modo. */
+.experience .section-header,
+.projects .section-header {
+    /* Congelado: era `clamp(0.75rem, 1.8vh, 1.5rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    margin-bottom: 1.01rem;
+}
+
+/* ── Luz coherente con el sol ─────────────────────────────────────────────
+   Si hay una fuente arriba, las superficies tienen que mostrarlo: un realce
+   de un píxel en el borde superior. Es lo que integra el sol con el contenido
+   en vez de dejarlo como un fondo pegado atrás. Es `inset`, así que no dibuja
+   nada fuera de la caja ni cuesta capa nueva. */
+.timeline-card,
+.project-card,
+.skills-category {
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+[data-theme="light"] .timeline-card,
+[data-theme="light"] .project-card,
+[data-theme="light"] .skills-category {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Con el cursor propio activo, **nada** dibuja un cursor del sistema.
+
+   Va con `!important` a propósito: es un modo global que tiene que ganarle a
+   cualquier `cursor` declarado localmente, y hay una docena repartidos por las
+   secciones. Antes la lista era `a, button, [role=button]`, y por eso se colaba
+   la manito sobre las tarjetas —que son `div` con `cursor: pointer`— y la barra
+   de escribir sobre los sliders del reproductor, que son `<input>` y caían en la
+   regla de `cursor: text`.
+
+   Si alguna vez entra un campo de texto de verdad, necesita su propia excepción:
+   ahí el cursor de texto sí es información útil. */
+.tiene-cursor-propio,
+.tiene-cursor-propio * {
+    cursor: none !important;
+}
+
+/* ── Tarjetas oscuras del tema verde ──────────────────────────────────────
+   Con la tarjeta en verde oscuro, el texto que va encima tiene que invertirse.
+   Se redefinen los tokens en la propia tarjeta: como son variables CSS,
+   heredan a todo lo de adentro sin tener que tocar una sola regla de texto. */
+/* Los botones de idioma y de tema entran acá porque se pintan con el mismo
+   `--bg-card`: son la misma superficie verde, en chico. */
+/* Proyectos ya no está acá, **en ningún estado**. La tarjeta cerrada nunca fue una
+   superficie —el marco es la tarjeta y el nombre queda sobre la página—, e invertirle
+   el texto lo dejaba en 1.91:1; la expandida lo era y dejó de serlo cuando se le sacó
+   el fondo. Ahora las dos se leen contra la página y les sirve la paleta de afuera. */
+/* La barra del reproductor entra acá aunque su tarjeta ya no: la tarjeta abierta perdió
+   el fondo, pero la barra conserva el suyo —es `--bg-card`, el verde oscuro— así que
+   sigue siendo una superficie oscura y su texto tiene que invertirse. Sin esto quedaba
+   con la paleta de la página: el título en 2.03:1 y los tiempos en 1.23:1. */
+/* Y los cuatro botones de contacto del final del pie, que solo existen en angosto: son
+   `--bg-card` como el resto, y sin esto quedaban con la paleta de la página — la etiqueta
+   y el ícono en **1.23:1**, el mismo número que tenían los tiempos del reproductor antes
+   de entrar acá. Con los tokens de este bloque suben a 5.2:1. */
+[data-theme="light"] .timeline-card,
+[data-theme="light"] .fono-barra,
+[data-theme="light"] .skills-category,
+[data-theme="light"] .footer-contacto-link,
+[data-theme="light"] .toggle-btn {
+    --text-primary: #f2f7f4;
+    --text-secondary: #b9d0c2;
+    /* Subido de #6fd89a y el tinte bajado de 0.14: una etiqueta se lee sobre su
+       propio fondo, no sobre la tarjeta, y ese 14% de relleno aclaraba la superficie
+       lo justo para dejarla en 3.74. Con esto da 4.66. */
+    --accent-text: #8fe8b4;
+    --accent-glow: rgba(143, 232, 180, 0.10);
+    --border: rgba(255, 255, 255, 0.16);
+}
+
+/* El realce superior blanco pleno era para tarjetas claras; sobre verde
+   oscuro sería una línea deslumbrante. Los botones quedan afuera: son de
+   36px y ahí la línea es la mitad del borde, además de que su `:hover`
+   reemplaza el `box-shadow` y la haría parpadear. */
+[data-theme="light"] .timeline-card,
+[data-theme="light"] .skills-category {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+
+/* Y se vuelven a dar vuelta en las superficies blancas de adentro, que sí
+   necesitan texto oscuro.
+
+   Los ítems de Habilidades salieron de acá: eran una píldora con superficie blanca
+   propia y ahora son una etiqueta —tinte del acento sobre la ventana oscura— así que
+   volverles el texto a oscuro los dejaba en 2.5:1. Con el token de adentro dan 4.7. */
+[data-theme="light"] .timeline-gallery-item,
+[data-theme="light"] .project-gallery-item {
+    --text-primary: #0d1f14;
+    --text-secondary: #324439;
+    color: var(--text-primary);
+}
+
+/* Las dos galerías son `ul`. El reset global ya les saca margen y relleno, pero
+   no la viñeta, así que va acá — en las dos a la vez, porque la estructura es la
+   misma y la grilla la define cada sección. */
+.timeline-gallery,
+.project-gallery {
+    list-style: none;
+}
+
+/* ── Galerías: contenido real ─────────────────────────────────────────────
+   Cada sección define el hueco en su propio CSS (medidas y grilla, que sí
+   difieren); acá va solo cómo se acomoda el medio adentro, que es idéntico en
+   las dos y por eso no puede vivir en el archivo de una sola.
+
+   Las capturas son apaisadas y llenan el hueco recortando lo que sobra. Los
+   videos son grabaciones de celular (1080×1920): con `cover` se vería una
+   franja del medio de la pantalla y nada más, así que entran enteros y a los
+   costados se ve el fondo del propio hueco —de ahí que no lleven `background`,
+   para que la banda siga el tema en vez de ser negra siempre. */
+.timeline-gallery-item.is-media,
+.project-gallery-item.is-media {
+    /* El punteado significa "acá todavía no hay nada"; con contenido, estorba. */
+    border-style: solid;
+    border-color: var(--border);
+    /* Sin esto el radio del hueco no recorta la imagen. */
+    overflow: hidden;
+}
+
+.timeline-gallery-item :is(img, video),
+.project-gallery-item :is(img, video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.timeline-gallery-item img,
+.project-gallery-item img {
+    object-fit: cover;
+}
+
+.timeline-gallery-item video,
+.project-gallery-item video {
+    object-fit: contain;
+}
+
+/* ── Riel de contacto (borde izquierdo) ───────────────────────────────────
+   Se despliega hacia la derecha mostrando el nombre de cada enlace.
+
+   `--riel-ancho` no es el ancho real del riel (55px plegado), sino la franja
+   del margen izquierdo que se le reserva: las figuras decorativas se corren en
+   función de ella, y el sobrante son los pocos px de aire entre ambos.
+   El riel es `position: fixed`: su relayout al abrirse no toca el flujo del
+   documento, que es la condición para que animar tamaño sea aceptable. */
+:root {
+    --riel-ancho: 64px;
+}
+
+/* Debajo de este ancho `App` no monta el riel, así que no reserva nada y las figuras del
+   margen izquierdo vuelven a su lugar. Va sobre la variable y no sobre las figuras: es
+   un hecho del riel —"acá no estoy"— y así lo aprovecha cualquier cosa que la use, no
+   solo `.wire-decor.at-left`, que hoy es la única. */
+/* corte SIN_RIEL */
+@media (max-width: 900px) {
+    :root {
+        --riel-ancho: 0px;
+    }
+}

@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-    FiFastForward, FiImage, FiMaximize, FiPause, FiPlay, FiRewind, FiVolume2, FiVolumeX,
-} from 'react-icons/fi';
-// Feather no trae ícono de subtítulos; el de Material es el que todo el mundo
-// reconoce. Relleno cuando están puestos y contorneado cuando no, que dice el
-// estado sin depender solo del color.
-import { MdClosedCaption, MdOutlineClosedCaption } from 'react-icons/md';
+import { useEffect, useRef, useState } from 'react';
+import { FiImage, FiPlay } from 'react-icons/fi';
 import { useLang } from '../../context/lang-context';
+import { useCarrusel } from '../../hooks/useCarrusel';
+import { useReproductor } from '../../hooks/useReproductor';
+import BarraReproductor from './BarraReproductor';
+import { soportaVistaTransicion } from '../../lib/vista-transicion';
+import './DemoDispositivo.css';
 
 /**
  * El aparato de la referencia tamalsen: en diagonal, girando sobre su eje y
@@ -77,12 +76,17 @@ import { useLang } from '../../context/lang-context';
  * pausarlo desde afuera ni limpiar nada en un efecto.
  *
  * @remarks
+ * **Qué quedó acá y qué no.** Este archivo es el chasis: el giro, el enderezado al elegir
+ * una demo, el carrusel de capturas de la pantalla y el empalme con la View Transition.
+ * El reproductor se fue en dos partes —el estado y las acciones a
+ * `hooks/useReproductor`, la barra a `ui/BarraReproductor`— porque era la mitad del
+ * archivo y no tenía nada que ver con el aparato: la misma barra serviría dentro de
+ * cualquier otra cosa.
+ *
  * **El video es intocable y los controles viven afuera.** El `<video>` no lleva
- * `controls` y el CSS le saca los eventos de puntero, así que la barra del
- * navegador no aparece nunca encima de la pantalla del celular. En su lugar hay
- * una barra propia debajo de los botones de demo. Eso obliga a mantener acá el
- * estado del reproductor (si va, dónde va, cuánto dura, volumen), sincronizado
- * con los eventos del elemento — no alcanza con leerlo una vez.
+ * `controls` y el CSS le saca los eventos de puntero, así que la barra del navegador no
+ * aparece nunca encima de la pantalla del celular. En su lugar hay una barra propia
+ * debajo de los botones de demo.
  *
  * Tres decisiones que son de rendimiento, no de gusto:
  *
@@ -95,10 +99,6 @@ import { useLang } from '../../context/lang-context';
  *   re-rasterizaría por frame — lo que causó el problema térmico de las figuras.
  * - **El video se monta recién al elegir una demo.** Sin interacción no baja un
  *   solo byte: lo único que se pide son los posters.
- *
- * Las dos barras llevan `aria-valuetext` porque sin él un lector de pantalla lee
- * el número crudo —"38 de 0 a 63,8", "0,65"—, que no es ni un tiempo ni un
- * porcentaje.
  *
  * El giro se apaga con `prefers-reduced-motion` desde el CSS.
  */
@@ -130,26 +130,29 @@ export default function DemoDispositivo({
     const [activa, setActiva] = useState(null);
     // Qué captura está en pantalla, y cuál se está yendo mientras dura el relevo. La
     // saliente se limpia sola cuando termina su animación de salida.
-    const [pieza, setPieza] = useState(0);
-    const [saliente, setSaliente] = useState(null);
-    const indiceRef = useRef(0);
+    //
+    // El carrusel se para en dos casos: con una demo puesta —el video tapa la pantalla,
+    // así que serían relevos que nadie ve— y con la tarjeta cerrada. Lo segundo no es
+    // teórico: `.project-extra` no desmonta su contenido, lo tapa con `max-height: 0`
+    // para poder animarlo, así que cuatro proyectos estaban cambiando de captura y
+    // animando dos imágenes cada uno, uno de ellos cada segundo, para una pantalla de
+    // alto cero.
+    const {
+        indice: pieza, saliente, limpiarSaliente,
+    } = useCarrusel({
+        cantidad: piezas.length,
+        segundos,
+        activo: auto && visible && activa === null,
+        // A corte no hay relevo, así que no hay saliente: la pieza vieja no tiene que
+        // quedarse en pantalla porque nada se desplaza por encima de ella. Y conviene
+        // que no quede: sin animación no llega el `animationend` que la desmonta, y se
+        // acumularían capturas viejas encima de la buena.
+        conSaliente: !corte,
+    });
     // Mientras vuelve al giro: corta la animación para que la transición pueda
     // llevarlo de frente hasta la pose inicial. Ver `elegir`.
     const [volviendo, setVolviendo] = useState(false);
-    const videoRef = useRef(null);
     const fonoRef = useRef(null);
-
-    // Estado del reproductor. Existe porque los controles son propios: sin esto
-    // los botones no sabrían qué ícono mostrar ni dónde está la aguja.
-    const [va, setVa] = useState(false);
-    const [tiempo, setTiempo] = useState(0);
-    const [duracion, setDuracion] = useState(0);
-    const [volumen, setVolumen] = useState(1);
-    const [mudo, setMudo] = useState(false);
-    // Si los subtítulos están puestos. Es del reproductor y no del video: se conserva al
-    // cambiar de demo y al cambiar de idioma —lo que cambia ahí es **qué** pista se
-    // muestra, no si se muestran—, que es lo que uno espera de un interruptor de CC.
-    const [subtitulos, setSubtitulos] = useState(false);
 
     // Quieto y de frente: porque se eligió una demo, o —con carrusel y nada que
     // elegir— porque no hay ningún motivo para que gire. Lo primero es VibeTrip, que
@@ -165,6 +168,19 @@ export default function DemoDispositivo({
     // Solo un video trae reproductor. Una imagen se pone de frente y ya está: no hay
     // aguja que mover ni volumen que bajar.
     const video = medio?.tipo === 'video' ? medio : undefined;
+
+    // El reproductor entero —estado, oyentes, acciones y subtítulos— en
+    // `hooks/useReproductor`.
+    //
+    // Va **después** de `medio` y no antes: `clave` es el nombre del video puesto, y
+    // declarado más arriba leía `medio` todavía en su zona muerta —`const` no se iza con
+    // valor— así que tiraba un ReferenceError en cada render y la página no cargaba. Es
+    // el mismo tropiezo que ya había pasado con `ORDEN` y `LETRAS` en `NombreTrazado`.
+    //
+    // `clave` existe porque el `<video>` lleva `key`: al cambiar de demo se remonta con
+    // sus pistas nuevas y hay que volver a elegir cuál se muestra.
+    const reproductor = useReproductor({ idioma: lang, clave: medio?.nombre });
+    const { videoRef, va, propsVideo, marcarPausado } = reproductor;
     // Lo que va en la pantalla sin ninguna demo puesta: la captura que le toca al
     // carrusel, o —sin carrusel— la primera imagen, y si el proyecto solo tiene videos
     // (Melodía) el poster del primero que tenga uno.
@@ -172,59 +188,6 @@ export default function DemoDispositivo({
     const reposo = medios.find(m => m.tipo === 'imagen')?.src
         ?? medios.find(m => m.poster)?.poster;
 
-    // El carrusel. Solo en modo `auto`, y solo si hay más de una pieza que mostrar.
-    //
-    // Se apaga con `prefers-reduced-motion`: un carrusel que avanza solo es movimiento
-    // que el usuario no pidió y del que no puede salir, que es justamente lo que esa
-    // preferencia viene a evitar. Ahí se queda en la primera.
-    //
-    // El índice también vive en un ref porque el relevo necesita las dos piezas a la
-    // vez: la que entra y la que sale, que se quedan juntas en pantalla mientras dura
-    // el desplazamiento. Con solo el estado habría que leer el valor viejo desde el
-    // actualizador, que es donde no se pueden tener efectos.
-    //
-    // Se para mientras hay una demo puesta: el video tapa la pantalla, así que serían
-    // relevos que nadie ve.
-    useEffect(() => {
-        if (!auto || piezas.length < 2 || activa !== null) return undefined;
-        // Y solo con la tarjeta abierta. Sin esto el relevo seguía corriendo en las
-        // cerradas —`.project-extra` no las desmonta, las tapa con `max-height: 0`— así
-        // que cuatro proyectos estaban cambiando de captura y animando dos imágenes cada
-        // uno, uno de ellos cada segundo, para una pantalla de alto cero. Es la misma
-        // fuga que el video en bucle, por el mismo motivo.
-        if (!visible) return undefined;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-        const id = window.setInterval(() => {
-            const viejo = indiceRef.current;
-            const proximo = (viejo + 1) % piezas.length;
-            indiceRef.current = proximo;
-            // A corte no hay relevo, así que no hay saliente: la pieza vieja no tiene
-            // que quedarse en pantalla porque nada se desplaza por encima de ella. Y
-            // conviene que no quede: sin animación no llega el `animationend` que la
-            // desmonta, y se acumularían capturas viejas encima de la buena.
-            if (!corte) setSaliente(viejo);
-            setPieza(proximo);
-        }, segundos * 1000);
-        return () => window.clearInterval(id);
-    }, [auto, visible, piezas.length, activa, segundos, corte]);
-
-    // Qué pista de subtítulos se ve. **Todas** las que tiene el video están montadas y
-    // acá se decide cuál se muestra: así cambiar de idioma es tocar una propiedad del
-    // elemento y no montar y desmontar `<track>`, que reinicia la carga de la pista y la
-    // haría parpadear —o desaparecer un rato— con el video andando.
-    //
-    // `disabled` y no `hidden` para las otras: `hidden` sigue cargando el archivo y
-    // emitiendo eventos de cue por una pista que nadie mira.
-    //
-    // Depende del nombre del video porque el `<video>` lleva `key`, o sea que cambiar de
-    // demo lo remonta con sus pistas nuevas y hay que volver a elegir.
-    useEffect(() => {
-        const v = videoRef.current;
-        if (!v) return;
-        for (const pista of v.textTracks) {
-            pista.mode = subtitulos && pista.language === lang ? 'showing' : 'disabled';
-        }
-    }, [subtitulos, lang, medio?.nombre]);
 
     // Arranca la demo al elegirla. Va acá y no en el atributo `autoplay` porque
     // con audio los navegadores lo bloquean salvo que haya un gesto del usuario
@@ -234,7 +197,7 @@ export default function DemoDispositivo({
     useEffect(() => {
         if (activa === null) return;
         videoRef.current?.play().catch(() => { /* sin permiso de audio, queda en pausa */ });
-    }, [activa]);
+    }, [activa, videoRef]);
 
     // El bucle arranca solo, sin que nadie lo elija, y corre más rápido que la grabación
     // original. Lo que habilita el arranque automático es `muted`: con audio los
@@ -249,7 +212,7 @@ export default function DemoDispositivo({
         if (!enBucle || !visible || !el) return;
         el.playbackRate = bucle.velocidad ?? 1;
         el.play().catch(() => { /* si lo rechazan, el póster queda a la vista */ });
-    }, [enBucle, visible, bucle]);
+    }, [enBucle, visible, bucle, videoRef]);
 
     /**
      * Tocar la demo que ya está puesta la saca; tocar otra, cambia de video.
@@ -277,9 +240,7 @@ export default function DemoDispositivo({
         // tomó con el aparato girado, así que el morph lo lleva de esa pose a la de
         // frente. Sacándolo afuera, las dos capturas salen iguales y el enderezado se
         // pierde.
-        const morfando = Boolean(conTransicion)
-            && Boolean(document.startViewTransition)
-            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const morfando = Boolean(conTransicion) && soportaVistaTransicion();
 
         if (morfando) {
             conTransicion(() => {
@@ -289,14 +250,14 @@ export default function DemoDispositivo({
                 if (el) el.style.transform = '';
                 if (apagando) {
                     setActiva(null);
-                    setVa(false);
+                    marcarPausado();
                     onPlayingChange?.(false);
                     return;
                 }
                 if (elegibles[i].tipo === 'video') {
                     onPlayingChange?.(true);
                 } else if (va) {
-                    setVa(false);
+                    marcarPausado();
                     onPlayingChange?.(false);
                 }
                 setActiva(i);
@@ -311,7 +272,7 @@ export default function DemoDispositivo({
             // esa misma pose y el empalme no se ve.
             setVolviendo(true);
             setActiva(null);
-            setVa(false);
+            marcarPausado();
             onPlayingChange?.(false);
             // La duración se lee del elemento en vez de repetirla acá: vive en
             // `--demo-anim`, en el CSS.
@@ -335,7 +296,7 @@ export default function DemoDispositivo({
         } else if (va) {
             // Y pasar de un video a una imagen desmonta el `<video>` sin que dispare
             // `pause`, así que el apagado hay que avisarlo a mano.
-            setVa(false);
+            marcarPausado();
             onPlayingChange?.(false);
         }
         setActiva(i);
@@ -346,34 +307,6 @@ export default function DemoDispositivo({
             if (fonoRef.current) fonoRef.current.style.transform = '';
         }));
     };
-
-    // En pantalla completa el video queda solo: nuestra barra no viaja con él, y
-    // como lo dejamos sin `controls` y sin eventos de puntero, salía una imagen
-    // muerta que no se podía ni pausar. Ahí y solo ahí se le devuelven los
-    // controles nativos. El puntero y el encuadre los arregla el CSS con
-    // `:fullscreen`; `controls` es un atributo y hay que ponerlo desde acá.
-    useEffect(() => {
-        const alCambiar = () => {
-            const v = videoRef.current;
-            if (v) v.controls = document.fullscreenElement === v;
-        };
-        document.addEventListener('fullscreenchange', alCambiar);
-        return () => document.removeEventListener('fullscreenchange', alCambiar);
-    }, []);
-
-    /** Salta `seg` segundos, acotado a los extremos del video. */
-    const saltar = useCallback(seg => {
-        const v = videoRef.current;
-        if (!v) return;
-        v.currentTime = Math.max(0, Math.min(v.duration || 0, v.currentTime + seg));
-    }, []);
-
-    const alternarPausa = useCallback(() => {
-        const v = videoRef.current;
-        if (!v) return;
-        if (v.paused) v.play().catch(() => {});
-        else v.pause();
-    }, []);
 
     return (
         <div className={`fono-bloque ${className}`.trim()} {...props}>
@@ -422,7 +355,6 @@ export default function DemoDispositivo({
                             // eslint-disable-next-line jsx-a11y/media-has-caption
                             <video
                                 key={video.nombre}
-                                ref={videoRef}
                                 src={video.src}
                                 poster={video.poster}
                                 playsInline
@@ -432,18 +364,7 @@ export default function DemoDispositivo({
                                     ? e => { e.currentTarget.playbackRate = bucle.velocidad ?? 1; }
                                     : undefined}
                                 aria-label={`${nombreDemo(t, video.nombre)} — ${label}`}
-                                // `va` es solo el ícono del botón de la barra. El acomodo
-                                // de la tarjeta **no** cuelga de esto: lo decide `elegir`,
-                                // así una pausa no la desarma.
-                                onPlay={() => setVa(true)}
-                                onPause={() => setVa(false)}
-                                onTimeUpdate={e => setTiempo(e.currentTarget.currentTime)}
-                                onLoadedMetadata={e => setDuracion(e.currentTarget.duration)}
-                                onLoadStart={e => { setTiempo(0); setDuracion(0); setVa(!e.currentTarget.paused); }}
-                                onVolumeChange={e => {
-                                    setVolumen(e.currentTarget.volume);
-                                    setMudo(e.currentTarget.muted);
-                                }}
+                                {...propsVideo}
                             >
                                 {/* Van las dos, y el efecto de más arriba elige cuál se
                                     ve. Sin `default`: dejar que el navegador prenda una
@@ -480,7 +401,7 @@ export default function DemoDispositivo({
                                         src={piezas[saliente].src}
                                         alt=""
                                         aria-hidden="true"
-                                        onAnimationEnd={() => setSaliente(null)}
+                                        onAnimationEnd={limpiarSaliente}
                                     />
                                 )}
                                 {/* A corte la `key` es fija a propósito: es justo lo
@@ -544,152 +465,35 @@ export default function DemoDispositivo({
                     El nombre del grupo describe qué controla, no de qué proyecto es:
                     con solo `label` anunciaba "Melodía, grupo", que no dice nada sobre
                     lo que hay adentro. */}
+                {/* La barra del reproductor, debajo de los botones de selección. Solo
+                    aparece cuando hay algo que controlar: en bucle no hay nada que elegir
+                    ni que pausar. Es presentación pura —ver `ui/BarraReproductor.jsx`— y
+                    todo lo que hace sale del hook. */}
                 {video && !enBucle && (
-                    <div
-                        className="fono-barra"
-                        role="group"
-                        aria-label={`${t('projects.player.label')} — ${label}`}
-                    >
-                        <div className="fono-pista">
-                            <span className="fono-pista-nombre">{nombreDemo(t, video.nombre)}</span>
-                            <span className="fono-pista-album">{label}</span>
-                        </div>
-
-                        <div className="fono-transporte">
-                            <button
-                                type="button"
-                                className="fono-icono"
-                                onClick={e => { e.stopPropagation(); saltar(-10); }}
-                                aria-label={t('projects.player.back10')}
-                            >
-                                <FiRewind size={16} />
-                            </button>
-
-                            <button
-                                type="button"
-                                className="fono-icono fono-play"
-                                onClick={e => { e.stopPropagation(); alternarPausa(); }}
-                                aria-label={va ? t('projects.player.pause') : t('projects.player.play')}
-                            >
-                                {va ? <FiPause size={18} /> : <FiPlay size={18} />}
-                            </button>
-
-                            <button
-                                type="button"
-                                className="fono-icono"
-                                onClick={e => { e.stopPropagation(); saltar(10); }}
-                                aria-label={t('projects.player.forward10')}
-                            >
-                                <FiFastForward size={16} />
-                            </button>
-                        </div>
-
-                        <p className="fono-tiempos">
-                            <span className="fono-tiempo-actual">{reloj(tiempo)}</span>
-                            <span aria-hidden="true"> / </span>
-                            <span className="fono-tiempo-total">{reloj(duracion)}</span>
-                        </p>
-
-                        <div className="fono-secundarios">
-                            <button
-                                type="button"
-                                className="fono-icono"
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    const v = videoRef.current;
-                                    if (v) v.muted = !v.muted;
-                                }}
-                                aria-label={mudo ? t('projects.player.unmute') : t('projects.player.mute')}
-                            >
-                                {mudo || volumen === 0 ? <FiVolumeX size={15} /> : <FiVolume2 size={15} />}
-                            </button>
-
-                            {/* Solo si el video trae pistas. Va pegado al de silencio
-                                porque son los dos interruptores de la barra, y como los
-                                dos dice su estado con `aria-pressed` además del ícono. */}
-                            {idiomasPista.length > 0 && (
-                                <button
-                                    type="button"
-                                    className={`fono-icono ${subtitulos ? 'is-activo' : ''}`}
-                                    onClick={e => { e.stopPropagation(); setSubtitulos(x => !x); }}
-                                    aria-pressed={subtitulos}
-                                    aria-label={subtitulos
-                                        ? t('projects.player.captionsOff')
-                                        : t('projects.player.captionsOn')}
-                                >
-                                    {subtitulos
-                                        ? <MdClosedCaption size={17} />
-                                        : <MdOutlineClosedCaption size={17} />}
-                                </button>
-                            )}
-
-                            <input
-                                className="fono-rango fono-volumen"
-                                /* Igual que la aguja: el tramo activo se pinta con un
-                                   degradado calculado, porque la pista no tiene forma
-                                   nativa de mostrar hasta dónde llega el valor. */
-                                style={{ '--nivel': `${(mudo ? 0 : volumen) * 100}%` }}
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.05"
-                                value={mudo ? 0 : volumen}
-                                onClick={e => e.stopPropagation()}
-                                onChange={e => {
-                                    const v = videoRef.current;
-                                    if (!v) return;
-                                    v.volume = Number(e.target.value);
-                                    v.muted = Number(e.target.value) === 0;
-                                }}
-                                aria-label={t('projects.player.volume')}
-                                aria-valuetext={`${Math.round((mudo ? 0 : volumen) * 100)} %`}
-                            />
-
-                            <button
-                                type="button"
-                                className="fono-icono"
-                                onClick={e => { e.stopPropagation(); videoRef.current?.requestFullscreen?.(); }}
-                                aria-label={t('projects.player.fullscreen')}
-                            >
-                                <FiMaximize size={15} />
-                            </button>
-                        </div>
-
-                        {/* La aguja va al ras del borde de abajo, como en la referencia, y
-                            no entre los tiempos. El relleno se pinta con un degradado
-                            calculado, porque un `input[type=range]` no tiene forma nativa
-                            de mostrar cuánto lleva recorrido. */}
-                        <input
-                            className="fono-aguja"
-                            style={{ '--avance': `${duracion ? (tiempo / duracion) * 100 : 0}%` }}
-                            type="range"
-                            min="0"
-                            max={duracion || 0}
-                            step="0.1"
-                            value={Math.min(tiempo, duracion || 0)}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => {
-                                const v = videoRef.current;
-                                if (v) v.currentTime = Number(e.target.value);
-                            }}
-                            aria-label={t('projects.player.seek')}
-                            aria-valuetext={`${reloj(tiempo)} ${t('projects.player.of')} ${reloj(duracion)}`}
-                        />
-                    </div>
+                    <BarraReproductor
+                        nombre={nombreDemo(t, video.nombre)}
+                        label={label}
+                        va={reproductor.va}
+                        tiempo={reproductor.tiempo}
+                        duracion={reproductor.duracion}
+                        volumen={reproductor.volumen}
+                        mudo={reproductor.mudo}
+                        subtitulos={reproductor.subtitulos}
+                        haySubtitulos={idiomasPista.length > 0}
+                        onAlternarSubtitulos={reproductor.alternarSubtitulos}
+                        onSaltar={reproductor.saltar}
+                        onAlternarPausa={reproductor.alternarPausa}
+                        onAlternarMudo={reproductor.alternarMudo}
+                        onVolumen={reproductor.ponerVolumen}
+                        onBuscar={reproductor.buscar}
+                        onPantallaCompleta={reproductor.pantallaCompleta}
+                    />
                 )}
 
                 {children}
             </div>
         </div>
     );
-}
-
-/** Segundos a `m:ss`. Sin duración todavía, `0:00`. */
-function reloj(segundos) {
-    if (!Number.isFinite(segundos)) return '0:00';
-    const m = Math.floor(segundos / 60);
-    const s = Math.floor(segundos % 60);
-    return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 /**

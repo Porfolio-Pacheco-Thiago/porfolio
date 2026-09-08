@@ -1,0 +1,13 @@
+/* ── Los videos de marca, los tres en fila ────────────────────────────────
+   El hueco lo define quien la usa (`.project-marca-grande.es-fila`, en `Projects.css`);
+   acá va solo cómo se reparten las tres piezas adentro. */
+
+.logo-fila-pieza {
+    /* Un tercio cada uno, sin que el ancho intrínseco del archivo mande: el mínimo
+       automático de un ítem flex es su tamaño intrínseco, y estos son lienzos de
+       1500px. Es el mismo caso que el `min-width: 0` del banner de Trayectoria. */
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    object-fit: contain;
+}

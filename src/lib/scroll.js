@@ -1,3 +1,5 @@
+import { prefiereMenosMovimiento } from './medidas';
+
 // Desplazamiento suave a una sección por id. Lo usan el Hero y el Navbar.
 export function scrollToSection(id) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -25,11 +27,9 @@ export function desplazarA(destino, ms = 900) {
 
     const desde = window.scrollY;
     const delta = destino - desde;
-    const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     // Sin animación para quien pidió menos movimiento, y tampoco para saltos de
     // dos píxeles: animar eso solo agrega demora.
-    if (reducido || Math.abs(delta) < 2) {
+    if (prefiereMenosMovimiento() || Math.abs(delta) < 2) {
         window.scrollTo({ top: destino, behavior: 'instant' });
         return () => {};
     }

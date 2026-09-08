@@ -1,0 +1,175 @@
+.footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    margin-top: 2rem;
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.footer-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.footer-logo-img {
+    height: 64px;
+    width: auto;
+    display: block;
+}
+
+.footer-tagline {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.footer-built {
+    opacity: 0.6;
+}
+
+/* ── El contacto al final de todo ─────────────────────────────────────────
+   Solo se dibuja en angosto: es `App` quien decide montarlo, con el mismo umbral de 900
+   con el que deja de montar el riel. Acá antes había un `padding-bottom` extra para que
+   la barra fija del riel no tapara los últimos píxeles del pie; ya no hace falta, porque
+   esa barra no existe más y lo que hay abajo está en el flujo.
+
+   El aire de arriba es el doble del de abajo a propósito: separa este bloque del
+   copyright, que es de lo que hay que despegarlo; abajo ya está el borde de la página. */
+.footer-contacto {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.footer-contacto-titulo {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* El mismo círculo que el riel dibuja desplegado, con su mismo aro. */
+.footer-contacto-foto {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--accent);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+}
+
+.footer-contacto-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Los cuatro en un renglón que se parte solo. Con `wrap` y no con un número de columnas:
+   son cuatro hoy y la lista sale de `socials.js`, así que fijar la grilla la ataría a
+   ese número.
+
+   Cada uno es `flex: 1 1 4rem`, o sea que se reparten el renglón en partes iguales en vez
+   de quedarse en su ancho mínimo. Con un ancho fijo de 4.5rem los cuatro pedían 324px
+   contra los 306 que da un teléfono de 370, y el CV caía solo a un segundo renglón. */
+.footer-contacto-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+}
+
+.footer-contacto-lista > li {
+    display: flex;
+    flex: 1 1 4rem;
+    /* Sin este techo, en una tablet de 900 los cuatro se estiraban hasta 200px cada uno
+       y quedaban cuatro placas enormes con un ícono chiquito en el medio. */
+    max-width: 7rem;
+}
+
+.footer-contacto-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    /* Alto y ancho de sobra para un dedo: 44px es el mínimo que recomienda WCAG para un
+       blanco táctil, y acá el ícono solo mide 20. */
+    flex: 1;
+    min-height: 3.4rem;
+    padding: 0.6rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    text-decoration: none;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+/* `--accent-text` y no `--accent`: el estado se lee **contra el botón**, que es una
+   superficie oscura, no contra la página. Con el acento crudo daba 1.46:1 en tema claro,
+   o sea que tocar el botón lo hacía desaparecer. El token de texto lo redefine el bloque
+   de superficies oscuras de `styles/primitivas.css` y acá da 5.8:1; en tema oscuro los
+   dos tokens son el mismo color, así que ahí no cambia nada. */
+.footer-contacto-link:active {
+    color: var(--accent-text);
+    border-color: var(--accent-text);
+}
+
+/* El puntero solo existe donde hay puntero. En una pantalla táctil `:hover` se queda
+   pegado después de tocar, y el estado que corresponde ahí es `:active`, que ya está. */
+@media (hover: hover) {
+    .footer-contacto-link:hover {
+        color: var(--accent-text);
+        border-color: var(--accent-text);
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-top {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}

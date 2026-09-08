@@ -7,7 +7,7 @@ on:
 
 jobs:
   verify:
-    name: Lint y build
+    name: Lint, contenido y build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +21,24 @@ jobs:
       # eslint-plugin-jsx-a11y para convivir con ESLint 10.
       - run: npm ci
 
-      - run: npm run lint
+      - name: ESLint
+        run: npm run lint
 
-      - run: npm run build
+      # Formato, sintaxis y nombres del CSS.
+      - name: Stylelint
+        run: npm run lint:css
+
+      # La clase de bug que este proyecto ya se comió dos veces: una regla que le gana en
+      # silencio a un `@media`, porque tienen la misma especificidad y va después. Eso no
+      # lo mira stylelint. Ver `scripts/check-css.js`.
+      - name: Cascada del CSS
+        run: npm run check:css
+
+      # Que `es.json` y `en.json` tengan las mismas claves, y que cada `id` de metadata
+      # tenga su texto. Nada de eso rompe el build por sí solo: la tarjeta sale sin
+      # metadata o el texto sale en el otro idioma, y se descubre mirando la página.
+      - name: Contenido sincronizado
+        run: npm run check:contenido
+
+      - name: Build
+        run: npm run build

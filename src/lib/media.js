@@ -53,6 +53,20 @@ for (const [ruta, url] of Object.entries(archivos)) {
 }
 
 /**
+ * Lo mismo, pero ya armado: la lista de objetos que devuelve `getMedia`.
+ *
+ * El índice es estático —sale de `import.meta.glob` en tiempo de build y no cambia
+ * nunca— así que armarlo dos veces da exactamente lo mismo. Y se armaba muchas más de
+ * dos veces: cada accesor de este archivo llama a `getMedia`, y una sola tarjeta de
+ * proyecto dispara ocho llamadas (`getPortada` sola son tres). Con ocho tarjetas eran
+ * 64 filtrados, ordenamientos y mapeos por cada render de la sección — y la sección
+ * re-renderiza al cambiar de idioma, al abrir una tarjeta y al poner una demo.
+ *
+ * @type {Map<string, Array<object>>}
+ */
+const armadas = new Map();
+
+/**
  * Los medios de una carpeta, en orden alfabético por nombre de archivo.
  *
  * Devuelve solo los hijos directos: `timeline/lovelytics` no incluye lo que
@@ -67,10 +81,14 @@ for (const [ruta, url] of Object.entries(archivos)) {
  *          hace que la galería caiga en el marcador de posición.
  */
 export function getMedia(carpeta) {
-    const contenido = porCarpeta.get(carpeta);
-    if (!contenido) return [];
+    const yaArmada = armadas.get(carpeta);
+    if (yaArmada) return yaArmada;
 
-    return [...contenido.entries()]
+    const contenido = porCarpeta.get(carpeta);
+    // El vacío también se guarda: una carpeta que no existe se pregunta tantas veces
+    // como una que sí, y devolver siempre el mismo arreglo evita además que quien lo use
+    // vea una referencia nueva en cada render.
+    const lista = !contenido ? [] : [...contenido.entries()]
         .filter(([nombre]) => !POSTER.test(nombre) && !SUBTITULO.test(nombre))
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([nombre, src]) => {
@@ -85,6 +103,9 @@ export function getMedia(carpeta) {
                 subtitulos: esVideo ? subtitulosDe(contenido, nombre) : undefined,
             };
         });
+
+    armadas.set(carpeta, lista);
+    return lista;
 }
 
 /**

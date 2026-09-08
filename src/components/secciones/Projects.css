@@ -1,0 +1,1155 @@
+.projects {
+    /* Congelado: era `clamp(1rem, 2.2vh, 2rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 1.24rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.projects-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    /* Referencia para la tarjeta abierta, que se posiciona sobre la grilla entera. */
+    position: relative;
+}
+
+/* La tarjeta **no es una superficie**: en la referencia no hay ninguna caja
+   alrededor: el marco es la tarjeta, y el nombre y el recuadro se apoyan directo
+   sobre el fondo de la página. Con fondo y borde propios se veía un cuadro dentro
+   de otro.
+
+   Tampoco lleva `overflow: hidden` —de recortar la foto se encarga
+   `.project-media`—, así el recuadro puede sobresalir hacia el espacio entre
+   columnas, como en la referencia.
+
+   Lo único que se conserva es el rol de contenedor de layout: ancho, y el
+   `--marco` que le da aire al bloque expandido. */
+.project-card {
+    /* 0 en reposo: el marco arranca en el borde de la columna. El estado expandido
+       lo levanta, porque ahí sí hay una superficie que necesita respiro. */
+    /* La misma que adentro de las tarjetas de Trayectoria. Queda en la tarjeta y no en
+       un elemento suelto, así la toma todo lo que va adentro. Se salvan dos: el nombre
+       del proyecto, que tiene su propia display —es lo que más pesa de la pieza— y los
+       tiempos del reproductor, que van en mono porque son números que cambian y con
+       ancho variable bailan. */
+    font-family: var(--font-tarjeta);
+    --marco: 0rem;
+    /* Grosor del marco, alto de la barra de título, lado del recuadro y tamaño de
+       su diagonal. Son los valores de la grilla de tres columnas: la ventana de larson
+       entera —barra, diagonal y recuadro— pero a escala, porque siete tarjetas en tres
+       filas dentro de una pantalla no toleran el tamaño grande. */
+    --trazo: 2px;
+    --barra: 15px;
+    --barra-hueco: 4px;
+    --barra-aire: 6px;
+    --barra-punto: 7px;
+    --notch: 2.6rem;
+    --corte: 0.6rem;
+    /* Aire entre el pie del marco y el nombre. */
+    --aire: 0.7rem;
+    /* Duración y curva de la coreografía de poner o sacar una demo: la foto que se
+       contrae, la barra, el marco que se desvanece y el celular que crece. Van
+       todas de la misma variable para que no se desfasen — y porque el recentrado
+       escucha el fin de dos de ellas.
+
+       La curva entra y sale suave. Antes era `cubic-bezier(0.22, 1, 0.36, 1)`, que
+       arranca de golpe y frena al final: a 0.45s se sentía un salto más que una
+       animación. */
+    --demo-anim: 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+    /* Lo que tarda el relevo del carrusel. Bastante menos que los 3s que se queda
+       cada pieza, para que el movimiento se lea como un relevo y no como un vaivén
+       permanente. */
+    --relevo: 0.6s;
+    /* La banda clara que cruza el marco al pasar el mouse. Sale del acento para no
+       salirse de la paleta: un tornasol como el de la referencia, sobre un sitio de
+       un solo verde, se leería como un error de color. */
+    /* `--degrade-luz` y no `white`: en tema claro el acento es verde profundo
+       sobre una página verde media, y mezclarlo con blanco lo lleva justo a la
+       luminosidad del fondo — la banda se volvía gris y desaparecía. Ver la nota
+       del token en index.css. */
+    --brillo: linear-gradient(115deg,
+            var(--degrade-sombra) 0%,
+            var(--accent) 22%,
+            color-mix(in srgb, var(--accent) 45%, var(--degrade-luz)) 42%,
+            color-mix(in srgb, var(--accent) 25%, var(--degrade-luz)) 52%,
+            var(--accent) 78%,
+            var(--degrade-sombra) 100%);
+    width: calc(33.333% - 1rem);
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* Reveal (opacity) y hover. El ancho/alto los anima la View Transition. */
+.projects-grid .project-card {
+    transition: opacity 0.7s ease, border-color 0.3s ease,
+        box-shadow 0.3s ease, transform 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* Duración/curva del morph de reacomodo (View Transitions API).
+   Acotado por `view-transition-class` a las tarjetas de proyecto: con `*`
+   alcanzaba también al navbar y a cualquier otro grupo de la página.
+   Si el navegador no soporta el selector, cae en la duración por defecto. */
+::view-transition-group(*.proj-card) {
+    animation-duration: 0.55s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Con una tarjeta abierta, el resto desaparece **pero sigue ocupando su lugar**:
+   `visibility` y no `display: none`. Es lo mismo que hace Trayectoria y por el mismo
+   motivo: si la grilla cambiara de alto, la sección cambiaría con ella y la página se
+   movería bajo el mouse. Así la grilla mide siempre lo mismo, la tarjeta abierta se
+   dibuja encima ocupándola entera, y no hace falta ningún scroll de reacomodo — la
+   tarjeta aparece exactamente donde ya estabas mirando.
+
+   `visibility` además las saca del foco y del lector de pantalla, que es lo que
+   `display: none` hacía bien y `opacity` sola no. */
+.projects-grid:has(.project-card.expanded) .project-card:not(.expanded) {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Expandida **tampoco tiene fondo**: lo que contiene su contenido es el marco, no una
+   superficie. Antes sí lo era —un verde oscuro— y eso obligaba a invertir la paleta de
+   todo lo de adentro, que es lo que se fue con el fondo: ahora el texto de la tarjeta
+   abierta se lee contra la página, igual que el de la cerrada, y usa sus mismos
+   tokens. Ver el bloque de `styles/primitivas.css` que daba vuelta las superficies oscuras. */
+.project-card.expanded {
+    /* Fuera del flujo y sobre la grilla entera: ver la regla de arriba. */
+    position: absolute;
+    inset: 0;
+    --marco: 0.7rem;
+    width: auto;
+    background: none;
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+}
+
+/* El techo cambió cuando la tarjeta abierta pasó a ocupar exactamente el hueco de la
+   grilla: ya no puede crecer y empujar la sección, así que lo que mida de más se lo
+   quita al celular y a la descripción, que van debajo. Con `28.5vh` el contenido se
+   pasaba 85px del borde y el celular quedaba cortado. */
+/* ── El alto de la franja de la tarjeta abierta ───────────────────────────
+   No es un valor: es lo que sobra. La tarjeta abierta no puede crecer —es `inset: 0`
+   sobre el hueco de la grilla— así que cualquier alto fijo acá es una apuesta contra el
+   largo del texto y el tamaño de la pantalla, y se pierde de los dos lados: si se queda
+   corto el logo sale diminuto, y si se pasa el contenido termina fuera del borde. Hubo
+   una regla por proyecto tratando de acertarle a cada caso, y con cada cambio de copy
+   había que volver a medirlas.
+
+   Con la tarjeta en columna flexible y la ventana como único elemento que se estira, el
+   reparto lo hace el navegador: lo de abajo ocupa lo que necesita y la franja se queda
+   con todo el resto. El logo queda siempre lo más alto que entra, y el contenido nunca
+   se pasa, porque lo que crece es justamente lo que sobraba. */
+.project-card.expanded {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card.expanded .project-marco {
+    flex: 1 1 auto;
+    /* Un piso para que no llegue a leerse como una raya en vez de una ventana. */
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card.expanded .project-media {
+    height: auto;
+    flex: 1 1 auto;
+    /* Sin esto un elemento flexible no baja de su contenido y no podría achicarse. */
+    min-height: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    /* ── Hover: la tarjeta se inclina y el marco se pone brilloso ──────────────
+       Como en la referencia. Ahí el efecto son **dos SVG intercambiados**
+       —`GridWindow_Default` y `GridWindow_Hover`—; acá el marco está dibujado con CSS,
+       así que se reproduce con CSS.
+
+       El brillo es un degradado del propio acento, no el tornasol de la referencia:
+       su paleta es violeta y admite un arcoíris, la nuestra es de un solo verde y un
+       arcoíris se leería como un error. La sensación de brillo la da la banda clara
+       cruzando en diagonal. */
+    .project-card:not(.expanded):hover {
+        transform: rotate(-1.8deg) scale(1.03);
+    }
+
+    .project-card:not(.expanded):hover .project-marco {
+        /* Borde con degradado: el truco de dos fondos, uno recortado a la caja de
+           relleno y otro a la del borde. Un `border-color` no puede llevar degradado. */
+        border-color: transparent;
+        background:
+            linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+            var(--brillo) border-box;
+        box-shadow: 0 14px 44px rgb(var(--sombra-rgb) / 0.35),
+            0 0 26px var(--accent-glow-raw);
+    }
+
+    .project-card:not(.expanded):hover .project-barra {
+        background: var(--brillo);
+    }
+
+    .project-card:not(.expanded):hover .project-notch {
+        border-color: var(--accent);
+    }
+}
+
+
+/* ── La ventana (larson) ──────────────────────────────────────────────────
+   Marco de trazo grueso con barra de título arriba y la foto embutida, con un
+   hueco oscuro entre el borde y la imagen. Esquinas rectas y **sin recorte**: la
+   diagonal es del recuadro, no del marco. */
+.project-marco {
+    margin: var(--marco) var(--marco) 0;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease,
+        opacity var(--demo-anim), margin var(--demo-anim),
+        padding var(--demo-anim), border-width var(--demo-anim);
+    /* Atenuado contra el acento puro: en larson el marco es del color de acento
+       porque toda su paleta es ese violeta. Nuestro verde a full sobre siete
+       tarjetas a la vez se vuelve un subrayador. El cómo se atenúa depende del
+       tema: ver `--proy-marco` en `index.css`. */
+    border: var(--trazo) solid var(--proy-marco);
+    /* El hueco entre el marco y la foto sale de este fondo asomando por el
+       padding, como en la referencia. */
+    background: var(--bg-primary);
+    padding-bottom: var(--trazo);
+}
+
+/* Lo único propio de esta barra: se contrae a cero al pasar a reproducción, y por eso
+   necesita recortar y animar su alto. El resto —acomodo, cuadraditos, color— sale de
+   `.ventana-barra`. */
+.project-barra {
+    overflow: hidden;
+    transition: height var(--demo-anim);
+}
+
+/* Alta y no una franja: con la ventana de larson la foto tiene que leerse como foto.
+   El tope lo pone la pantalla —tres filas más el encabezado de la sección— y el aire
+   lo liberaron los tags, que en reposo no se muestran. */
+.project-media {
+    position: relative;
+    /* Este alto es lo que fija el de la tarjeta cerrada, y por lo tanto el de la grilla
+       y el de la tarjeta abierta, que se dibuja encima ocupándola entera. Está calibrado
+       para que la sección entera —encabezado más grilla— entre en una pantalla: medido,
+       la sección mide 944px de los 953 disponibles, y los 93px que quedan por encima del
+       encabezado son el hueco que deja el navbar fijo. Subirlo más empieza a empujar la
+       grilla fuera de la ventana. */
+    /* Congelado: era `clamp(120px, 16.3vh, 168px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 147px;
+    /* El hueco a los tres lados restantes; abajo lo pone el padding del marco. */
+    margin: var(--trazo) var(--trazo) 0;
+    overflow: hidden;
+    transition: height var(--demo-anim);
+}
+
+/* ── Reproduciendo: la ventana se contrae y el celular se queda con el espacio ──
+   Mientras corre una demo, lo que hay que mirar es la pantalla del celular; la
+   foto de arriba no aporta nada, así que se va y le cede su alto.
+
+   Se animan los altos de la foto y de la barra, que son valores concretos, y no un
+   `max-height` sobre el marco: desde `none` no interpola y el colapso saltaría. */
+/* La especificidad tiene que ganarle a `.project-card.expanded
+   .project-media`, que fija el alto de la foto abierta. Con un selector más corto
+   la foto no colapsaba: la regla de arriba seguía mandando. */
+.project-card.expanded.is-reproduciendo .project-media,
+.project-card.is-reproduciendo .project-barra {
+    height: 0;
+    /* La ventana abierta se estira para quedarse con el alto que sobra; acá no tiene que
+       hacerlo, porque el alto que le toca es cero. Sin esto `flex-grow` le devuelve el
+       hueco y el `height: 0` de arriba no se ve. */
+    flex: none;
+}
+
+.project-card.is-reproduciendo .project-marco {
+    margin-block: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    opacity: 0;
+    /* Y por lo mismo el marco deja de estirarse y suelta su piso: mientras se reproduce
+       no hay ventana, así que su alto mínimo no tiene a qué aplicarse y lo único que
+       hacía era dejar una tira vacía arriba del monitor. */
+    flex: 0 0 auto;
+    min-height: 0;
+}
+
+/* El recuadro se apoyaba en la esquina de la ventana; sin ventana no tiene de qué
+   colgarse. */
+.project-card.is-reproduciendo .project-notch {
+    opacity: 0;
+}
+
+/* El nombre va **debajo** del marco y alineado con su borde izquierdo. El
+   recuadro no ocupa lugar en el flujo: se posiciona sobre la esquina del marco y
+   el título le pasa por encima, como en la referencia. */
+.project-cabecera {
+    position: relative;
+    margin: var(--aire) var(--marco) 0;
+}
+
+/* Vacío, de trazo fino y **transparente**: en la referencia se ven los bordes del
+   marco a través de él. Sobresale hacia la izquierda y hacia abajo de la esquina,
+   y la diagonal está en **su** esquina superior derecha. */
+.project-notch {
+    position: absolute;
+    /* Sobresale hacia el espacio entre columnas. Ahora la tarjeta no recorta, así
+       que el desplazamiento se mide contra el propio lado del recuadro: un tercio
+       queda afuera, bastante menos que los 24px de separación de la grilla. */
+    left: calc(var(--notch) / -3.4);
+    /* Anclado **por arriba**, no por abajo. Dos razones: en la referencia el
+       recuadro cuelga sobre todo hacia abajo del pie del marco (un tercio arriba,
+       dos tercios abajo), y anclarlo al borde inferior lo movía cuando el nombre
+       ocupaba dos líneas y la cabecera crecía. Se descuenta `--aire` porque la
+       cabecera arranca ese tanto más abajo que el marco. */
+    top: calc((var(--aire) + var(--notch) / 3) * -1);
+    width: var(--notch);
+    height: var(--notch);
+    border: 1px solid color-mix(in srgb, var(--accent) 85%, var(--border));
+    transition: opacity var(--demo-anim);
+    clip-path: polygon(
+        0 0,
+        calc(100% - var(--corte)) 0,
+        100% var(--corte),
+        100% 100%,
+        0 100%
+    );
+}
+
+/* La tapa reemplaza al ícono cuando el proyecto tiene medios. En compacto la
+   ventana es apaisada y baja, así que el recorte vertical es fuerte: `getCover`
+   elige una imagen apaisada justamente para que ahí se siga entendiendo qué se
+   ve. */
+.project-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* ── La marca: lo que llena la ventana con la tarjeta cerrada ─────────────
+   Cerrada, la tarjeta muestra el logo del proyecto; al abrirse el logo se va y
+   aparece la captura, que es la que tiene algo para contar cuando hay lugar. Es el
+   mismo mecanismo que las tres versiones de `portada` de más abajo: las dos piezas
+   conviven en el DOM y acá se elige cuál se ve.
+
+   La placa que rellena lo que sobra **no** es blanco puro, y no es la misma para todos:
+   cada logo trae su propio fondo y la placa lo copia, así el relleno no se ve como una
+   caja alrededor del logo sino como parte de él. Los valores salen de muestrear la
+   esquina de cada archivo, no de elegirlos a ojo:
+
+     - SpecForge  `#0c0c0c`, el negro sobre el que está dibujado su ASCII
+     - Zorro      `#3f3f3f`, el marco de la ventana de terminal de su captura
+     - el resto   el gris claro del tema claro del sitio, porque sus logos son
+                  transparentes y no tienen fondo que copiar. Los tres videos de
+                  sistemas distribuidos vienen sobre `#fdfdfd`, a seis puntos de ese
+                  gris, así que apoyan sin junta visible. */
+.project-media.con-marca {
+    --marca-placa: #f7faf8;
+    background: var(--marca-placa);
+}
+
+[data-proyecto="specforge"] .project-media.con-marca {
+    --marca-placa: #0c0c0c;
+    /* Su PNG trae 33,6% del ancho en margen negro —146px de un lado y 137 del
+       otro sobre 843—, así que el tope antes de tocar el dibujo es 1.51. */
+    --marca-zoom: 1.45;
+}
+
+/* Dos placas porque son dos archivos con fondos distintos: el logo chico es una
+   captura de la terminal, con su marco gris; el grande viene sobre blanco. */
+[data-proyecto="zorro-ocas"] .project-media.con-marca {
+    --marca-placa: #3f3f3f;
+    --marca-placa-grande: #fff;
+    --marca-zoom: 1;
+}
+
+/* Los tres videos son iconos chicos en un lienzo cuadrado de 1500px: casi todo lo que
+   se recorta al acercar es lienzo vacío, de ahí que aguanten el acercamiento más
+   grande de los cinco.
+
+   Y su lienzo es blanco puro, así que la placa también. El gris claro que usan los
+   demás dejaba una junta visible alrededor del video: seis puntos de diferencia
+   alcanzan para que se vea el rectángulo. El `#fdfdfd` que se midió antes salió de
+   una miniatura escalada —el remuestreo ensucia los bordes—; a tamaño nativo las
+   cuatro esquinas y los cuatro bordes de los tres archivos dan #ffffff.
+
+   El acercamiento lo manda el más apretado de los tres, porque comparten el valor.
+   Midiendo el dibujo a lo largo de los 3s de cada uno, el tope de la nube es 1.36 y
+   el de la base de datos 1.26: a 1.36 el segundo perdía los bordes. */
+[data-proyecto="distributed-systems"] .project-media.con-marca {
+    --marca-placa: #fff;
+    --marca-zoom: 1.18;
+}
+
+/* Sin placa: el PNG ya viene con transparencia, así que el logo se apoya directo sobre
+   el fondo de la tarjeta en los dos huecos. */
+[data-proyecto="cassandra-engine"] .project-media.con-marca {
+    --marca-placa: transparent;
+    --marca-placa-grande: transparent;
+    --marca-zoom: 1.15;
+}
+
+/* Y sin la placa del marco tampoco. Con las dos anteriores en `transparent` lo que
+   quedaba asomando era el fondo de `.project-marco` —`--bg-primary` plano—, que no es
+   el fondo de la página: el sol verde de `body::before` va en una capa fija por detrás
+   del contenido, así que un relleno opaco lo tapa y la ventana se leía como un
+   rectángulo gris en medio del degradado. Se nota solo acá porque es el único proyecto
+   cuya ventana no está cubierta por una captura.
+
+   No descubre nada de atrás con la tarjeta abierta: mientras hay una expandida las
+   demás quedan en `visibility: hidden`, así que detrás está la página y nada más. */
+[data-proyecto="cassandra-engine"] .project-marco {
+    background: transparent;
+}
+
+/* El hover no lleva excepción a propósito: ahí vuelve la placa gris. La regla de
+   `.project-card:not(.expanded):hover .project-marco` apila dos fondos —uno opaco
+   recortado a `padding-box` y el degradado a `border-box`— y le gana en especificidad a
+   la de arriba, así que el centro se rellena con `--bg-primary` mientras el mouse está
+   encima y vuelve a quedar sin fondo al salir. Es lo buscado: en reposo el logo se apoya
+   sobre la página, y el hover lo levanta sobre una superficie. */
+
+[data-proyecto="monopoly"] .project-media.con-marca {
+    --marca-zoom: 1.0;
+}
+
+.project-marca {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    /* `contain` y no `cover`: son logos, y un logo recortado es un logo roto. Los
+       wordmarks son mucho más apaisados que la ventana y los videos son cuadrados,
+       así que en los dos casos sobra lugar; lo que sobra lo rellena la placa. */
+    object-fit: contain;
+    /* El aire que separa al logo del marco. Va como padding y no como un contenedor
+       aparte porque `object-fit` se calcula dentro de la caja de contenido, así que
+       el padding lo achica sin deformarlo. Es poco a propósito: `contain` ya deja
+       márgenes propios —el hueco es 2.4:1 y ningún logo tiene esa proporción— y
+       sumarle padding encima los dejaba diminutos. */
+    padding: 0.15rem 0.4rem;
+    background: var(--marca-placa);
+    /* El acercamiento final. `contain` mete la pieza entera y ahí se planta, aunque
+       le sobre lugar a los costados; esto la agranda por encima de ese tope y lo que
+       se pasa lo recorta `.project-media`. Se puede porque lo que se recorta es el
+       propio margen del archivo, no dibujo: los tres videos de sistemas distribuidos
+       son iconos chicos centrados en un lienzo cuadrado de 1500px, y el logo de
+       Cassandra y el de Zorro tienen aire de sobra alrededor.
+       Los dos wordmarks —Monopoly y SpecForge— van casi sin acercar: son anchos, ya
+       tocan los bordes del hueco, y pasarse les come las letras. */
+    transform: scale(var(--marca-zoom, 1));
+    transition: opacity 0.3s ease;
+}
+
+/* El logo apaisado ocupa la franja de arriba de la tarjeta abierta, en lugar de la
+   captura. Va por encima de las dos capas de abajo —la marca chica y la tapa— porque
+   mientras está no tienen nada que aportar. Su placa puede ser distinta de la de la
+   marca chica: son archivos distintos y cada uno trae su propio fondo. */
+.project-marca-grande {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 0.15rem 0.4rem;
+    background: var(--marca-placa-grande, var(--marca-placa));
+    opacity: 0;
+    /* Entra con el mismo retardo con el que se va la marca chica, así el cambio ocurre
+       una vez que la ventana terminó de crecer y no se cruza con el cambio de alto. */
+    transition: opacity 0.35s ease 0.2s;
+}
+
+.project-card.expanded .project-marca-grande {
+    opacity: 1;
+}
+
+/* ── La franja se ajusta al logo, en vez de al revés ──────────────────────
+   Por defecto la franja de la tarjeta abierta se estira para tomar el alto que sobra
+   (`flex: 1 1 auto`), y lo que haya adentro se acomoda como puede. Para un logo apaisado
+   eso está al revés: el logo tiene que cruzarla de lado a lado —es una banda, no una
+   foto— y entonces su alto no lo elige la tarjeta sino la proporción del archivo.
+
+   Con `aspect-ratio` igual a la del archivo, la franja mide exactamente lo que el logo
+   dibuja: cruza de lado a lado y queda al ras arriba y abajo, sin una banda de relleno.
+   Y como deja de estirarse, lo que sobra se lo lleva el texto: la franja pasó de 276px a
+   221, o sea del 40% de la tarjeta al 32%.
+
+   **Los dos números están atados.** El alto que dibuja el logo es `ancho / relación`, así
+   que para bajarlo más hay que ensanchar el archivo con margen a los costados —arriba y
+   abajo va al ras— y traer esa nueva relación acá. Hoy `logo-grande.png` es 888x145.
+   Referencia rápida sobre los 1104px de ancho que mide la franja: 4.42 → 250px de alto,
+   5.00 → 221, 5.52 → 200, 6.13 → 180. */
+[data-proyecto="specforge"].expanded .project-marco {
+    flex: none;
+}
+
+[data-proyecto="specforge"].expanded .project-media {
+    flex: none;
+    height: auto;
+    aspect-ratio: 888 / 145;
+}
+
+/* Y el alto que la franja deja de reclamar se lo lleva lo de abajo. En las demás
+   tarjetas ese sobrante se lo come el marco, que es `flex: 1 1 auto`; acá se lo acaban
+   de sacar, y sin decir quién lo hereda el reparto termina antes de llegar al borde:
+   quedaban 77px muertos entre los tags y el fondo de la tarjeta. Con esto los toma el
+   bloque de la terminal, que la centra en el aire que gana. */
+[data-proyecto="specforge"].expanded .project-info {
+    flex: 1 1 auto;
+}
+
+/* La variante en fila: no es una imagen sino la caja que contiene los tres videos de
+   marca, así que hereda la ubicación y la placa de la regla de arriba —el mismo hueco,
+   el mismo aire, el mismo fondo— y solo agrega el reparto.
+
+   `object-fit` no le sirve a un contenedor: lo que se acomoda es cada pieza, y el
+   `contain` va en ellas. */
+.project-marca-grande.es-fila {
+    display: flex;
+    align-items: center;
+    /* El hueco entre piezas sale del reparto, no de un `gap`: son iconos con aire
+       propio en su lienzo, y sumarles separación encima los dejaba chicos. */
+    gap: 0;
+}
+
+/* Abierta: la marca se corre y deja ver la captura que tiene detrás. El retardo la
+   deja irse recién cuando la ventana terminó de crecer, para que no se cruce el
+   cambio de imagen con el cambio de alto. */
+.project-card.expanded .project-marca {
+    opacity: 0;
+    transition: opacity 0.35s ease 0.2s;
+}
+
+/* ── La marca según el tema ───────────────────────────────────────────────
+   Cuando un logo trae sus dos versiones, las dos están en el DOM y acá se elige. Va
+   por `visibility` y no por `opacity`, que es lo que usan las tapas, porque la opacidad
+   de la marca ya está tomada: es la que la hace entrar y salir al abrir la tarjeta
+   —`.project-card.expanded .project-marca`— y una regla de tema encima competiría con
+   esa por la misma propiedad. `visibility` es ortogonal, así que las dos conviven, y a
+   diferencia de `display: none` la copia escondida igual se descarga y se decodifica:
+   cambiar de tema no deja el hueco vacío mientras baja el archivo. */
+.project-marca.es-claro,
+.project-marca-grande.es-claro {
+    visibility: hidden;
+}
+
+[data-theme="light"] .project-marca.es-oscuro,
+[data-theme="light"] .project-marca-grande.es-oscuro {
+    visibility: hidden;
+}
+
+[data-theme="light"] .project-marca.es-claro,
+[data-theme="light"] .project-marca-grande.es-claro {
+    visibility: visible;
+}
+
+/* Pero **solo dentro de una tarjeta que se vea**.
+   `visibility` se hereda, y a diferencia de casi todo lo demás un descendiente puede
+   volver a ponerla en `visible` y ganarle a la del ancestro. Sin este freno, con
+   cualquier tarjeta abierta la regla de arriba resucitaba el logo claro de Cassandra
+   —la única marca con versión `-claro`— dentro de su propia tarjeta colapsada, que
+   sigue en el DOM en `visibility: hidden` y en su lugar de la grilla. Como la tarjeta
+   abierta se dibuja encima de la grilla entera, el logo aparecía flotando sobre ella.
+
+   Solo pasaba en tema claro, porque en oscuro ninguna copia se declara `visible`, y solo
+   se notaba en los proyectos sin marca propia —Melodía, VibeTrip— que son los que no
+   tenían nada que taparlo. */
+.projects-grid:has(.project-card.expanded) .project-card:not(.expanded) :is(.project-marca, .project-marca-grande) {
+    visibility: hidden;
+}
+
+/* Con marca, la tapa no se dibuja. Mientras las placas eran opacas daba igual —quedaba
+   tapada de todos modos— pero la de Cassandra es transparente, y ahí la captura se veía
+   por detrás del logo. Sacándola queda el fondo del marco, que es el de la página.
+
+   No hace falta una excepción para la tarjeta abierta: desde que un proyecto con un solo
+   logo lo usa también en la franja apaisada, la tapa ya no era la capa visible en ningún
+   estado. */
+.project-media.con-marca .project-cover {
+    opacity: 0;
+}
+
+/* Sin captura debajo no hay nada que descubrir, así que la marca se queda también con
+   la tarjeta abierta. Le pasa a SpecForge, cuyo único archivo es su propio logo. */
+.project-media.con-marca:not(:has(.project-cover)) .project-marca {
+    opacity: 1;
+}
+
+/* ── Tapa en tres versiones: quieta por tema, y animada al abrir ──────────
+   Las tres están en el DOM y acá se elige cuál se ve. Es CSS y no un cambio de `src`
+   en JS porque así la animada ya está decodificada cuando la tarjeta se abre: si se
+   cargara en ese momento, se vería el hueco vacío mientras baja.
+
+   Van una encima de otra, en absoluto, para que el hueco mida siempre lo mismo. */
+.project-cover.es-oscuro,
+.project-cover.es-claro,
+.project-cover.es-animada {
+    position: absolute;
+    inset: 0;
+    /* Entera y no recortada: el dibujo es cuadrado y el hueco apaisado, así que con
+       `cover` se perdían las columnas de los costados —justo las que hacen que se lea
+       como una red—. Lo que sobra a los lados lo rellena el fondo, que es el mismo
+       sobre el que se generó cada versión. */
+    object-fit: contain;
+}
+
+.project-cover.es-oscuro,
+.project-cover.es-animada {
+    background: #000;
+}
+
+/* Las dos reglas de tema claro van condicionadas a que exista la versión clara. La
+   tapa en tres versiones no obliga a traer las tres: un dibujo puede funcionar sobre un
+   solo fondo y no tener sentido sobre el otro. Es el caso de los modelos predictivos,
+   cuya red neuronal vive del brillo de los nodos contra el negro; sobre blanco las
+   conexiones se pierden. Ese proyecto entonces no trae `portada-claro`, y sin ella acá
+   no hay nada que intercambiar: la oscura se queda, y la animada —que es transparente y
+   toma el fondo de su propia capa— se queda sobre negro para acompañarla.
+
+   Se expresa como la ausencia del archivo y no como una excepción por proyecto para que
+   la regla sea una sola: el que quiera cambiar con el tema trae las dos piezas, el que
+   no, trae una. */
+.project-cover.es-claro,
+[data-theme="light"] .project-media:has(.es-claro) .project-cover.es-animada {
+    background: #fff;
+}
+
+/* Cerrada: la quieta del tema que corresponda. */
+.project-cover.es-claro,
+[data-theme="light"] .project-media:has(.es-claro) .project-cover.es-oscuro {
+    opacity: 0;
+}
+
+[data-theme="light"] .project-cover.es-claro {
+    opacity: 1;
+}
+
+/* Abierta: la animación tapa a las dos quietas. Va con transición para que el cambio
+   no sea un corte seco al terminar de expandirse. */
+.project-cover.es-animada {
+    opacity: 0;
+    transition: opacity 0.35s ease 0.25s;
+}
+
+.project-card.expanded .project-cover.es-animada {
+    opacity: 1;
+}
+
+/* La animación es un dibujo con transparencia: sin esto se vería lo quieto por
+   detrás, con su fondo, en vez del fondo de la página. */
+.project-card.expanded .project-cover.es-oscuro,
+.project-card.expanded .project-cover.es-claro {
+    opacity: 0;
+}
+
+/* ── La tapa ampliada al hacerle click (solo en la tarjeta abierta) ────────
+   La tapa está muy recortada: el mockup es 1600×1132 y el hueco, apaisado y bajo.
+   Al hacerle click se ve completa y más grande.
+
+   **Crece como capa, no en el flujo.** Completa y a ancho de tarjeta serían 781px
+   de alto: la tarjeta abierta dejaría de entrar en una pantalla, que es
+   justamente lo que no puede pasar. Posicionada en absoluto no mueve nada de lo
+   que tiene alrededor, y el alto se acota en `vh` para no pasarse de la ventana.
+
+   La imagen está en absoluto **siempre**, no solo en hover: cambiar `position` no
+   se puede animar y el salto se vería. Así lo único que cambia es el alto, que sí
+   interpola. */
+.project-card.expanded .project-media {
+    /* Para que la tapa ampliada pase por encima del título y del celular. */
+    z-index: 2;
+}
+
+/* `top`/`left`/`width` y **no** `inset: 0`: fijar `top` y `bottom` juntos
+   sobredetermina la caja y el alto que se le pida queda ignorado. */
+.project-card.expanded .project-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        object-fit 0s 0.4s;
+}
+
+/* Se abre con click y no al pasar el mouse: con `:hover` alcanzaba con que el puntero
+   cruzara la franja para que la captura se abriera sola encima del título y del aparato.
+   El estado lo pone `Projects.jsx` —solo en la tarjeta abierta y solo donde la franja
+   muestra una captura— y lo que se ve lo define esto. */
+/* La ampliación **al hacerle click** es para las capturas, que están muy recortadas y
+   no se entienden en el hueco. La tapa en tres versiones no la necesita: ya se ve
+   entera, y agrandar una animación mientras corre distrae más de lo que muestra. */
+.project-card.expanded .project-media:not(.con-marca).is-ampliada:has(.es-animada) {
+    overflow: hidden;
+}
+
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover.es-oscuro,
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover.es-claro,
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover.es-animada {
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+}
+
+/* Acotado a las franjas que muestran una captura. Donde la franja muestra un logo
+   —Cassandra, Monopoly, Zorro, SpecForge y sistemas distribuidos— no hay nada que ver
+   mejor: un logo ya se ve entero, así que ahí el click no hace nada. Melodía y VibeTrip sí la conservan, que son las que muestran foto. */
+/* Al agrandarse la franja recupera un alto propio, así que ahí tiene que
+   dejar de estirarse: si no, `flex-grow` la devolvería al alto del hueco y el alto de
+   abajo no se vería. */
+.project-card.expanded .project-media:not(.con-marca).is-ampliada {
+    flex: none;
+    /* Deja salir la imagen del hueco; el resto del marco sigue recortando. */
+    overflow: visible;
+}
+
+.project-card.expanded .project-media:not(.con-marca).is-ampliada .project-cover {
+    /* Congelado: era `min(58vh, 470px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 470px;
+    /* Completa, sin recortar. El fondo opaco tapa lo que queda atrás en las
+       bandas laterales que deja `contain`. */
+    object-fit: contain;
+    background: var(--bg-primary);
+    box-shadow: 0 26px 60px rgb(var(--sombra-rgb) / 0.55);
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), object-fit 0s;
+}
+
+.project-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-img-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent-glow-raw) 0%, transparent 50%);
+    opacity: 0.2;
+}
+
+.project-icon {
+    font-size: 1.8rem;
+    z-index: 1;
+}
+
+/* El relleno horizontal sigue a `--marco` para que la descripción y los tags
+   arranquen en la misma vertical que el marco y el nombre. En reposo eso es 0
+   —no hay caja de la que despegarse—; expandida, el mismo aire que el marco. */
+.project-info {
+    /* Congelado: era `clamp(0.35rem, 0.6vh, 0.55rem)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    padding: 0.35rem var(--marco) var(--marco);
+}
+
+/* La tipografía del nombre, que en larson es lo que más pesa de la tarjeta:
+   geométrica, bold y con las líneas bien juntas. Sin interletrado negativo —en la
+   referencia las letras están holgadas, no comprimidas. */
+.project-title {
+    font-family: var(--font-display);
+    /* Más chico que el de la referencia, pero no tanto: le da mucho peso al nombre.
+       El techo lo puso la pantalla — con más que esto, los nombres que envuelven a dos
+       líneas desbordan las tres filas. */
+    /* Congelado: era `clamp(1.1rem, 0.95rem + 0.45vw, 1.35rem)`. A 1920 —el ancho del lienzo— esa expresión ya daba
+       este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
+       hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
+       `zoom`: si lo midiera contra la ventana real en vez de contra el lienzo, la medida
+       volvería a cambiar de un monitor a otro, que es justo lo que se vino a sacar. */
+    font-size: 1.35rem;
+    font-weight: 700;
+    /* Ancho e interletrado copiados de la referencia: las letras son anchas y
+       **separadas**, no comprimidas. Yo había puesto interletrado negativo, que es
+       lo contrario. */
+    font-stretch: 112%;
+    letter-spacing: 0.05em;
+    line-height: 1.06;
+    color: var(--text-primary);
+    /* Reparte las líneas para que no quede una palabra sola abajo. Con nombres
+       como "Modelos Predictivos y Análisis con IA" pasaba siempre. */
+    text-wrap: balance;
+    margin-bottom: 0.35rem;
+}
+
+/* El título **es** el botón que abre la tarjeta. Hereda todo del `h3` para que
+   siga leyéndose como un título y no como un control: lo que lo delata es el
+   cursor, el color al pasar por encima y el anillo de foco. */
+.project-title-btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .project-title-btn:hover {
+        color: var(--accent-text);
+    }
+}
+
+
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+/* En la referencia la tarjeta chica es **solo** marco y nombre. Los tags y el link al
+   repo no van; el link ya vive dentro del bloque expandible. */
+.project-card:not(.expanded) .project-tags {
+    display: none;
+}
+
+.project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .project-link:hover {
+        color: var(--accent-text);
+    }
+}
+
+
+/* Sin `.project-toggle`: el botón "Más información" se fue y ahora el control es
+   el propio título (`.project-title-btn`), como en la referencia. */
+
+/* Contenido extra que aparece al expandir */
+.project-extra {
+    max-height: 0;
+    opacity: 0;
+    /* `clip` en vez de `hidden`, para poder pedirle un margen de recorte. El bloque
+       necesita recortar —es lo que hace que su despliegue se pueda animar con
+       `max-height`— pero el aparato que gira adentro se sale un poco de su caja, y
+       recortarlo justo en el borde le comía las puntas.
+       Antes esto se compensaba con padding en `.fono-escena`, o sea empujando el
+       aparato hacia adentro; el costo era una franja vacía entre la foto y el
+       aparato. Con el margen de recorte el aparato puede pintar afuera y el aire de
+       arriba vuelve a ser una decisión de composición y no una obligación técnica.
+       Donde no esté soportado se recorta en el borde, que es lo que hacía antes. */
+    overflow: clip;
+    overflow-clip-margin: 2.5rem;
+}
+
+.project-card.expanded .project-extra {
+    max-height: 1400px;
+    opacity: 1;
+    /* Poco: en las tarjetas con aparato el bloque llega casi al pie de la tarjeta, y
+       cada píxel de acá es un píxel que el celular tiene para no cruzar el borde. */
+    margin-bottom: 0.25rem;
+}
+
+/* Descripción, tags y repo. Con celular esto cae en su columna derecha —de ahí que
+   no fije ancho ni dirección propia más allá de apilar—; sin celular ocupa el
+   ancho del bloque. */
+.project-aparte {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+}
+
+.project-fulldesc {
+    /* Como las explicaciones de Trayectoria: es lo que se viene a leer, así que va en
+       negrita. */
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    /* ~65 caracteres: más ancho que esto y el ojo pierde el renglón al volver. */
+    max-width: 62ch;
+}
+
+/* El aire entre párrafos, sólo cuando hay más de uno. Va en `em` para que siga al
+   tamaño del texto. */
+.project-fulldesc + .project-fulldesc {
+    margin-top: 0.85em;
+}
+
+/* Un solo marco limpio para las capturas, con el mismo borde y radio que la
+   tarjeta que lo contiene. Sin cromo de ventana ni adornos: el marco lo da el
+   borde, y las capturas van adentro divididas por finas separaciones. */
+.project-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--border);
+    overflow: hidden;
+}
+
+/* Alto acotado en vez de `aspect-ratio: 4/3`. La tarjeta abierta ocupa la fila
+   entera, así que tres columnas de 4/3 daban huecos de 274px de alto y la sección
+   se pasaba de pantalla — justamente lo que no puede pasar. El tope va en `vh`
+   porque el presupuesto es la altura de la ventana, no el ancho de la tarjeta. */
+.project-gallery-item {
+    /* Congelado: era `clamp(92px, 13vh, 140px)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    height: 117px;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 1.6rem;
+}
+
+/* Quieto, de frente y un poco más grande. La escala va en el `transform` y no en
+   el `width` para no disparar un relayout. */
+/* Con la ventana contraída sobra alto: el celular lo toma creciendo de ancho, que
+   es lo que fija su alto (la pantalla es 1:2).
+
+   Y **sin la escala** del estado de demo: `scale(1.1)` sobre un celular de este
+   tamaño lo agrandaba 75px más allá de su caja de layout, y esa parte la recortaba
+   el `overflow: hidden` del bloque expandible — se comían los bordes de arriba y
+   abajo. Acá ya es grande por ancho; no necesita escalarse. */
+/* Mientras corre el morph, la sección no anima nada por su cuenta: la View Transition
+   es el único reloj. Ver la nota en `conTransicion`, en Projects.jsx. La bandera va en
+   `<html>` porque el morph es del documento entero, no de una tarjeta. */
+.morfando .project-card,
+.morfando .project-card * {
+    transition: none !important;
+}
+
+.project-card.expanded .project-aparte {
+    view-transition-name: demo-aparte;
+}
+
+::view-transition-group(demo-aparato),
+::view-transition-group(demo-aparte),
+::view-transition-group(demo-botones) {
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reproduciendo **en un monitor**, el bloque pasa a una sola columna: el monitor
+   arriba y la botonera, la barra y la descripción abajo. Un monitor a 620px no entra en
+   media fila, y la mitad de al lado no tiene nada que defender en ese momento — la foto
+   de arriba ya se contrajo y le cedió su alto.
+
+   Acotado al monitor a propósito. Aplicado también al celular, el bloque se hacía más
+   alto que la tarjeta y la descripción terminaba recortada por el `overflow` del bloque
+   expandible: el celular es angosto y alto, así que apilar le suma todo su alto en vez
+   de aprovechar el ancho que sobra.
+
+   Va después de `.fono-bloque:has(.fono.es-monitor)` porque tienen la misma
+   especificidad y desempata el orden. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) {
+    /* Ancho del monitor mientras se reproduce. Vive acá y no en la regla del aparato
+       porque lo necesitan dos: el propio monitor y la columna que lo aloja.
+
+       El alto sale de este ancho, por la proporción de la pantalla, así que este número
+       es en realidad el reparto entre el monitor y la descripción de abajo. Abajo va un
+       párrafo solo —ver la regla que esconde el resto—, así que el monitor se queda casi
+       con todo: lo que bajó de 915 es lo que el primer párrafo de Cassandra pide de más,
+       porque ocupa cuatro renglones y no los tres para los que este acomodo estaba
+       calculado, más unos pocos píxeles de margen para no depender del redondeo. */
+    --monitor-video: 880px;
+}
+
+/* Diagonal fija y giro sobre el eje vertical. No da la vuelta completa a
+   propósito: sin caras 3D, pasado los 90° se vería la pantalla espejada. */
+@keyframes fono-girar {
+    0% { transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px); }
+    50% { transform: rotateZ(-8deg) rotateY(24deg) translateY(5px); }
+    100% { transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px); }
+}
+
+@keyframes monitor-girar {
+    0% { transform: rotateZ(-6deg) rotateY(-15deg) translateY(-4px); }
+    50% { transform: rotateZ(-4deg) rotateY(13deg) translateY(4px); }
+    100% { transform: rotateZ(-6deg) rotateY(-15deg) translateY(-4px); }
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .project-aparte {
+    /* Debajo de todo y a lo ancho de las dos columnas. Adentro pasa de columna a
+       renglones: la descripción se lleva uno entero y los tags comparten el siguiente
+       con el link al repo, que se va al extremo opuesto. */
+    grid-column: 1 / -1;
+    grid-row: 3;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 1.5rem;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .project-fulldesc {
+    flex: 1 0 100%;
+    /* Y suelta su tope de 62ch. Es la única parte del sitio donde ese tope no aplica, y
+       es a propósito: acá el renglón largo no es un problema de lectura sino la forma de
+       que el texto ocupe tres renglones en vez de seis, que es justo el alto que
+       necesitaba el monitor. En la columna angosta del estado normal el tope sigue
+       valiendo. */
+    max-width: none;
+}
+
+/* Solo Cassandra, y solo mientras se reproduce: va el primer párrafo y nada más. Este
+   acomodo está calculado
+   para una descripción de tres renglones —es lo que deja al aparato en su tamaño bueno—
+   y las descripciones pasaron a tener dos párrafos, o sea el doble. De los dos, el que
+   se queda es el primero: dice qué es el proyecto, que es lo que hace falta para
+   entender lo que se está viendo en la pantalla. El segundo es el detalle de
+   arquitectura, y está entero a un clic, apenas se corta la demo.
+
+   Va con `display: none` y no con `visibility`: acá el punto es que no ocupe alto. */
+[data-proyecto="cassandra-engine"].is-reproduciendo .project-fulldesc:not(:first-of-type) {
+    display: none;
+}
+
+@keyframes fono-sube-entra {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes fono-sube-sale {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100%); }
+}
+
+/* El giro es decoración: sin él el celular sigue mostrando lo mismo. Y la
+   coreografía de poner la demo —0.85s de foto contrayéndose y celular creciendo—
+   es justo el tipo de movimiento grande que hay que apagar acá: con la variable en
+   0s, los cinco pedazos pasan a ser instantáneos de una sola vez. */
+@media (prefers-reduced-motion: reduce) {
+    .project-card {
+        --demo-anim: 0s;
+    }
+}
+
+
+/* Una tarjeta por fila. Cubre también todo lo que hay por debajo, así que el bloque de
+   768 no vuelve a declararlo. */
+/* corte SIN_RIEL */
+@media (max-width: 900px) {
+    .project-card {
+        width: 100%;
+    }
+
+    /* ── La tarjeta abierta vuelve al flujo ───────────────────────────────
+       En ancho es una capa: `position: absolute; inset: 0` sobre la grilla entera, para
+       que la grilla no cambie de alto y la página no se mueva bajo el mouse. Acá ese
+       argumento no existe —no hay mouse y se scrollea igual— y en cambio el efecto es
+       ruinoso: con una tarjeta por fila la grilla son ocho apiladas, o sea un par de
+       miles de píxeles, y la abierta heredaría ese alto entero.
+
+       De vuelta en el flujo crece y empuja lo de abajo, que es lo que se espera de una
+       tarjeta que se abre en un teléfono. */
+    .project-card.expanded {
+        position: static;
+        inset: auto;
+        width: 100%;
+    }
+
+    /* Y las otras se van del todo. En ancho quedan en `visibility: hidden` **ocupando su
+       lugar**, que es lo que mantiene el alto de la grilla; acá eso mismo dejaría siete
+       huecos vacíos debajo de la abierta. */
+    .projects-grid:has(.project-card.expanded) .project-card:not(.expanded) {
+        display: none;
+    }
+
+    /* Sin techo no hay resto que repartir: la franja deja de estirarse y toma un alto
+       propio, proporcional al ancho, que es lo que tiene sentido para una banda apaisada
+       en una pantalla angosta. */
+    .project-card.expanded .project-marco {
+        flex: none;
+        min-height: 0;
+    }
+
+    .project-card.expanded .project-media {
+        flex: none;
+        height: clamp(120px, 38vw, 260px);
+    }
+
+    /* ── El acomodo de reproducción, apilado ──────────────────────────────
+       En ancho el monitor se va contra el borde derecho y el reproductor ocupa lo que
+       queda a su izquierda, con la descripción abajo cruzando las dos columnas. Eso
+       cuelga de `--monitor-video`, que es un ancho en **px**: a 880 no entra en ninguna
+       pantalla angosta, y la columna que lo aloja tampoco.
+
+       Acá pasa a `100%` y la grilla a una sola columna. El orden del DOM ya es el que
+       corresponde —aparato, botonera, barra, descripción— porque los controles van con
+       `display: contents` y se disuelven en la grilla; lo único que hay que deshacer son
+       las ubicaciones explícitas, que si no se superponen en la única columna que queda.
+
+       El aparato en reposo no necesita nada: `.fono` y `.fono.es-monitor` ya se miden con
+       `min()` contra un porcentaje y un `vh`. */
+    .project-card.is-reproduciendo:has(.fono.es-monitor) {
+        --monitor-video: 100%;
+    }
+
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-escena,
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-barra,
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .project-aparte {
+        grid-column: auto;
+        grid-row: auto;
+        justify-self: stretch;
+    }
+
+    /* ── Un solo párrafo, en todos ──────────────────────────────────────
+       Las descripciones vienen en dos partes: la primera dice qué es el proyecto y la
+       segunda cuenta cómo está hecho por dentro. En una columna de teléfono la segunda
+       son diez o doce renglones más de texto seguido, y la tarjeta abierta ya es lo más
+       largo de la página. Se queda la primera, que es la que hace falta para saber qué
+       se está mirando.
+
+       Acá había la regla contraria y acotada a un proyecto: Cassandra escondía su
+       segundo párrafo mientras reproducía —el acomodo del monitor estaba calculado para
+       tres renglones— y en este ancho lo recuperaba, porque apilada la tarjeta crece y
+       no había nada que ahorrar. Con la regla general esa excepción sobra: ninguno lo
+       muestra, reproduciendo o no.
+
+       Va con `display: none` y no con `visibility`, por lo mismo que en la regla de
+       Cassandra: el punto es que no ocupe alto. Y de paso sale del árbol de
+       accesibilidad, así que un lector de pantalla tampoco lo lee. */
+    .project-fulldesc:not(:first-of-type) {
+        display: none;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    /* Alto propio para la ventana de la tarjeta **cerrada**: el `clamp` de la regla base
+       está calibrado contra el alto de la ventana para que la sección entera entre en
+       una pantalla de escritorio, y en un teléfono ese cálculo no viene al caso.
+
+       No alcanza a la tarjeta abierta: ahí manda `.project-card.expanded .project-media`,
+       que son tres clases contra una, y la franja se sigue estirando para tomar el alto
+       que sobra. */
+    .project-media {
+        height: 160px;
+    }
+}

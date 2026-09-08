@@ -1,0 +1,53 @@
+/* ── Cursor propio ────────────────────────────────────────────────────────
+   El círculo que reemplaza al puntero del sistema (`ui/Cursor.jsx`).
+
+   La regla que esconde el cursor del sistema **no** está acá sino en
+   `styles/primitivas.css`: su sujeto es `*` y alcanza a toda la página, así que moverla
+   a este archivo —que carga más tarde— le haría ganar empates que hoy pierde. */
+
+/* ── Cursor propio ────────────────────────────────────────────────────────
+   Dos cajas anidadas y no una: la de afuera solo se traslada (la mueve el JS)
+   y la de adentro solo se escala (lo hace el CSS). Mezclar ambas cosas en el
+   mismo elemento desviaba el círculo, porque las propiedades individuales se
+   aplican antes que `transform` y terminaban multiplicando las coordenadas de
+   la traslación por el factor de escala. */
+.cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: var(--z-cursor);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    will-change: transform;
+}
+
+.cursor[data-vivo] {
+    opacity: 1;
+}
+
+/* El anillo se dibuja centrado en el origen de su padre.
+
+   Crece sobre lo que se puede tocar. No es decoración: al sacar el cursor del
+   sistema se perdió la señal de "esto es clickeable", y esta la reemplaza. */
+.cursor-anillo {
+    transition: width 0.18s ease, height 0.18s ease,
+        margin 0.18s ease, background-color 0.18s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+}
+
+.cursor.is-control .cursor-anillo {
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    background-color: color-mix(in srgb, var(--accent) 16%, transparent);
+}

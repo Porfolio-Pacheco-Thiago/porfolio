@@ -44,11 +44,11 @@
 }
 
 .logo-dibuja .logo-trazos path {
-    animation: logoTrazar calc((150ms + var(--k) * 405ms) * var(--logo-vel)) ease-out backwards;
+    animation: logo-trazar calc((150ms + var(--k) * 405ms) * var(--logo-vel)) ease-out backwards;
     animation-delay: calc(var(--i) * 23ms * var(--logo-vel));
 }
 
-@keyframes logoTrazar {
+@keyframes logo-trazar {
     from {
         stroke-dasharray: 100;
         stroke-dashoffset: 100;
@@ -68,11 +68,11 @@
     transform-box: fill-box;
     transform-origin: center;
     /* Mismo motivo que arriba: la escala 0 vive en el `@keyframes`. */
-    animation: logoNodo calc(135ms * var(--logo-vel)) cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+    animation: logo-nodo calc(135ms * var(--logo-vel)) cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
     animation-delay: calc((170ms + var(--i) * 23ms) * var(--logo-vel));
 }
 
-@keyframes logoNodo {
+@keyframes logo-nodo {
     from {
         scale: 0;
     }

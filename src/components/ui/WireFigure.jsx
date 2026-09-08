@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { alTerminarCarga } from '../../lib/carga';
+import './WireFigure.css';
 
 /**
  * Figura de alambre decorativa que gira lentamente en 3D.

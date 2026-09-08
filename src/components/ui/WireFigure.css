@@ -1,0 +1,404 @@
+/* ── Figuras de alambre decorativas ───────────────────────────────────────
+   La geometría 3D de `ui/WireFigure.jsx`, su entrada desde el borde, cómo responden al
+   mouse y cómo se encienden desde el navbar.
+
+   Estaba en `styles/ui.css`, mezclada con las primitivas compartidas. Es un cuarto de
+   aquel archivo y no la usa nadie más que este componente.
+
+   El conteo de elementos se mantiene bajo a propósito: con `preserve-3d` el navegador
+   re-rasteriza cada hijo en cada frame, porque su tamaño proyectado cambia al girar. 111
+   elementos hacían volar el cooler; ahora son 33 repartidos en tres figuras, y solo gira
+   la que está a la vista. */
+.wire {
+    --wire-size: 800px;
+    --wire-line: 3px;
+    /* Tono propio de las figuras. En claro no alcanza con bajar la opacidad del
+       acento: sobre un fondo claro, un verde medio al 22% desaparece. Se usa el
+       verde oscuro accesible y con bastante más carga. */
+    --wire-tint: color-mix(in srgb, var(--accent) 22%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+    width: var(--wire-size);
+    height: var(--wire-size);
+    perspective: 1900px;
+    pointer-events: none;
+}
+
+[data-theme="light"] .wire {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 62%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 46%, transparent);
+}
+
+/* Marca una sección como contenedora de un adorno. Las secciones miden 1200px
+   y están centradas; las figuras tienen que ignorar ese ancho y sangrar hacia
+   los costados. Sin `overflow: hidden` acá: recorta el `overflow-x: clip` del
+   html, contra la ventana y no contra la columna de contenido. */
+.has-decor {
+    position: relative;
+}
+
+.wire-decor {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 0;
+}
+
+.wire-decor.at-right {
+    right: calc(-1 * var(--wire-size) / 2.6);
+}
+
+.wire-decor.at-left {
+    /* La franja que el riel de contacto ocupa en el margen izquierdo entra en la cuenta
+       acá y no en una segunda regla más abajo. Antes eran dos `left` sobre el mismo
+       selector, a 350 líneas de distancia: quien tocara este de acá no veía que el otro
+       lo pisaba siempre —el riel está a 64px en escritorio— y creía estar cambiando algo
+       que no cambiaba nada. Debajo del corte de `SIN_RIEL` no hay riel, y ahí la variable
+       vale 0: ver `--riel-ancho` en `styles/primitivas.css`. */
+    left: calc(-1 * var(--wire-size) / 2.6 + var(--riel-ancho, 0px));
+}
+
+/* La inclinación va en su propia capa, separada del giro: si estuviera en el
+   mismo transform, la animación de rotateY la pisaría. En la esfera esto es lo
+   que abre los paralelos — a 0° se ven de canto y parecen no estar. */
+.wire-tilt {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--tx, 18deg)) rotateZ(var(--tz, -12deg));
+}
+
+.wire-turn {
+    width: 100%;
+    height: 100%;
+}
+
+.wire-spin {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+/* — Modo 3d: rotación real. Cada hijo se re-rasteriza por frame; solo para
+     tamaños chicos, donde el área es despreciable. — */
+.spin-3d .wire-spin {
+    animation: wire-gira var(--wire-seconds, 120s) linear infinite;
+    animation-play-state: paused;
+}
+
+.spin-3d[data-visible] .wire-spin {
+    animation-play-state: running;
+}
+
+/* — Modo flat: nada se mueve dentro, así que el subárbol se rasteriza una sola
+     vez; lo que gira es esta capa, en 2D. — */
+.spin-flat .wire-turn {
+    /* `steps` y no `linear`, y es lo que hace que estas figuras sean pagables.
+       El `preserve-3d` que necesitan para armarse en 3D impide que el subárbol se
+       aplane en una sola textura, así que el giro no es una capa compuesta: el
+       navegador vuelve a rasterizar la geometría en cada cuadro. Y la geometría es
+       cara — las tres grandes suman 22.6 megapíxeles, once pantallas de 1920x1080
+       en líneas.
+       Pero giran despacísimo: una vuelta cada 150 segundos son 0.04 grados por
+       cuadro. Son 9000 repintados por vuelta para mover cuatro centésimas de grado
+       cada vez. Con 1440 pasos el giro avanza de a 0.25 grados, que en la figura de
+       880px son 1.9px en el borde —por debajo de lo que se distingue— y el repintado
+       baja de 60 por segundo a 9.6 en la más lenta: **seis veces menos trabajo**.
+       El número sale del tamaño: 1440 es lo más grueso que se puede pisar sin que el
+       salto se note en la figura más grande. Si alguna vez crecen, hay que subirlo. */
+    animation: wire-plano var(--wire-seconds, 120s) steps(1440) infinite;
+    animation-play-state: paused;
+}
+
+/* `will-change` va junto con el arranque y no en la regla de arriba. Puesto ahí era
+   permanente: la capa quedaba promovida y residente en memoria aunque la figura
+   estuviera fuera de pantalla con su animación en pausa. Y al girar, la capa que el
+   navegador tiene que reservar no es la figura sino el cuadrado que la contiene —para
+   la de 880px, unos 1245 de lado—, así que cada una cuesta varios MB de textura que se
+   multiplican por el escalado de la pantalla.
+   Es exactamente la regla que `index.css` ya documenta para `.reveal`: `will-change`
+   tiene que ser temporal, o quedan capas vivas toda la sesión. */
+.spin-flat[data-visible] .wire-turn {
+    animation-play-state: running;
+    will-change: transform;
+}
+
+/* — Esfera — */
+.wire-ring {
+    position: absolute;
+    inset: 0;
+    border: var(--wire-line) solid var(--wire-tint);
+    border-radius: 50%;
+}
+
+.wire-meridian {
+    transform: rotateY(var(--rot));
+}
+
+/* Cada paralelo es el mismo círculo acostado, escalado por cos(lat) y elevado
+   por sin(lat): de ahí sale la silueta esférica. */
+.wire-parallel {
+    transform:
+        translateY(calc(var(--lift) * var(--wire-size) / 2))
+        rotateX(90deg)
+        scale(var(--scale));
+    border-color: var(--wire-tint-soft);
+    border-width: calc(var(--wire-line) * 0.8);
+}
+
+/* — Cubo: 6 caras con borde en lugar de 12 aristas sueltas — */
+.wire-face {
+    position: absolute;
+    inset: 12%;
+    border: var(--wire-line) solid var(--wire-tint);
+    transform: var(--face) translateZ(calc(var(--wire-size) * var(--z, 0.38)));
+}
+
+/* Cortes interiores del cubo: mismo grosor que las caras. La jerarquía la
+   marca el color, no el trazo — reducirlo los hacía desaparecer. */
+.wire-inner {
+    border-color: var(--wire-tint-soft);
+}
+
+/* Cortes horizontales de la pirámide */
+.wire-slice {
+    position: absolute;
+    inset: 19%;
+    border: calc(var(--wire-line) * 0.8) solid var(--wire-tint-soft);
+    transform:
+        translateY(calc(var(--wire-size) * var(--lift)))
+        rotateX(90deg)
+        scale(var(--scale));
+}
+
+/* — Arista genérica entre dos puntos del espacio. La usa el tetraedro, cuyas
+     aristas de la base no comparten un origen común. — */
+.wire-bar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: var(--wire-line);
+    width: calc(var(--wire-size) * var(--len));
+    margin-top: calc(var(--wire-line) / -2);
+    background: var(--wire-tint);
+    transform-origin: 0 50%;
+    transform:
+        translate3d(calc(var(--wire-size) * var(--px)),
+                    calc(var(--wire-size) * var(--py)),
+                    calc(var(--wire-size) * var(--pz)))
+        rotateY(var(--ry))
+        rotateZ(var(--rz));
+}
+
+/* — Pirámide: base cuadrada + 4 aristas al vértice — */
+.wire-base {
+    position: absolute;
+    inset: 19%;
+    border: var(--wire-line) solid var(--wire-tint);
+    transform: translateY(calc(var(--wire-size) * 0.36)) rotateX(90deg);
+}
+
+.wire-edge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: var(--wire-line);
+    width: calc(var(--wire-size) * var(--len) / 2);
+    background: var(--wire-tint);
+    transform-origin: 0 50%;
+    /* Se parte del vértice y se orienta hacia la esquina de la base */
+    transform:
+        translateY(calc(var(--wire-size) * var(--up) / 2))
+        rotateY(var(--ry))
+        rotateZ(var(--rz));
+}
+@media (prefers-reduced-motion: reduce) {
+    .wire-spin {
+        animation: none;
+    }
+}
+
+
+
+/* Nervaduras verticales de la pirámide: mismo trazo que las aristas, tono
+   suave para que no compitan con la silueta. */
+.wire-rib {
+    background: var(--wire-tint-soft);
+}
+
+/* ── Entrada de las figuras ───────────────────────────────────────────────
+   Vienen desde fuera de la pantalla hacia su posición, una sola vez.
+   Se usa `transform` y no `translate`: la propiedad `translate` ya está
+   ocupada centrando verticalmente el adorno, y son propiedades separadas que
+   se componen, así que no se pisan. */
+.wire-decor,
+.hero-fig {
+    opacity: 0;
+    /* Lenta y con retardo a propósito: si entra rápido, para cuando la página
+       terminó de cargar ya están colocadas y el movimiento se pierde. */
+    transition: opacity 2.4s cubic-bezier(0.16, 0.84, 0.32, 1) 0.35s,
+        transform 3s cubic-bezier(0.16, 0.84, 0.32, 1) 0.35s;
+}
+
+.wire-decor.at-left {
+    transform: translateX(-60%);
+}
+
+.wire-decor.at-right {
+    transform: translateX(60%);
+}
+
+/* Las del hero entran desde el borde más cercano */
+.hero-fig.fig-a,
+.hero-fig.fig-b {
+    transform: translateX(-90%);
+}
+
+.hero-fig.fig-c {
+    transform: translateX(90%);
+}
+
+.wire-decor[data-entered],
+.hero-fig[data-entered] {
+    opacity: 0.55;
+    transform: none;
+}
+
+.hero-fig[data-entered] {
+    opacity: 0.5;
+}
+@media (prefers-reduced-motion: reduce) {
+
+    .wire-decor,
+    .hero-fig {
+        transition: none;
+        transform: none;
+        opacity: 0.55;
+    }
+}
+
+
+/* ── Interacción con el mouse ─────────────────────────────────────────────
+   Las figuras aceptan puntero, pero el contenido va por encima (z-index 1),
+   así que solo reciben hover donde no hay nada del contenido delante. Ningún
+   clic queda bloqueado.
+   La reacción es la misma que provoca señalar su link en el navbar: da igual
+   por dónde llegues, la figura responde igual. */
+.wire-decor,
+.hero-fig {
+    pointer-events: auto;
+}
+@media (hover: hover) and (pointer: fine) {
+    .wire-decor:hover,
+    .hero-fig:hover {
+        opacity: 0.95;
+        --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+
+    [data-theme="light"] .wire-decor:hover,
+    [data-theme="light"] .hero-fig:hover {
+        --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+    }
+
+    /* Las chicas crecen más: con el mismo porcentaje que las grandes el cambio
+       no se notaría. */
+    .wire-decor:hover {
+        transform: scale(1.06);
+    }
+
+    .hero-fig:hover {
+        transform: scale(1.18);
+    }
+}
+
+
+/* ── Resaltado desde el navbar ────────────────────────────────────────────
+   Al poner el mouse sobre un link, reaccionan sus DOS figuras: la chica del
+   propio link y la grande de esa sección. Se dispara con el hover del link y
+   no con la sección activa, que dejaba la figura agrandada de forma
+   permanente mientras estabas ahí. */
+[data-hover-section="journey"] #journey .wire-decor,
+[data-hover-section="projects"] #projects .wire-decor,
+[data-hover-section="skills"] #skills .wire-decor {
+    opacity: 0.95;
+    transform: scale(1.06);
+}
+
+/* La mitad de `:hover` se separó del resto: lo demás lo dispara
+   `data-hover-section`, que lo pone el JS del navbar, y apagarlo en táctil no
+   tendría nada que ver con el puntero. Los valores son los mismos. */
+[data-hover-section="journey"] #journey .wire,
+[data-hover-section="projects"] #projects .wire,
+[data-hover-section="skills"] #skills .wire {
+    --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+    .nav-link:hover .nav-figure {
+        --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+}
+
+
+[data-theme="light"][data-hover-section="journey"] #journey .wire,
+[data-theme="light"][data-hover-section="projects"] #projects .wire,
+[data-theme="light"][data-hover-section="skills"] #skills .wire {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+    [data-theme="light"] .nav-link:hover .nav-figure {
+        --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+        --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+    }
+}
+
+
+/* Las figuras del hero también responden: son las mismas cuatro formas en
+   chico, así que al señalar una sección se enciende su forma en las tres
+   partes a la vez — el navbar, el hero y la propia sección. Se emparejan por
+   tipo de figura, no por posición. */
+[data-hover-section="journey"] .hero-fig.wire-cube,
+[data-hover-section="projects"] .hero-fig.wire-tetrahedron,
+[data-hover-section="skills"] .hero-fig.wire-sphere,
+[data-hover-section="about"] .hero-fig {
+    opacity: 0.95;
+    transform: scale(1.18);
+    /* El color también acompaña, no solo el tamaño. */
+    --wire-tint: color-mix(in srgb, var(--accent) 46%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+[data-theme="light"][data-hover-section="journey"] .hero-fig.wire-cube,
+[data-theme="light"][data-hover-section="projects"] .hero-fig.wire-tetrahedron,
+[data-theme="light"][data-hover-section="skills"] .hero-fig.wire-sphere,
+[data-theme="light"][data-hover-section="about"] .hero-fig {
+    --wire-tint: color-mix(in srgb, var(--accent-text) 82%, transparent);
+    --wire-tint-soft: color-mix(in srgb, var(--accent-text) 62%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+    /* La figura chica también gira mientras el mouse está sobre su link, no solo
+       cuando la sección está activa. */
+    .nav-link:hover .nav-figure .wire-spin {
+        animation-play-state: running;
+    }
+}
+
+
+/* El color también acompaña, no solo el tamaño */
+.wire-ring,
+.wire-face,
+.wire-bar,
+.wire-base,
+.wire-slice {
+    transition: border-color 0.45s ease, background-color 0.45s ease;
+}
+
+/* Acá había un bloque de 900 que acostaba el riel abajo como barra fija. Ya no existe
+   ese caso: debajo de ese ancho `App` directamente no monta el riel, y la foto con los
+   enlaces está al final del pie —ver `Footer.jsx`—. La barra era `fixed`, así que se le
+   montaba encima al último tramo del documento, que es el único que no se puede
+   scrollear para sacárselo de encima, y no se podía cerrar. */

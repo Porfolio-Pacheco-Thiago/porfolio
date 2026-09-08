@@ -1,24 +1,26 @@
 {
-  "name": "tmp-vite",
+  "name": "porfolio",
+  "version": "1.0.0",
+  "description": "Portfolio de Thiago Pacheco — Data & AI Engineer | Software Engineer (UBA)",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "check:css": "node scripts/check-css.js",
+    "check:contenido": "node scripts/check-contenido.js",
+    "check": "npm run lint && npm run lint:css && npm run check:css && npm run check:contenido && npm run build"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "motion": "^12.42.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-icons": "^5.6.0",
-    "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.3.3"
+    "react-icons": "^5.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -30,6 +32,8 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "stylelint": "^17.15.0",
+    "stylelint-config-standard": "^40.0.0",
     "vite": "^8.0.10"
   },
   "overrides": {

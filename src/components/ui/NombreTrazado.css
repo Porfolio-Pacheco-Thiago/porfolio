@@ -17,7 +17,7 @@
    del componente — con una sola capa las letras se apelmazan. */
 .nombre-contornos path {
     fill: none;
-    stroke: url(#nombre-degrade);
+    stroke: url("#nombre-degrade");
     stroke-width: var(--borde-nombre-svg, 170);
     stroke-linejoin: round;
 }
@@ -39,16 +39,16 @@
    si la animación no llegara a correr —una pestaña en segundo plano, un navegador
    con las animaciones apagadas— el nombre quedaría invisible. */
 .nombre-contornos path {
-    animation: nombreTrazar 1.05s ease-in-out backwards;
+    animation: nombre-trazar 1.05s ease-in-out backwards;
     animation-delay: calc(0.5s + var(--i) * 17ms);
 }
 
 .nombre-rellenos path {
-    animation: nombreRellenar 0.45s ease-out backwards;
+    animation: nombre-rellenar 0.45s ease-out backwards;
     animation-delay: calc(1.3s + var(--i) * 17ms);
 }
 
-@keyframes nombreTrazar {
+@keyframes nombre-trazar {
     from {
         stroke-dasharray: 100;
         stroke-dashoffset: 100;
@@ -60,7 +60,7 @@
     }
 }
 
-@keyframes nombreRellenar {
+@keyframes nombre-rellenar {
     from {
         fill-opacity: 0;
     }

@@ -1,5 +1,6 @@
 import { useState, useLayoutEffect, useMemo, useCallback } from 'react';
 import { flushSync } from 'react-dom';
+import { conVistaTransicion } from '../lib/vista-transicion';
 import { ThemeContext } from './theme-context';
 
 const STORAGE_KEY = 'portfolio-theme';
@@ -24,17 +25,17 @@ export function ThemeProvider({ children }) {
     }, [theme]);
 
     const toggleTheme = useCallback(() => {
-        const swap = () => flushSync(() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark')));
         // Un crossfade compuesto en vez de transicionar background/color por CSS:
         // `color` se hereda, así que la versión CSS repintaba toda la página.
         // Cambiar el tema es un cambio global, el caso que las View Transitions
         // resuelven bien. Sin soporte (o con motion reducido), cambia directo.
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (document.startViewTransition && !reduced) {
-            document.startViewTransition(swap);
-        } else {
-            swap();
-        }
+        //
+        // El `flushSync` va adentro porque el `useLayoutEffect` de abajo tiene que
+        // aplicar el atributo de forma síncrona dentro del morph: si no, el crossfade
+        // captura el "después" sin cambios.
+        conVistaTransicion(
+            () => flushSync(() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))),
+        );
     }, []);
 
     const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);

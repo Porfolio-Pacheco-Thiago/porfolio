@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { prefiereMenosMovimiento } from '../../lib/medidas';
+import './Cursor.css';
 
 /**
  * Cursor propio: un círculo que sigue al mouse y reemplaza al puntero del
@@ -11,7 +13,7 @@ import { useEffect, useRef } from 'react';
  *   se aplican antes que `transform` y terminan multiplicando las coordenadas.
  * - Solo se activa con punteros finos. En pantallas táctiles no hay cursor que
  *   reemplazar, y ocultar el del sistema ahí sería un error.
- * - El anillo **crece sobre lo tocable**. No es adorno: `ui.css` oculta el cursor
+ * - El anillo **crece sobre lo tocable**. No es adorno: `styles/primitivas.css` oculta el cursor
  *   del sistema en todo el documento, así que sin esto no quedaría ninguna señal
  *   de que algo se puede clickear.
  * - Se posiciona dentro de un `requestAnimationFrame`, así hay como mucho una
@@ -22,9 +24,11 @@ export default function Cursor() {
     const ref = useRef(null);
 
     useEffect(() => {
+        // Se leen una vez al montar y no se escucha el cambio: el efecto arma y
+        // desarma escuchas de mouse y una clase en `<html>`, y no hay ningún caso real
+        // en el que un puntero pase de grueso a fino con la página abierta.
         const fino = window.matchMedia('(pointer: fine)').matches;
-        const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!fino || quieto) return;
+        if (!fino || prefiereMenosMovimiento()) return;
 
         const el = ref.current;
         if (!el) return;

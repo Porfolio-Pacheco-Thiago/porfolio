@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
 import { useLang } from '../../context/lang-context';
+import { useCarrusel } from '../../hooks/useCarrusel';
 import './Shell.css';
 
 /**
@@ -39,23 +39,9 @@ import './Shell.css';
  */
 export default function Shell({ medios, titulo, label, segundos = 4, children }) {
     const { t } = useLang();
-    const [actual, setActual] = useState(0);
-    // El intervalo lee el largo, no el índice: guardándolo en un ref el efecto no se
-    // reinicia en cada relevo, que es lo que hacía que la primera captura durase el
-    // doble que las demás.
-    const indiceRef = useRef(0);
-
-    useEffect(() => {
-        if (medios.length < 2) return undefined;
-        // Un carrusel que avanza solo es movimiento que nadie pidió y del que no se
-        // puede salir: con la preferencia puesta se queda en la primera.
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-        const id = window.setInterval(() => {
-            indiceRef.current = (indiceRef.current + 1) % medios.length;
-            setActual(indiceRef.current);
-        }, segundos * 1000);
-        return () => window.clearInterval(id);
-    }, [medios.length, segundos]);
+    // Sin saliente: las capturas se cruzan con un fundido, no con un desplazamiento, así
+    // que la que se va no tiene que quedarse en pantalla — la de abajo ya está ahí.
+    const { indice: actual } = useCarrusel({ cantidad: medios.length, segundos });
 
     return (
         <div className="shell-bloque">

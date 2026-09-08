@@ -1,44 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Archivo:wdth,wght@112,400..700&family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap');
 
-/* Tailwind v4, para los componentes de shadcn/cult-ui. Todo lo de abajo es CSS
-   propio sin capa, y en la cascada el CSS sin capa gana sobre el de @layer, así
-   que el design system de acá pisa al preflight de Tailwind, no al revés. */
-@import 'tailwindcss';
-
-/* Los componentes de cult-ui usan utilidades `dark:` para su versión oscura,
-   y por defecto Tailwind las resuelve con la clase `.dark` o con la preferencia
-   del sistema — ninguna de las dos es lo que usa este proyecto, que temáis con
-   `[data-theme]`. Sin esta línea, todo `dark:` de cualquier componente del
-   registry queda muerto (texture-card tiene 14, gradient-heading 3). */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
-/* Puente entre los nombres de shadcn y este design system.
-   Los componentes de cult-ui usan utilidades tipo `bg-background`, `text-foreground`
-   o `border-border`, que Tailwind genera a partir de estos tokens. `inline` hace
-   que las utilidades apunten al var() en vez de copiar su valor, así siguen
-   automáticamente el cambio de tema claro/oscuro de las variables de abajo.
-   Sin esto, cualquier componente de cult-ui se renderiza sin colores. */
-@theme inline {
-  --color-background: var(--bg-primary);
-  --color-foreground: var(--text-primary);
-  --color-card: var(--bg-card);
-  --color-card-foreground: var(--text-primary);
-  --color-popover: var(--bg-card);
-  --color-popover-foreground: var(--text-primary);
-  --color-primary: var(--accent);
-  --color-primary-foreground: var(--accent-on);
-  --color-secondary: var(--bg-secondary);
-  --color-secondary-foreground: var(--text-primary);
-  --color-muted: var(--bg-secondary);
-  --color-muted-foreground: var(--text-secondary);
-  --color-accent: var(--accent-glow);
-  --color-accent-foreground: var(--accent);
-  --color-border: var(--border);
-  --color-input: var(--border);
-  --color-ring: var(--accent);
-  --color-destructive: #ef4444;
-}
-
 /* Design System — CSS Variables */
 :root {
   /* Dark Theme (default) */
@@ -88,7 +49,7 @@
      claro, que lleva el relleno un punto más fino. */
   --font-hero: 'Chakra Petch', var(--font-display);
   /* El cuerpo de los títulos de sección es un token porque hay que descontarlo
-     desde fuera del título: ver el margen del encabezado en Journey.css. */
+     desde fuera del título: ver el margen del encabezado en `secciones/Journey.css`. */
   /* Congelado: era `clamp(2rem, 4vw, 3rem)`. A 1920 —el ancho del lienzo— esa expresión ya daba
      este valor, así que la vista de referencia no se mueve. Se deja escrito porque no
      hay que confiar en cómo cada navegador resuelve un `vw` dentro de un elemento con
@@ -156,14 +117,14 @@
   --degrade-sombra: #008c46;
 
   /* El marco y la barra de título de las tarjetas de Proyectos. Son tokens y no
-     `color-mix()` sueltos en `Projects.css` porque el color con el que se atenúa
+     `color-mix()` sueltos en `secciones/Projects.css` porque el color con el que se atenúa
      el acento **tiene que cambiar con el tema**: en oscuro se atenúa contra las
      superficies grises, pero en claro esas superficies son casi blancas y el
      resultado quedaba en 1.97:1 (barra) y 2.80:1 (marco) contra la página, o sea
      por debajo del 3:1 que pide WCAG para gráficos. Atenuando contra el verde de
      tarjeta, los dos suben a 5.2:1.
      Ojo: en tema claro la tarjeta **expandida** es verde oscuro, así que ahí estos
-     dos se vuelven a dar vuelta — ver el bloque de tarjetas oscuras en `ui.css`. */
+     dos se vuelven a dar vuelta — ver el bloque de tarjetas oscuras en `styles/primitivas.css`. */
   --proy-marco: color-mix(in srgb, var(--accent) 52%, var(--border));
   --proy-barra: color-mix(in srgb, var(--accent) 62%, var(--bg-secondary));
 
@@ -217,7 +178,7 @@
      porque no es texto que se lea por su color: lo que dibuja las letras es el
      contorno grueso del acento, y el relleno solo tiene que separarse de él.
      Se invierte con el tema: negro sobre el fondo oscuro, blanco sobre el claro. */
-  --hero-nombre-relleno: #000000;
+  --hero-nombre-relleno: #000;
 
   /* Botón principal. En oscuro es el acento a secas; en claro se pinta con el
      verde de las tarjetas: ver el bloque de abajo. */
@@ -255,10 +216,10 @@
      —que pide 3:1—, y abre un rango que sí se nota. */
   --titulo-degrade-fin: #166634;
   /* El acento ahora es oscuro, así que encima va blanco y no negro */
-  --accent-on: #ffffff;
+  --accent-on: #fff;
 
   /* Ver la nota de arriba: el relleno se invierte con el tema. */
-  --hero-nombre-relleno: #ffffff;
+  --hero-nombre-relleno: #fff;
 
   --logo: #018c1e;
 
@@ -313,13 +274,80 @@
   --sol-piso: rgba(255, 255, 255, 0.13);
 }
 
-/* Reset & Base */
+/* ── Reset ────────────────────────────────────────────────────────────────
+   Esto reemplaza al preflight de Tailwind, que estaba acá solo por eso: el proyecto no
+   usa ni una clase de utilidad, así que todo el resto de Tailwind era andamiaje muerto.
+   Pero el preflight **sí** hacía trabajo, y sacarlo sin reponerlo le devolvía a los
+   botones el borde y la tipografía del sistema.
+
+   Cada regla de acá abajo está porque el proyecto la necesita, no porque venga en una
+   lista. Lo que el preflight traía y no se repone —`table`, `hr`, `abbr`, `sub`/`sup`,
+   `::placeholder`, los inputs de fecha— es para elementos que este sitio no usa. */
 *,
 *::before,
 *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* El borde a cero **en todo**, que es la parte del preflight que más se nota al
+     faltar: sin esto un `<button>` vuelve a dibujarse con el borde biselado del sistema,
+     y este sitio tiene una docena —los de demo, los de la barra del reproductor, las
+     flechas del carrusel, los rótulos de rama del timeline—. Va como `0 solid` y no como
+     `none` para que a cualquier elemento le alcance con declarar `border-width` para
+     tener borde. */
+  border: 0 solid;
+}
+
+html {
+  /* Que iOS no reescale el texto al girar el teléfono. */
+  -webkit-text-size-adjust: 100%;
+  /* Sin el flash gris al tocar un control en móvil. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Los encabezados heredan cuerpo y peso en vez de traer los del navegador. Acá cada uno
+   se dibuja con su clase —`.section-title`, `.project-title`, `.timeline-company`— y dos
+   de los seis (`.hero-name`, `.footer-contacto-titulo`) no declaran `font-weight`: sin
+   esta regla les volvería la negrita del `<h1>`/`<h2>` por defecto. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Las listas de acá son colecciones semánticas, no viñetas: las galerías, el riel de
+   contacto, la fila de marcas y las líneas de tiempo internas. Las seis declaran
+   `list-style: none` por su cuenta, pero se pone también acá para que la próxima no
+   dependa de acordarse. */
+ul,
+ol,
+menu {
+  list-style: none;
+}
+
+/* Los controles heredan la tipografía y no traen fondo propio. Es la otra mitad de lo
+   que se nota al sacar el preflight: sin esto un botón se dibuja con Arial de 13.33px
+   sobre el gris del sistema. `color` y `letter-spacing` van por lo mismo. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+/* El puntero de mano en lo que se puede tocar. El preflight de Tailwind no lo trae —al
+   contrario, lo saca— pero acá todos los botones ya lo declaran uno por uno; ponerlo en
+   la base evita la repetición y no cambia nada de lo que hay. */
+button {
+  cursor: pointer;
 }
 
 /* Mientras la pantalla de carga está arriba, nada del resto del sitio se mueve.
@@ -456,16 +484,15 @@ a {
 img,
 video {
   max-width: 100%;
+  /* Junto con el `max-width`: al achicarse por ancho conservan su proporción en vez de
+     estirarse. Venía del preflight y se repone tal cual, porque es lo que había. */
+  height: auto;
   display: block;
 }
 
-/* El preflight de Tailwind pone los svg en display:block, lo que saca de la
-   línea de texto a los íconos (p. ej. el de React en el footer). Volvemos al
-   default del navegador. Si algún día un componente de cult-ui necesita el
-   comportamiento de Tailwind, hay que darle su propia regla. */
-svg {
-  display: inline;
-}
+/* Acá había un `svg { display: inline }` que existía **solo** para deshacer el
+   `display: block` que les ponía el preflight de Tailwind. Sin preflight, el valor por
+   defecto del navegador ya es `inline` y la regla sobra. */
 
 /* Scrollbar */
 ::-webkit-scrollbar {

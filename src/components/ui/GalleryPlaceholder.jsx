@@ -12,7 +12,7 @@ import { FiImage } from 'react-icons/fi';
  *
  * @example
  * <GalleryPlaceholder className="project-gallery" />
- * <GalleryPlaceholder className="nested-gallery" count={2} inert />
+ * <GalleryPlaceholder className="timeline-gallery" count={2} inert />
  *
  * @remarks
  * El resto de props se pasa al contenedor, así se le puede dar `id`, `inert`

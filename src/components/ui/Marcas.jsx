@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLang } from '../../context/lang-context';
+import { prefiereMenosMovimiento } from '../../lib/medidas';
 import { marcas } from '../../data/marcas';
 import './Marcas.css';
 
@@ -41,7 +42,7 @@ export default function Marcas() {
     // avance automático podía caer justo después del click y pasar dos de una.
     const programar = useCallback(() => {
         clearInterval(relojRef.current);
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (prefiereMenosMovimiento()) return;
         relojRef.current = setInterval(() => setPaso(p => p + 1), ESPERA);
     }, []);
 

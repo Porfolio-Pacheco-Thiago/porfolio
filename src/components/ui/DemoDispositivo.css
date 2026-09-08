@@ -1,0 +1,861 @@
+/* ── El aparato de las demos ──────────────────────────────────────────────
+   El celular y el monitor de `ui/DemoDispositivo.jsx`, con su botonera, su barra de
+   reproductor y sus subtítulos.
+
+   Vivía dentro de `Projects.css` —unas mil líneas de las dos mil que tenía—, que era
+   la única sección que lo montaba. Está acá por la misma razón por la que
+   `ui/Shell.css` siempre estuvo al lado de su componente: es el CSS de una pieza
+   reutilizable, no el de una sección.
+
+   **Lo que se quedó en `Projects.css` a propósito** es cómo la *tarjeta* se reacomoda
+   alrededor del aparato: `.project-card.is-reproduciendo …`, los nombres de la View
+   Transition y la regla de `.morfando`. Eso lo decide la sección, no el aparato, y
+   depende de estados que solo la sección conoce. */
+
+/* ── El celular de las demos (tamalsen) ───────────────────────────────────
+   En reposo flota y gira; al elegir una demo se endereza y queda quieto de
+   frente, con el video adentro.
+
+   La perspectiva vive en la escena y la rotación en un único elemento. **Sin
+   `transform-style: preserve-3d` a propósito:** el celular es plano, así que sus
+   hijos se aplanan en su plano y el conjunto viaja como una sola capa compuesta.
+   Con `preserve-3d` cada hijo se re-rasterizaría por frame, que es lo que causó
+   el problema térmico de las figuras. */
+.fono-bloque {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: center;
+}
+
+/* El aire de arriba y abajo no es decorativo: al girar, la caja del aparato crece.
+   Con el celular medido —205×394 quieto— el peor caso del giro (rotateY pasando por
+   0, con el rotateZ de -11°) es 276×426, o sea 32px más alto de lo que ocupa
+   maquetado, más los 5px del `translateY` de los fotogramas. Con los 12px que había,
+   la escena medía 418 y `.project-extra` —que lleva `overflow: hidden` para poder
+   animar su despliegue— recortaba las puntas de arriba y abajo. */
+/* Con monitor la columna del aparato pesa más que la del texto, porque lo que limita
+   a un monitor es el ancho y no la altura. Va acotado a `:has(.es-monitor)` y no puesto
+   en `.fono-bloque` a secas: aplicado a todos, le angostaba la columna de texto a
+   Melodía, cuya descripción es la más larga de las ocho, y las líneas de más la
+   hacían pasarse del borde de abajo de la tarjeta. */
+.fono-bloque:has(.fono.es-monitor) {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+}
+
+.fono-escena {
+    perspective: 1100px;
+    display: grid;
+    place-items: center;
+    /* Asimétrico, y por eso no es un descuido. Arriba el aire tiene que cubrir lo que
+       la caja del aparato crece al girar; abajo no hace falta tanto, porque el giro
+       deja 33px de sobra de ese lado —el `translateY` de los fotogramas lo empuja
+       hacia arriba— y el padding de más era lo que hacía que el celular de Melodía
+       cruzara el borde inferior de su tarjeta. Con `place-items: center`, recortarlo
+       de abajo sube el aparato sin cambiarle el tamaño. */
+    padding: 0.8rem 0 0;
+    /* Y encima se lo sube un poco más. El desplazamiento va acá y no en `.fono`
+       porque ahí lo pisaría la animación del giro, que también es un `transform`. */
+    transform: translateY(-0.95rem);
+}
+
+/* El monitor necesita más que el celular: es más ancho, así que al girar su caja
+   crece más en términos absolutos aunque el ángulo sea menor. Medido: 535x310
+   quieto pasa a 548x360 girado, o sea 25px por lado, y el `translateY` de los
+   fotogramas se lleva 4 más para arriba. */
+.fono-escena:has(.fono.es-monitor) {
+    padding: 2.8rem 0;
+}
+
+/* El cuerpo del iPhone. El grosor **no** son caras 3D: es un `box-shadow` sólido
+   desplazado, que con la inclinación se lee como el canto del aparato. Caras de
+   verdad exigirían `preserve-3d` y su re-rasterizado por frame. */
+.fono {
+    position: relative;
+    /* Acotado también por el alto disponible: la tarjeta abierta ya no crece, así que
+       un celular más ancho es un celular que se sale por abajo. */
+    /* Congelado: era `min(215px, 62%, 27vh)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    width: min(215px, 62%);
+    /* El bisel. Fino a propósito: los marcos gordos son de un teléfono viejo, y acá
+       además le comen lugar a la pantalla, que es lo que se vino a ver. El radio de
+       la pantalla es este valor menos el del cuerpo, para que las dos curvas sean
+       concéntricas. */
+    padding: 4px;
+    background: linear-gradient(145deg,
+        var(--fono-luz) 0%,
+        var(--fono-medio) 38%,
+        var(--fono-hondo) 60%,
+        var(--fono-brillo) 100%);
+    border-radius: 30px;
+    box-shadow:
+        /* el canto */
+        7px 5px 0 -2px var(--fono-canto),
+        11px 8px 0 -4px var(--fono-canto-claro),
+        /* la sombra en el piso */
+        0 28px 60px rgb(var(--sombra-rgb) / 0.5);
+    animation: fono-girar 16s ease-in-out infinite;
+    /* La misma pose que el fotograma 0% del giro. Es lo que hace invisible el
+       reingreso: al volver, la transición termina justo acá y el giro arranca en
+       este mismo valor. */
+    transform: rotateZ(-11deg) rotateY(-26deg) translateY(-5px);
+    /* Lleva el celular desde donde el giro lo haya dejado hasta el frente sin
+       salto: la transición arranca del valor calculado en ese instante. */
+    transition: transform var(--demo-anim), width var(--demo-anim);
+}
+
+/* Los botones del canto. Van sobre el borde y giran con el cuerpo. */
+.fono-lateral {
+    position: absolute;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--fono-detalle);
+}
+
+.fono-lateral-izq {
+    left: -2px;
+    top: 22%;
+    height: 13%;
+}
+
+.fono-lateral-der {
+    right: -2px;
+    top: 28%;
+    height: 9%;
+}
+
+/* Con la tarjeta cerrada el celular sigue maquetado —`.project-extra` lo tapa con
+   `max-height: 0`, no lo desmonta—, así que sin esto el giro seguiría corriendo
+   en la GPU sobre algo que nadie ve. Es exactamente el patrón que nos costó el
+   problema térmico: una transformación permanente en un elemento invisible. */
+.project-card:not(.expanded) .fono {
+    animation-play-state: paused;
+}
+
+/* Y el giro del aparato se congela: la VT captura una imagen del antes y otra del
+   después, y si entre las dos el aparato siguió girando, el morph interpola entre dos
+   poses distintas y se ve un tirón. */
+.morfando .fono {
+    animation-play-state: paused;
+}
+
+/* ── El paso a reproducción, morfeado ────────────────────────────────────
+   Sin nombres, una View Transition hace un fundido cruzado de la página entera: el
+   acomodo igual cambia de golpe, solo que tapado por un fundido. Con nombres, el
+   navegador reconoce cada pieza a los dos lados del cambio y la lleva de una posición a
+   la otra — que es lo que hace falta acá, porque el aparato se muda de la mitad
+   izquierda al borde derecho y la descripción pasa de una columna angosta al ancho
+   completo.
+
+   Los nombres van sobre la tarjeta **abierta** y no sobre todas: un
+   `view-transition-name` repetido en el documento aborta la transición entera, y solo
+   hay una tarjeta abierta por vez. Van sobre `.fono-escena` y no sobre `.fono` porque
+   nombrar un elemento le crea un contexto de apilamiento propio, y `.fono` es el que
+   lleva la animación del giro. */
+.project-card.expanded .fono-escena {
+    view-transition-name: demo-aparato;
+}
+
+.project-card.expanded .fono-botones {
+    view-transition-name: demo-botones;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-bloque {
+    /* El monitor se va contra el borde derecho y el reproductor ocupa lo que queda a su
+       izquierda.
+
+       Las dos pistas son **no intrínsecas** a propósito. Con la columna del monitor en
+       `auto`, la descripción —que abarca las dos— le vuelca encima su ancho de contenido
+       y la columna se lleva los 1088px enteros, dejando la del reproductor en cero. Es
+       el mismo reparto de pistas intrínsecas que ya había mordido con la botonera. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--monitor-video));
+    align-items: center;
+    /* Poco espacio entre renglones. El de la grilla es 1.5rem, pensado para la columna
+       de al lado; acá el renglón de abajo es la descripción y el de arriba lo ocupa el
+       monitor, que ya trae su propio aire en la escena. Sumados dejaban un vacío grande
+       justo debajo del aparato. */
+    row-gap: 0.35rem;
+    /* Y poco entre columnas: cada píxel de separación se lo saca a la barra, que con el
+       monitor a 885px es la que anda justa. */
+    column-gap: 0.6rem;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-escena {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    justify-self: end;
+}
+
+/* Solo el celular: el monitor pisa este ancho con `--monitor-video`.
+
+   Bajó de 330 por una razón distinta a la del monitor, y que no se arregla escondiendo
+   texto: acá la descripción va **al lado** del aparato y no debajo, así que el alto de
+   la tarjeta lo fija el celular solo. A 330 medía 652px contra los 695 de la tarjeta y
+   se pasaba del borde con uno o con dos párrafos. */
+.project-card.is-reproduciendo .fono {
+    width: min(310px, 70%);
+}
+
+.project-card.is-reproduciendo .fono.is-demo {
+    transform: none;
+}
+
+/* Mientras vuelve al giro, la animación no puede estar: una animación de keyframes
+   le gana al `transform` declarado, así que con ella puesta no habría transición
+   que ver — el celular saltaría a la pose inicial de una. Sin ella, la transición
+   lo lleva suave hasta esa pose, y recién ahí `PhoneDemo` saca la clase. */
+.fono.is-volviendo {
+    animation: none;
+}
+
+.fono.is-demo {
+    animation: none;
+    transform: rotateZ(0deg) rotateY(0deg) scale(1.1);
+}
+
+/* ── El otro chasis: un monitor ───────────────────────────────────────────
+   Mismo comportamiento y mismo código que el celular —gira, se endereza, tiene la
+   misma botonera y la misma barra—; lo único distinto es la carcasa, porque lo que
+   tiene que mostrar es apaisado. Una captura de escritorio en una pantalla 1:2
+   entraba de canto.
+
+   El giro es el mismo `fono-girar`, pero el monitor es ancho y a 26° de rotación en
+   Y un plano ancho se escorza mucho más que uno angosto: la mitad de la pantalla se
+   volvía ilegible. De ahí su propio juego de fotogramas, con la mitad de amplitud. */
+.fono.es-monitor {
+    /* Aluminio, contra el dorado del celular: son dos aparatos distintos y conviene
+       que se lean como tales. Los tokens salen de index.css, uno por tema. */
+    background: linear-gradient(145deg,
+        var(--aparato-luz) 0%,
+        var(--aparato-medio) 38%,
+        var(--aparato-hondo) 60%,
+        var(--aparato-brillo) 100%);
+    /* Lo que manda es el 96% de la columna; el literal y el `vh` están para que en
+       pantallas muy anchas o muy bajas no se desborde. Antes el tope eran 330px, que
+       dejaba 185px de columna sin usar. */
+    /* Congelado: era `min(485px, 90%, 58vh)`. Con la raíz escalada un `vw` ya vale siempre lo mismo, pero
+       un `vh` sigue al alto de la ventana, que no entra en la cuenta de la escala — dos
+       monitores del mismo ancho y distinto alto se veían distinto. Este es el valor a la
+       altura de referencia del lienzo, 900. */
+    width: min(485px, 90%);
+    padding: 4px 4px 5px;
+    border-radius: 7px;
+    /* Menos canto que el celular: un monitor es un panel fino, no un ladrillo. */
+    box-shadow:
+        5px 4px 0 -2px var(--aparato-canto),
+        8px 6px 0 -4px var(--aparato-canto-claro),
+        0 26px 55px rgb(var(--sombra-rgb) / 0.5);
+    animation-name: monitor-girar;
+    transform: rotateZ(-6deg) rotateY(-15deg) translateY(-4px);
+}
+
+/* El pie: cuello y base en un solo elemento, dibujados con dos fondos. Cuelga por
+   debajo del marco y gira con él, como los botones del canto del celular. Es plano
+   a propósito — ver la nota sobre `preserve-3d` más arriba. */
+.fono-pie {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 34%;
+    height: 13px;
+    transform: translateX(-50%);
+    background:
+        /* la base, apoyada abajo */
+        linear-gradient(var(--aparato-canto-claro), var(--aparato-medio)) bottom / 100% 4px no-repeat,
+        /* el cuello, angosto y centrado */
+        linear-gradient(var(--aparato-luz), var(--aparato-canto)) top 0 left 50% / 22% 10px no-repeat;
+    border-radius: 0 0 3px 3px;
+}
+
+/* Enderezado, el monitor no se escala: ya ocupa casi todo el ancho de su columna y
+   un `scale` lo sacaría del bloque, que recorta. */
+.fono.es-monitor.is-demo {
+    transform: rotateZ(0deg) rotateY(0deg);
+}
+
+/* Más chico que sin reproducir, no más grande. Apilado el monitor ya no compite por
+   el ancho sino por el alto, y cada 100px de ancho son 56 de alto que le saca a la
+   descripción, que abajo tiene que entrar entera. */
+.project-card.is-reproduciendo .fono.es-monitor {
+    width: var(--monitor-video, 717px);
+}
+
+/* Y la escena deja de reservar aire para el giro: reproduciendo el monitor está
+   derecho, así que su caja ya no crece y ese margen no defiende nada. Son casi 80px
+   que le quedan a lo de abajo. */
+.project-card.is-reproduciendo .fono-escena {
+    padding-block: 0.4rem 0;
+}
+
+/* Apilada, los controles se reordenan en dos renglones en vez de cuatro:
+   el botón de la demo y la barra del reproductor comparten el primero, y la
+   descripción con los tags y el repo ocupan el segundo. Cada renglón que se ahorra es
+   alto que gana el monitor, que es lo que se vino a agrandar.
+
+   La barra deja de ocupar todo el ancho y se queda con el que tenía en la columna de
+   Melodía: una aguja de 1100px es imposible de apuntar, y el espacio que libera a los
+   costados es justamente donde entra el botón. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-controles {
+    /* `display: contents` disuelve la caja: sus tres hijos —botonera, barra y el bloque
+       de descripción— pasan a ser items de la grilla del bloque y se pueden colocar uno
+       por uno. Sin esto, los tres quedarían encerrados en la columna izquierda, y la
+       descripción a 370px de ancho se iría a diez renglones. */
+    display: contents;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-botones {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    justify-content: center;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-barra {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    /* La barra recorta —tiene esquinas redondeadas y fondos que se salen— pero el
+       volumen tiene que poder asomar por arriba: en este acomodo se guarda detrás de su
+       botón y sube al pasarle el mouse. Ver la regla del volumen, más abajo. */
+    overflow: visible;
+    /* Toda la columna: acá el ancho lo fija el hueco que deja el monitor, no un tope
+       propio. */
+    width: 100%;
+    /* Los dos grupos a los extremos. Sin esto quedan pegados en el medio: el nombre de
+       la pista y el reloj se esconden en esta columna —ver las reglas de abajo— y sin
+       ellos no hay nada que los separe, así que los cinco botones se leían como un solo
+       bloque apretado con el resto de la barra vacío al costado. */
+    justify-content: space-between;
+    gap: 0.3rem;
+    padding: 0.7rem 0.5rem 1rem;
+}
+
+/* Adentro de cada grupo el aire alcanza para respirar: los cinco botones suman 170px en
+   una columna de 222, así que lo que antes se recortaba al mínimo —por miedo a que el
+   botón de pantalla completa se saliera— ahora entra sin problema. El que manda sigue
+   siendo el ancho de la columna, que es lo que deja libre el monitor. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-transporte,
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios {
+    gap: 0.3rem;
+}
+
+/* En esta columna la barra mide unos 370px y el nombre de la pista no entra: se parte
+   en cuatro renglones y se le encima al transporte. Se va, y no se pierde nada — lo
+   dice el botón que está justo encima, y el proyecto lo dice el título de la tarjeta. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-pista {
+    display: none;
+}
+
+/* Por el mismo motivo se va el contador: en 370px cada control pelea por el lugar, y
+   el minutero es lo primero que se puede resignar — la aguja de abajo ya muestra por
+   dónde va. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-tiempos {
+    display: none;
+}
+
+/* Y el volumen deja de estar siempre a la vista: se guarda detrás de su propio botón y
+   sube al pasarle el mouse por encima. Es un control que casi nadie toca ocupando el
+   ancho de tres. El `overflow: visible` que eso necesita está arriba, en el bloque de
+   `.fono-barra` de este mismo estado. */
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios {
+    position: relative;
+}
+
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-volumen {
+    position: absolute;
+    /* Sobre el **botón de volumen**, que es el primero del grupo, y no sobre el centro
+       del grupo. Acá decía `left: 50%`, que mientras los botones en flujo fueron dos
+       —silencio y pantalla completa— caía cerca del primero por casualidad. Al sumarse
+       el de subtítulos el centro se corrió y el control apareció sobre ese, que es un
+       botón con el que no tiene nada que ver. Media medida de botón desde el borde
+       izquierdo lo deja centrado sobre el suyo, cuenten los que cuenten el resto. */
+    left: calc(var(--fono-icono) / 2);
+    /* Vertical con un cuarto de vuelta, y no con `writing-mode`: el control ya está
+       dibujado a mano con los pseudoelementos de la pista y el pulgar, y rotarlo los
+       lleva a todos sin tocar ninguno. El giro es antihorario, así que el cero queda
+       abajo y el máximo arriba, que es como se lee un volumen.
+
+       El `2rem` no es decorativo: la caja mide 5rem de largo, al girar sobre su centro
+       ocupa esos 5rem hacia arriba y hacia abajo por igual, y con este desplazamiento su
+       borde inferior cae **justo** sobre el borde de arriba del botón. Un hueco entre
+       los dos sería una zona muerta donde el puntero pierde el `:hover` y el control se
+       cierra justo cuando lo vas a agarrar. */
+    bottom: calc(100% + 1.6rem);
+    width: 5rem;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    box-shadow: 0 6px 18px rgb(var(--sombra-rgb) / 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) rotate(-90deg) translateX(0.4rem);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/* `:focus-within` va aparte del `:hover`: es el camino por teclado, y tiene que
+   seguir funcionando donde no hay puntero fino. */
+.project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:focus-within .fono-volumen {
+    opacity: 1;
+    pointer-events: auto;
+    /* El desplazamiento va **después** del giro, así que corre a lo largo del control:
+       sube. */
+    transform: translateX(-50%) rotate(-90deg) translateX(0);
+}
+@media (hover: hover) and (pointer: fine) {
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-secundarios:hover .fono-volumen {
+        opacity: 1;
+        pointer-events: auto;
+        /* El desplazamiento va **después** del giro, así que corre a lo largo del control:
+           sube. */
+        transform: translateX(-50%) rotate(-90deg) translateX(0);
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-volumen {
+        transition: opacity 0.18s ease;
+        transform: translateX(-50%) rotate(-90deg);
+    }
+}
+
+
+/* La proporción la fija la pantalla y el celular la envuelve: así el bisel no
+   entra en la cuenta y la pantalla calza exacta con el video (720×1440). */
+.fono-pantalla {
+    aspect-ratio: 1 / 2;
+    width: 100%;
+    /* Marco de referencia de las dos piezas del relevo, que van en absoluto. */
+    position: relative;
+    border-radius: 26px;
+    overflow: hidden;
+    background: #000;
+}
+
+/* 16:9 y esquinas casi rectas. Y `contain` en vez de `cover`: las capturas de estos
+   tres proyectos no son 16:9 —Monopoly es casi 4:3 y Zorro más cuadrado todavía— así
+   que recortarlas les comería el tablero. Lo que sobra queda en negro, que es lo que
+   se ve en un monitor cuando la imagen no llena la pantalla. */
+.fono.es-monitor .fono-pantalla {
+    aspect-ratio: 16 / 9;
+    border-radius: 3px;
+}
+
+.fono.es-monitor .fono-pantalla :is(img, video) {
+    object-fit: contain;
+}
+
+/* El relevo del carrusel: las dos piezas suben a la vez, la que entra desde abajo y la
+   que sale hacia arriba, como el rodillo de una máquina tragamonedas. Se dispara solo
+   porque la `key` de React remonta cada imagen, así que las animaciones arrancan de
+   cero en cada cambio sin coordinar nada desde JS.
+
+   Van las dos en absoluto para que se superpongan; el recorte lo pone el
+   `overflow: hidden` de la pantalla. */
+.fono-pieza {
+    position: absolute;
+    inset: 0;
+    animation: fono-sube-entra var(--relevo) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.fono-pieza.is-saliente {
+    animation-name: fono-sube-sale;
+}
+
+/* El carrusel a corte: la pieza aparece puesta, sin subir. No hay `is-saliente` que
+   apagar porque en este modo no se monta ninguna —ver el efecto del intervalo—. */
+.fono-pieza.es-corte {
+    animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .fono-pieza { animation: none; }
+    /* Sin animación no llega el `animationend` que la desmonta, así que se la saca
+       de la vista desde acá. */
+    .fono-pieza.is-saliente { display: none; }
+}
+
+
+/* El video es **intocable**: sin `pointer-events` no hay menú contextual ni
+   controles del navegador encima de la pantalla del celular. Todo se maneja desde
+   la barra de abajo. */
+.fono-pantalla :is(img, video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* En pantalla completa se invierte: ahí el video **es** la interfaz, así que
+   recupera el puntero —los controles nativos los enciende `PhoneDemo`— y pasa a
+   `contain`, porque `cover` recortaría un video vertical contra una pantalla
+   apaisada. */
+.fono-pantalla video:fullscreen {
+    object-fit: contain;
+    pointer-events: auto;
+    background: #000;
+}
+
+.fono-controles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.fono-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.fono-boton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+        transform 0.12s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+    .fono-boton:hover {
+        color: var(--accent-text);
+        border-color: var(--accent);
+    }
+}
+
+
+/* Respuesta al apretar. Sin esto el botón se siente muerto entre el click y el
+   momento en que el celular termina de enderezarse, que son casi 900ms. */
+.fono-boton:active {
+    transform: translateY(1px);
+}
+
+.fono-boton.is-activa {
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* ── La barra del reproductor ─────────────────────────────────────────────
+   Panel al estilo de un reproductor de música: nombre de la pista a la izquierda,
+   transporte al centro, tiempos a la derecha, y la aguja al **ras del borde de
+   abajo** en vez de entre los tiempos.
+
+   El fondo es el mismo degradado del sol de la página —`--sol-nucleo` y
+   `--sol-halo` sobre la superficie de tarjeta—, así que son literalmente los
+   colores del fondo y cambia solo con el tema. En la referencia ese lugar lo ocupa
+   una foto; acá un degradado, que además no obliga a conseguir una imagen por
+   demo. */
+.fono-barra {
+    position: relative;
+    /* Lado de los botones redondos de la barra. Va como variable porque el popup del
+       volumen se ancla **sobre uno de ellos** y necesita la mitad de esta medida; con el
+       número escrito en los dos lados, tocar el tamaño del botón dejaba el popup
+       descentrado sin que nada lo avisara. */
+    --fono-icono: 1.9rem;
+    /* Explícito y no heredado: la barra es una superficie oscura y `styles/primitivas.css` le invierte
+       los tokens, pero lo que no pida `--text-primary` a mano heredaría el color de la
+       tarjeta, que desde que perdió el fondo es el oscuro de la página. */
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem 1.15rem;
+    border-radius: 10px;
+    overflow: hidden;
+    background:
+        radial-gradient(120% 190% at 10% -10%, var(--sol-nucleo), transparent 60%),
+        radial-gradient(95% 165% at 88% 115%, var(--sol-halo), transparent 68%),
+        var(--bg-card);
+    box-shadow: 0 0 30px var(--accent-glow-raw),
+        0 16px 40px rgb(var(--sombra-rgb) / 0.4);
+}
+
+/* Nombre de la demo y proyecto, como pista y álbum. */
+.fono-pista {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.fono-pista-nombre {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.25;
+}
+
+.fono-pista-album {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.fono-transporte {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+.fono-icono {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: var(--fono-icono, 1.9rem);
+    height: var(--fono-icono, 1.9rem);
+    padding: 0;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.12s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+    .fono-icono:hover {
+        color: var(--accent-text);
+        background: color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+}
+
+
+.fono-icono:active {
+    transform: scale(0.92);
+}
+
+/* El de subtítulos es el único de la barra que se queda prendido, así que necesita
+   decirlo también apagado el puntero. El ícono ya cambia de contorneado a relleno; esto
+   le suma el color del acento, porque la diferencia entre los dos glifos es sutil a
+   17px. Va después del `:hover` para que un botón prendido no se apague al pasarle el
+   mouse por encima. */
+.fono-icono.is-activo {
+    color: var(--accent-text);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ── Los subtítulos dentro de la pantalla ─────────────────────────────────
+   El navegador los dibuja con su tamaño por defecto, que es un porcentaje del alto del
+   video: en el celular —una pantalla de 215px de ancho— eso sale enorme y tapa media
+   demo. Se los baja a una medida atada a la pantalla y no al texto de la página, que es
+   lo que hace que se lean igual en el celular y en el monitor.
+
+   El fondo va semitransparente y no opaco: sobre una grabación de pantalla el bloque
+   negro macizo tapa justo la interfaz que se está mostrando. */
+.fono-pantalla video::cue {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: #fff;
+    background: rgb(0 0 0 / 0.72);
+}
+
+/* En el monitor la pantalla es mucho más grande, así que el mismo cuerpo se ve chico. */
+.fono.es-monitor .fono-pantalla video::cue {
+    font-size: 1.15rem;
+}
+
+/* El de reproducir es el principal: círculo relleno y más grande, como en la
+   referencia. */
+.fono-play {
+    width: 2.6rem;
+    height: 2.6rem;
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+    .fono-play:hover {
+        background: color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+}
+
+
+/* Tiempos: el transcurrido manda, el total acompaña. */
+.fono-tiempos {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.fono-tiempo-actual {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.fono-secundarios {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
+/* Un solo aspecto para las dos barras. */
+.fono-rango {
+    appearance: none;
+    height: 3px;
+    background: color-mix(in srgb, var(--text-secondary) 35%, transparent);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.fono-volumen {
+    flex-shrink: 0;
+    width: 3.6rem;
+    /* Mismo criterio que la aguja: alto de agarre cómodo, línea fina. */
+    height: 16px;
+    background: none;
+}
+
+/* Los pseudo-elementos de cada motor van en **reglas separadas**, nunca en una
+   lista separada por comas: si el navegador no entiende uno de los selectores,
+   descarta la regla entera. Agrupados, Chrome tiraba el bloque por el
+   `::-moz-range-track` y la línea del volumen quedaba invisible. */
+.fono-volumen::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--nivel, 100%),
+            color-mix(in srgb, var(--text-secondary) 38%, transparent) var(--nivel, 100%));
+}
+
+.fono-volumen::-moz-range-track {
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--nivel, 100%),
+            color-mix(in srgb, var(--text-secondary) 38%, transparent) var(--nivel, 100%));
+}
+
+.fono-volumen::-webkit-slider-thumb {
+    margin-top: -4px;
+}
+
+.fono-rango::-webkit-slider-thumb {
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    background: var(--accent);
+    border-radius: 50%;
+}
+
+.fono-rango::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+}
+
+/* La aguja, a todo el ancho contra el borde de abajo.
+
+   **El área de agarre y la línea visible son cosas distintas.** El input mide 18px
+   de alto para poder agarrarlo; la línea de 5px se dibuja en la pista, centrada
+   dentro de ese alto. Con los 4px de antes había que acertarle a una franja de
+   cuatro píxeles, y errarle un poco significaba clickear la tarjeta.
+
+   `--avance` lo calcula el componente: un `input[type=range]` no tiene forma
+   nativa de pintar lo recorrido. */
+.fono-aguja {
+    appearance: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 18px;
+    background: none;
+    cursor: pointer;
+}
+
+.fono-aguja::-webkit-slider-runnable-track {
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--avance, 0%),
+            color-mix(in srgb, var(--text-secondary) 28%, transparent) var(--avance, 0%));
+}
+
+.fono-aguja::-moz-range-track {
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+            var(--accent) var(--avance, 0%),
+            color-mix(in srgb, var(--text-secondary) 28%, transparent) var(--avance, 0%));
+}
+
+.fono-aguja::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg-card) 70%, transparent);
+    /* Centrar el tirador sobre una pista de 5px: la mitad de la diferencia. */
+    margin-top: -4.5px;
+}
+
+.fono-aguja::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg-card) 70%, transparent);
+}
+@media (max-width: 700px) {
+    /* En angosto el panel se apila y los secundarios pasan abajo. */
+    .fono-barra {
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .fono-pista {
+        flex-basis: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .fono {
+        animation: none;
+        transform: none;
+    }
+
+    .fono.is-demo {
+        transform: none;
+    }
+}
+
+/* corte SIN_RIEL */
+@media (max-width: 900px) {
+
+    .project-card.is-reproduciendo:has(.fono.es-monitor) .fono-bloque {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    /* El aparato y su columna de al lado se apilan, con el aparato arriba: en el DOM
+       `.fono-escena` va primero, así que en una sola columna queda encima solo.
+
+       Las dos ramas del selector no son decorativas. Los proyectos con monitor
+       redefinen el reparto en `.fono-bloque:has(.fono.es-monitor)` —dos clases contra
+       una—, así que con el selector corto la regla se aplicaba únicamente a los de
+       celular y todos los del monitor seguían en dos columnas: a 390 daba 138px para el
+       aparato y 132 para el texto. */
+    .fono-bloque,
+    .fono-bloque:has(.fono.es-monitor) {
+        grid-template-columns: 1fr;
+    }
+}

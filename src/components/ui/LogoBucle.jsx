@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useMenosMovimiento } from '../../hooks/useMenosMovimiento';
 
 /**
  * Los videos de marca de un proyecto, turnándose en bucle: cada uno se repite
@@ -20,18 +21,8 @@ export default function LogoBucle({ videos, className }) {
     const vueltas = useRef(0);
     const ref = useRef(null);
 
-    // Con movimiento reducido no hay bucle: se muestra el primero quieto. Se lee una
-    // vez y se escucha el cambio, porque el sistema operativo permite activarlo con la
-    // página abierta.
-    const [quieto, setQuieto] = useState(
-        () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    );
-    useEffect(() => {
-        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const alCambiar = e => setQuieto(e.matches);
-        mq.addEventListener('change', alCambiar);
-        return () => mq.removeEventListener('change', alCambiar);
-    }, []);
+    // Con movimiento reducido no hay bucle: se muestra el primero quieto.
+    const quieto = useMenosMovimiento();
 
     function alTerminar() {
         vueltas.current += 1;

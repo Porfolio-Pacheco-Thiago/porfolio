@@ -1,0 +1,201 @@
+/* ── La línea de tiempo interna de una entrada ────────────────────────────
+   Los puntos de `journey/NestedClients.jsx` y `journey/NestedNodes.jsx`: los clientes de
+   Lovelytics y la trayectoria de docencia.
+
+   Vivía dentro de `Journey.css`. Está acá por la regla del proyecto: el CSS al lado del
+   componente que lo dibuja.
+
+   **Dos reglas se quedaron en `Journey.css` a propósito**, y las dos por el mismo
+   motivo: nombran a la vez un elemento de acá y uno de la tarjeta que los contiene
+   —`.nested-tags, .timeline-tags` y el renglón de tipografía compartida— así que no son
+   de un archivo ni del otro. Quedan en el de la sección, que es el que carga después y
+   por lo tanto gana los empates. */
+
+/* Línea de tiempo anidada (Lovelytics → clientes) */
+/* Son <ul>/<li> por semántica: es una lista. Sin viñetas ni sangría. */
+.nested-timeline {
+    list-style: none;
+    position: relative;
+    margin: 0.5rem 0 0;
+    padding-left: 1.5rem;
+}
+
+/* Cuando después de la lista viene la galería —hoy solo docencia—, las fotos
+   arrancaban pegadas al último renglón de texto. El margen va acá y no en la galería
+   para que no aparezca en las tarjetas donde la lista es lo último. */
+.nested-timeline:not(:last-child) {
+    margin-bottom: 0.65rem;
+}
+
+.nested-timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    border-radius: 2px;
+    /* Del 40% al 70%: al 40 la línea daba 1.63:1 incluso en el tema oscuro, donde el
+       color sí era el correcto. Es una línea de 2px, no un fondo. */
+    background: color-mix(in srgb, var(--work-color) 70%, transparent);
+}
+
+.nested-item {
+    position: relative;
+    /* La separación entre un punto y el siguiente: el logo de uno contra el título del
+       de abajo. Estaba en 0.6rem —recortado cuando la tarjeta no entraba— y los puntos
+       se leían como un bloque continuo. Con las etiquetas en un renglón sobró alto y
+       vuelve a haber aire. */
+    padding-bottom: 1.15rem;
+}
+
+.nested-item:last-child {
+    padding-bottom: 0;
+}
+
+.nested-dot {
+    position: absolute;
+    left: -1.5rem;
+    top: 3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    /* Entero, no al 65%: era el otro que se perdía (2.27:1 en oscuro). */
+    border: 2px solid var(--work-color);
+}
+
+.nested-dot::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: var(--work-color);
+}
+
+.nested-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.nested-label {
+    /* Por encima de la explicación que tiene debajo (0.95rem): es su título, y a
+       0.78rem quedaba más chico que el texto que encabeza. */
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.nested-period {
+    /* Períodos anidados en mono */
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.nested-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* El logo de cada punto de la línea interna. Misma caja que el de la tarjeta —el
+   token está una sola vez— para que los dos tamaños de logo se lean como el mismo
+   elemento a dos escalas. */
+/* El logo del punto y sus etiquetas, en un renglón. */
+.nested-medios {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.35rem;
+}
+
+/* Un solo renglón, sin envolver nunca: `nowrap` y listo. Iban en dos filas y eso le
+   sumaba ~20px de alto a cada punto —60 en la tarjeta de Lovelytics, que tiene tres— y
+   la sacaba de su marco. En una fila el alto del renglón lo pone el logo y las
+   etiquetas viajan gratis. */
+.nested-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    align-items: center;
+    min-width: 0;
+}
+
+/* No se achican para entrar: una etiqueta con el texto cortado no dice nada. */
+.nested-tags .tag {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.nested-banner {
+    display: block;
+    /* A ancho completo quedaba del mismo tamaño que el logo de la tarjeta, y estos son
+       los clientes: el logo del empleador tiene que seguir siendo el grande. Acá además
+       comparte el renglón con las etiquetas. */
+    flex: 0 0 34%;
+    /* Sin esto el 45% no manda: el mínimo automático de un ítem flex es su tamaño
+       intrínseco, y el de una imagen es su ancho real —el de Toyota mide 800px—, así
+       que el logo se plantaba en 804 y las etiquetas quedaban apretadas contra el
+       borde. Es el mismo caso que el `min-height: 0` del recuadro de la foto. */
+    min-width: 0;
+    aspect-ratio: var(--caja-logo);
+    object-fit: contain;
+    /* Blanco por defecto, como el de la tarjeta; el punto que necesite otra cosa lo
+       declara en `data/journey.js`. */
+    background: var(--banner-fondo, #fff);
+    border: var(--trazo) solid var(--proy-marco);
+}
+@media (max-width: 768px) {
+
+    /* ── La tarjeta abierta se muestra entera, sin scroll propio ──────────
+       Acá hubo un techo de `78svh` con `overflow-y: auto`, que traducía la invariante
+       del escritorio —una entrada abierta nunca supera el alto disponible— a costa de
+       un scroll anidado. Con la tarjeta en 1868px era el único modo de que la sección
+       fuera navegable.
+
+       Ya no hace falta: entre esconder la galería, dejar un solo logo, quedarse con la
+       descripción del punto más reciente y sacar el renglón de medios de cada cliente,
+       Lovelytics —la más larga— pasó de 1868px a poco más de mil. Un scroll adentro de
+       otro scroll en un teléfono se paga caro, así que con el contenido ya recortado
+       conviene mostrarla entera y que la página scrollee una sola vez. */
+
+    /* ── El renglón de medios de cada cliente se va entero ─────────────────
+       `.nested-medios` es el logo del cliente más sus etiquetas, uno al lado del otro.
+       Los dos se rompían en esta columna:
+
+       - El logo saca su alto de `flex: 0 0 34%` más un `aspect-ratio` apaisado. Con los
+         835px de renglón que hay en ancho da 284x30; con 220 da 75px de ancho por **8
+         de alto**. Además dejaba a la entrada con cuatro logos —el suyo más uno por
+         cliente— donde tiene que haber uno.
+       - A las etiquetas les quedaban 132px, menos que el chip más largo, que se salía
+         de la ventana. Sueltas a lo ancho entraban, pero se partían en cuatro filas:
+         120px por cliente, 360 en total, para repetir palabras que el párrafo de arriba
+         ya dice.
+
+       Se esconde el contenedor y no sus dos hijos por separado: vacío seguiría ocupando
+       su `margin-top`. */
+    .nested-medios {
+        display: none;
+    }
+
+    /* ── De la lista anidada, solo se lee el punto más reciente ────────────
+       Lovelytics tiene tres clientes y docencia tres materias, y cada uno trae su
+       párrafo. En ancho los tres suman 443px sobre una tarjeta de 747; acá, en una
+       columna de 250px de texto, los mismos tres suman 1412 y son la mitad larga de
+       todo lo que hay que scrollear.
+
+       Se queda la descripción del primero —la lista va de más reciente a más antiguo—
+       y de los otros dos queda su rótulo y su período, que es lo que los nombra. La
+       lista sigue completa: lo que se va es el desarrollo, no el punto.
+
+       El selector le gana por especificidad a la regla base (3 clases contra 1), así
+       que no depende de dónde caiga en el archivo. */
+    .nested-item:not(:first-child) .nested-desc {
+        display: none;
+    }
+}
