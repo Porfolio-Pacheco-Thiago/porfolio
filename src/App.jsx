@@ -36,7 +36,12 @@ function App() {
     const aplicar = () => {
       const raiz = document.documentElement;
       const angosto = window.matchMedia(SIN_RIEL).matches;
-      const escala = angosto ? 1 : window.innerWidth / LIENZO;
+      // `clientWidth` y no `innerWidth`: el segundo **incluye la barra de scroll**, así
+      // que donde la barra ocupa lugar —Windows y Linux con barras clásicas, ~17px— el
+      // lienzo se escalaba para llenar un ancho que no existía y se salía por la derecha
+      // esos píxeles, que el `overflow-x: clip` recortaba. Con barras superpuestas
+      // (macOS, Windows 11 por defecto) los dos valores coinciden y no cambia nada.
+      const escala = angosto ? 1 : raiz.clientWidth / LIENZO;
       raiz.style.setProperty('--escala', String(escala));
       // El alto de una pantalla, medido **en unidades del lienzo**: escalado por `zoom`
       // vuelve a dar la ventana entera. No se usa `100dvh` para esto porque no está claro

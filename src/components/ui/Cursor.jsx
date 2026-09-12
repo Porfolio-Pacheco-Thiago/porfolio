@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { prefiereMenosMovimiento } from '../../lib/medidas';
+import { escalaLienzo, prefiereMenosMovimiento } from '../../lib/medidas';
 import './Cursor.css';
 
 /**
@@ -39,11 +39,30 @@ export default function Cursor() {
         // señal de que algo se puede clickear, y el anillo la reemplaza creciendo.
         const TOCABLE = 'a, button, [role="button"], input, select, summary, label';
 
+        // El lienzo escalado obliga a dividir. `<html>` lleva `zoom: var(--escala)`, así
+        // que el sistema de coordenadas de este elemento está multiplicado por esa escala
+        // — pero `clientX`/`clientY` vienen en píxeles reales de la ventana, sin escalar.
+        // Poniéndolos tal cual, el anillo se dibuja en `clientX * escala`: a escala 1 no
+        // se nota nada, y a 0.71 —un portátil de 1366— queda 289px a la izquierda del
+        // puntero de verdad en el borde derecho de la pantalla. El error crece con la
+        // distancia al origen, que es lo que lo hacía ver como un puntero suelto.
+        //
+        // Se divide acá y no con un `zoom` inverso en el CSS a propósito: el `zoom`
+        // arreglaría la posición pero también desharía el escalado del anillo, y el
+        // anillo tiene que achicarse con la página como todo lo demás.
+        //
+        // Se lee una vez y en cada `resize` en vez de en cada cuadro: `getComputedStyle`
+        // fuerza un recálculo de estilo, y acá se pinta hasta 60 veces por segundo.
+        let escala = 1;
+        const leerEscala = () => { escala = escalaLienzo(); };
+        leerEscala();
+        window.addEventListener('resize', leerEscala);
+
         let x = 0, y = 0, frame = 0, objetivo = null;
         const pintar = () => {
             frame = 0;
             // Solo traslación: el escalado vive en el hijo.
-            el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            el.style.transform = `translate3d(${x / escala}px, ${y / escala}px, 0)`;
             // El `closest` corre una vez por frame y no por evento de mouse, que
             // llegan de a decenas.
             el.classList.toggle('is-control', !!objetivo?.closest?.(TOCABLE));
@@ -63,6 +82,7 @@ export default function Cursor() {
 
         return () => {
             window.removeEventListener('mousemove', mover);
+            window.removeEventListener('resize', leerEscala);
             document.removeEventListener('mouseleave', irse);
             document.documentElement.classList.remove('tiene-cursor-propio');
             cancelAnimationFrame(frame);

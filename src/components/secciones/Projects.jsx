@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { useLang } from '../../context/lang-context';
 import { useAlternable } from '../../hooks/useAlternable';
-import { SIN_RIEL } from '../../lib/medidas';
+import { SIN_RIEL, escalaLienzo } from '../../lib/medidas';
 import { conVistaTransicion } from '../../lib/vista-transicion';
 import ProjectCard from './projects/ProjectCard';
 import WireFigure from '../ui/WireFigure';
@@ -65,7 +65,17 @@ export default function Projects() {
         const grilla = grillaRef.current;
         const angosto = window.matchMedia(SIN_RIEL).matches;
         if (grilla && !cerrando && expandedId === null && !angosto) {
-            grilla.style.height = `${grilla.getBoundingClientRect().height}px`;
+            // Dividido por la escala, y no es un detalle. `getBoundingClientRect()`
+            // devuelve píxeles **reales de la ventana** —ya pasados por el `zoom` del
+            // lienzo— pero lo que se escribe en `style.height` se interpreta en unidades
+            // del lienzo, que el `zoom` va a multiplicar otra vez. Sin dividir, la grilla
+            // queda del alto real en vez del alto en unidades: a escala 1 da igual, y en
+            // un portátil de 1366 —escala 0.71— se quedaba un 29% corta.
+            //
+            // La tarjeta abierta se dibuja con `inset: 0` sobre la grilla, así que ese
+            // 29% se lo comía de su propio alto: el celular y el enlace al repositorio
+            // se salían por abajo del marco.
+            grilla.style.height = `${grilla.getBoundingClientRect().height / escalaLienzo()}px`;
         }
         const soltarGrilla = () => {
             if (grilla && cerrando) grilla.style.height = '';

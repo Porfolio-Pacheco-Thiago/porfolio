@@ -40,6 +40,32 @@ export const MENOS_MOVIMIENTO = '(prefers-reduced-motion: reduce)';
 export const LIENZO = 1920;
 
 /**
+ * La escala a la que se está dibujando el lienzo, o 1 si no hay ninguna.
+ *
+ * Hace falta cada vez que se cruzan **píxeles reales de la ventana** con **unidades del
+ * lienzo**, que son dos sistemas distintos desde que `<html>` lleva `zoom`:
+ *
+ *  - `clientX`, `clientY` y `getBoundingClientRect()` vienen del navegador ya escalados,
+ *    o sea en píxeles reales;
+ *  - todo lo que se escribe en un `style` o en el CSS se interpreta en unidades del
+ *    lienzo, que el `zoom` va a multiplicar después.
+ *
+ * Pasar un número del primer grupo al segundo sin dividir es un error que **no se ve a
+ * escala 1** —el monitor de 1920, donde está afinado el diseño— y crece cuanto más se
+ * aparta de ahí. Nos pasó dos veces: el anillo del cursor dibujándose lejos del puntero,
+ * y el alto de la grilla de Proyectos quedando un 30% corto en un portátil de 1366, que
+ * le sacaba el piso a la tarjeta abierta.
+ *
+ * @returns {number}
+ */
+export function escalaLienzo() {
+    const v = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--escala'),
+    );
+    return Number.isFinite(v) && v > 0 ? v : 1;
+}
+
+/**
  * Si el usuario pidió menos movimiento, leído en el momento.
  *
  * Para el código que **no** es un componente y por lo tanto no puede usar un hook:
