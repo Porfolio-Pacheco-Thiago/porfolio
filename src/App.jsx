@@ -7,7 +7,7 @@ import Skills from './components/secciones/Skills';
 import Footer from './components/layout/Footer';
 import Loader from './components/layout/Loader';
 import { ATRIBUTO_CARGA, EVENTO_CARGA } from './lib/carga';
-import { SIN_RIEL, LIENZO } from './lib/medidas';
+import { SIN_RIEL } from './lib/medidas';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import Cursor from './components/ui/Cursor';
 import SideBar from './components/layout/SideBar';
@@ -23,41 +23,6 @@ function App() {
   // una sola vez— porque acá no hay nada que cortar al recalcularlo: son tres piezas que
   // se montan o no, y girar el teléfono tiene que dejar la página coherente.
   const angosto = useMediaQuery(SIN_RIEL);
-
-  // La escala del lienzo, en una variable que lee el `zoom` de `index.css`.
-  //
-  // Debajo del corte de `SIN_RIEL` vale 1: ahí manda el diseño adaptable, que está hecho
-  // a medida de esos anchos. Escalar el de escritorio en un teléfono sería mostrarlo al
-  // 20%, con el texto en 3px.
-  //
-  // Escucha `resize` en vez de leer `angosto` de arriba: no le alcanza con saber de qué
-  // lado del corte está, necesita el ancho exacto en cada cuadro del arrastre.
-  useEffect(() => {
-    const aplicar = () => {
-      const raiz = document.documentElement;
-      const angosto = window.matchMedia(SIN_RIEL).matches;
-      // `clientWidth` y no `innerWidth`: el segundo **incluye la barra de scroll**, así
-      // que donde la barra ocupa lugar —Windows y Linux con barras clásicas, ~17px— el
-      // lienzo se escalaba para llenar un ancho que no existía y se salía por la derecha
-      // esos píxeles, que el `overflow-x: clip` recortaba. Con barras superpuestas
-      // (macOS, Windows 11 por defecto) los dos valores coinciden y no cambia nada.
-      const escala = angosto ? 1 : raiz.clientWidth / LIENZO;
-      raiz.style.setProperty('--escala', String(escala));
-      // El alto de una pantalla, medido **en unidades del lienzo**: escalado por `zoom`
-      // vuelve a dar la ventana entera. No se usa `100dvh` para esto porque no está claro
-      // que todos los navegadores midan un `dvh` contra el lienzo y no contra la ventana
-      // real, y de eso depende que el hero llene la pantalla o se quede al 70%.
-      //
-      // En angosto la variable se **borra**, y el CSS cae en el `100dvh` de siempre. No es
-      // un detalle: en iOS `dvh` es lo que evita el salto cuando se retrae la barra de
-      // direcciones, y un número fijo en píxeles perdería eso.
-      if (angosto) raiz.style.removeProperty('--alto-lienzo');
-      else raiz.style.setProperty('--alto-lienzo', `${window.innerHeight / escala}px`);
-    };
-    aplicar();
-    window.addEventListener('resize', aplicar);
-    return () => window.removeEventListener('resize', aplicar);
-  }, []);
 
   // Ocultar el loader cuando la página terminó de cargar (con un mínimo y un tope).
   //
