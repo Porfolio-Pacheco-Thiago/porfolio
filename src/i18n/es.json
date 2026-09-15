@@ -32,7 +32,7 @@
             "id": "toyota",
             "label": "Cliente: Toyota",
             "period": "Julio 2026 — Presente",
-            "desc": "Desarrollo del pipeline de telemetría vehicular (500 GB/semana). Me encargo de corregir anomalías métricas de sensores físicos heredados (V1) y escalar la arquitectura de ingesta para soportar el alto volumen del nuevo hardware automotriz (V2).",
+            "desc": "Desarrollo del pipeline de telemetría vehicular (250 GB/semana). Me encargo de corregir anomalías métricas de sensores físicos heredados (V1) y escalar la arquitectura de ingesta para soportar el alto volumen del nuevo hardware automotriz (V2).",
             "tags": [
               "Azure",
               "Databricks",
@@ -47,7 +47,7 @@
             "id": "gp",
             "label": "Cliente: GP (Grupo Petersen)",
             "period": "Enero 2026 — Julio 2026",
-            "desc": "Diseño y optimización de pipelines de datos para procesar más de 250 TB de información financiera minorista. Formé parte del proceso de modernización tecnológica de la infraestructura del cliente, participando en la migración de repositorios de Atlas a GitLab y en la transición del procesamiento de datos de Apache Hue/Hive hacia entornos más eficientes con Apache Spark.",
+            "desc": "Diseño y optimización de pipelines de datos para procesar más de 250 TB de información financiera minorista. Formé parte del proceso de modernización tecnológica de la infraestructura del cliente.",
             "tags": [
               "Pipelines de Datos",
               "Cloud",

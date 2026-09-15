@@ -32,7 +32,7 @@
             "id": "toyota",
             "label": "Client: Toyota",
             "period": "July 2026 — Present",
-            "desc": "Development of the vehicle telemetry pipeline (500 GB/week). I fix metric anomalies from legacy physical sensors (V1) and scale the ingestion architecture to support the high volume of the new automotive hardware (V2).",
+            "desc": "Development of the vehicle telemetry pipeline (250 GB/week). I fix metric anomalies from legacy physical sensors (V1) and scale the ingestion architecture to support the high volume of the new automotive hardware (V2).",
             "tags": [
               "Azure",
               "Databricks",
@@ -47,7 +47,7 @@
             "id": "gp",
             "label": "Client: GP (Grupo Petersen)",
             "period": "January 2026 — July 2026",
-            "desc": "Engineered and optimized data pipelines to process over 250 TB of retail financial data. I took part in the client's technological modernization process, participating in the repository migration from Atlas to GitLab and transitioning data workflows from Apache Hue/Hive to highly efficient Apache Spark environments.",
+            "desc": "Engineered and optimized data pipelines to process over 250 TB of retail financial data. I took part in the client's technological modernization process.",
             "tags": [
               "Data Pipelines",
               "Cloud",
